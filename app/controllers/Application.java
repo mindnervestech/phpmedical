@@ -8,7 +8,9 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -215,11 +217,18 @@ public class Application extends Controller {
 		RegisterVM register = mapper.readValue(json.traverse(),RegisterVM.class);
 		
 		String email = null;
-
+		String type = null;
 		try {
 			Person user = Person.getUserByUserNameAndPassword(register.emailID,
 					register.password);
 			email = user.emailID;
+			if(user.role == 1){
+				type = "Patient";
+			} else if(user.role == 2){
+				type = "Doctor";
+			} else if(user.role == 3){
+				type = "Assistant";
+			}
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -235,8 +244,10 @@ public class Application extends Controller {
 		 * 
 		 * } catch(Exception e) { }
 		 */
-		
-		return ok(email);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("email", email);
+		map.put("type", type);
+		return ok(Json.toJson(map));
 
 		/*
 		 * BASE64Encoder base64 = new BASE64Encoder(); byte[] bytesEncoded =
