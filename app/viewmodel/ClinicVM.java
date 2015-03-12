@@ -8,4 +8,6 @@ public class ClinicVM {
 	public String location;
 	public String email;
 	public String doctorId;
+	public String parameter;
+	public boolean selected;
 }
