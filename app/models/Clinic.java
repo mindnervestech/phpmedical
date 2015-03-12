@@ -22,6 +22,7 @@ public class Clinic extends Model {
 	public String address;
 	public String location;
 	public String email;
+	public Integer doctorId;
 	
 	public static Finder<Integer,Clinic> find = new Finder<>(Integer.class,Clinic.class);
 	public static Clinic getClinicById(Integer id) {
@@ -29,6 +30,9 @@ public class Clinic extends Model {
 	}
 	public static List<Clinic> getClinic(String queryString) {
 		return find.where().like("clinicName", "%" + queryString +"%").findList();
+	}
+	public static List<Clinic> findAllByDoctorId(Integer doctorId2) {
+		return find.where().eq("doctorId", doctorId2).findList();
 	}
 	
 }

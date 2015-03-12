@@ -23,6 +23,8 @@ import models.PatientRegister;
 import models.Person;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 
@@ -487,12 +489,12 @@ public class Application extends Controller {
 	}
 	
 	
-	public static Result addClinic() {
-		Form<ClinicVM> form = DynamicForm.form(ClinicVM.class)
-				.bindFromRequest();
-		ClinicVM clinic = form.get();
+	public static Result addClinic() throws JsonParseException, JsonMappingException, IOException {
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+		ClinicVM clinic = mapper.readValue(json.traverse(),ClinicVM.class);
 		
-		System.out.println("called"+form);
 		Clinic clinics = new Clinic();
 		
 		clinics.clinicName = clinic.clinicName;
@@ -506,8 +508,10 @@ public class Application extends Controller {
 			String decryptedValue = URLDecoder.decode(
 					request().getQueryString("doctorId"), "UTF-8");
 			System.out.println("decryptedValue"+decryptedValue);
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+					.getDoctorByMail(decryptedValue)));
+			clinics.doctorId = doctor.doctorId;
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -871,6 +875,17 @@ public class Application extends Controller {
 		doctor.save();
 		System.out.println("assist doctors close");
 		return ok();
+	}
+	
+	public static Result getDoctorsClinic() throws UnsupportedEncodingException{
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+				.getDoctorByMail(decryptedValue)));
+		List<Clinic> clinics = new ArrayList<>();
+		clinics = Clinic.findAllByDoctorId(doctor.doctorId);
+		return ok(Json.toJson(clinics));
 	}
 	
 }
