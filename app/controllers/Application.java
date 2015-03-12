@@ -23,10 +23,8 @@ import models.PatientRegister;
 import models.Person;
 
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
+import org.codehaus.jackson.node.ArrayNode;
 
 import play.data.DynamicForm;
 import play.data.Form;
@@ -293,25 +291,23 @@ public class Application extends Controller {
 
 	public static Result removePatientsDoctor() throws Exception {
 		System.out.println("patient doctors");
-		String decryptedValue = URLDecoder.decode(request()
-				.getQueryString("id"), "UTF-8");
-		System.out.println(decryptedValue);
-		PatientRegister patient = PatientRegister.getPatientById((Person
-				.getPatientByMail(decryptedValue)));
-		String ids = request().getQueryString("doctors");
-		String[] array = null;
-		if(ids.contains(",")){
-			array = request().getQueryString("doctors").split(",");
-		} else {
-			array = new String[1];
-			array[0] = request().getQueryString("doctors");
+		JsonNode json = request().body().asJson();
+		String email = json.path("patientId").asText();
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+		ArrayNode docs = (ArrayNode) json.path("doctors");
+		for(int i=0;i<docs.size();i++){
+			JsonNode doc = docs.get(i);
+			Integer id = doc.path("id").asInt();
+			Integer type = doc.path("type").asInt();
+			if(type == 1){
+				DoctorRegister doctor = DoctorRegister.getDoctorById(id);
+				patient.doctors.remove(doctor);
+			} else {
+				BucketDoctors doctor = BucketDoctors.getDoctorById(id);
+				doctor.delete();
+			}
 		}
-		for (Integer i = 0; i < array.length; i++) {
-			DoctorRegister doctor = DoctorRegister.getDoctorById(Integer
-					.parseInt(array[i]));
-			patient.doctors.remove(doctor);
-			System.out.println("patient doctors close");
-		}
+		System.out.println("patient doctors close");
 		patient.save();
 		return ok();
 	}
@@ -440,7 +436,7 @@ public class Application extends Controller {
 			Person p = Person.getDoctorsById(doctor.doctorId);
 			patientDoctor.add(new PatientsDoctor(doctor.doctorId.toString(),
 					p.name, doctor.speciality, p.emailID, p.mobileNumber,
-					p.location));
+					p.location, 1));
 		}
 
 		List<BucketDoctors> bucketDoctors = BucketDoctors
@@ -451,7 +447,7 @@ public class Application extends Controller {
 				patientDoctor.add(new PatientsDoctor(
 						doctor.doctorId.toString(), doctor.name,
 						doctor.speciality, doctor.email, doctor.mobileNumber,
-						doctor.location));
+						doctor.location, 2));
 			}
 		}
 
@@ -541,6 +537,8 @@ public class Application extends Controller {
 		List<PatientsDoctor> patientDoctor = new ArrayList<>();
 		List<Person> person = Person
 				.getDoctor(request().getQueryString("name"));
+		/*List<BucketDoctors> bucketDocs = BucketDoctors
+				.getDoctor(request().getQueryString("name"));*/
 		for (Person doctor : person) {
 			System.out.println("2");
 			System.out.println(doctor.doctor);
@@ -551,8 +549,13 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location));
+					doctor.mobileNumber, doctor.location, 1));
 		}
+		/*for(BucketDoctors doc:bucketDocs){
+			patientDoctor.add(new PatientsDoctor(doc.doctorId.toString(),
+					doc.name, doc.speciality, doc.email,
+					doc.mobileNumber, doc.location, 2));
+		}*/
 		return ok(Json.toJson(patientDoctor));
 	}
 
@@ -620,7 +623,7 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location));
+					doctor.mobileNumber, doctor.location, 1));
 		}
 		return ok(Json.toJson(patientDoctor));
 		//return ok();

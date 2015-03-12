@@ -36,5 +36,13 @@ public class BucketDoctors extends Model {
 	public static List<BucketDoctors> getPersonByPatient(Integer patient) {
 		return find.where().eq("patient", patient).findList();
 	}
+	
+	public static List<BucketDoctors> getDoctor(String name){
+		return find.where().like("name", "%" + name +"%").findList();
+	}
+	
+	public static BucketDoctors getDoctorById(Integer id) {
+		return find.byId(id);
+	}
 
 }
