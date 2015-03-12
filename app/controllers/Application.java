@@ -503,18 +503,7 @@ public class Application extends Controller {
 		clinics.address = clinic.address;
 		clinics.location = clinic.location;
 		clinics.email = clinic.email;
-		
-		try {
-			String decryptedValue = URLDecoder.decode(
-					request().getQueryString("doctorId"), "UTF-8");
-			System.out.println("decryptedValue"+decryptedValue);
-			DoctorRegister doctor = DoctorRegister.getDoctorById((Person
-					.getDoctorByMail(decryptedValue)));
-			clinics.doctorId = doctor.doctorId;
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		
+		clinics.doctorId = DoctorRegister.getDoctorById((Person.getDoctorByMail(clinic.doctorId))).doctorId;
 		clinics.save();
 		
 		System.out.println("return");

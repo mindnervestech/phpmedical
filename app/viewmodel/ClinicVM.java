@@ -7,4 +7,5 @@ public class ClinicVM {
 	public String address;
 	public String location;
 	public String email;
+	public String doctorId;
 }
