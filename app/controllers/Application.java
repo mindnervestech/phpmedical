@@ -703,7 +703,7 @@ public class Application extends Controller {
 		//List	<Person> personAssistant =Person.getAssistentByDoctorId(id);
 		//for(Person person: personAssistant){
 		for(AssistentRegister ass:assistantReg){
-			Person person = Person.getAssistantByAssistantRegisterId(ass.assitentId);
+			Person person = Person.getAssistantByAssistantRegisterId(ass);
 			AssistantRegisterVM assistantRegisterVM = new AssistantRegisterVM();
 			//assistantRegisterVM.bloodGroup = person.bloodGroup;
 		//	assistantRegisterVM.dateOfBirth = person.dateOfBirth;
