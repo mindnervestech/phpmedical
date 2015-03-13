@@ -31,7 +31,7 @@ public class DoctorRegister extends Model {
 	public Person person;
 	
 	@JsonIgnore
-	@OneToMany
+	@ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
 	public List<AssistentRegister> assistentRegister;
 	
 	public boolean flag;

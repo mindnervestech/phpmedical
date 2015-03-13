@@ -25,9 +25,10 @@ POST    /saveDoctorClinicScheduleTime   controllers.Application.saveDoctorClinic
 GET     /getAllDoctors                     controllers.Application.getAllDoctors()
 GET     /getClinicScheduleshiftDetails           controllers.Application.getClinicScheduleshiftDetails()
 GET     /getDoctorAssistant                      controllers.Application.getDoctorAssistant()
-GET     /removeDoctorAssistants                 controllers.Application.removeDoctorAssistants()
+GET     /getAllAssistants                      controllers.Application.getAllAssistants()
 POST	/addDoctorsClinic				controllers.Application.addDoctorsClinic()
 POST	/removeDoctorsClinic				controllers.Application.removeDoctorsClinic()
 POST	/removeDoctorAssistance				controllers.Application.removeDoctorAssistance()
+POST	/addDoctorsAssistants				controllers.Application.addDoctorsAssistants()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

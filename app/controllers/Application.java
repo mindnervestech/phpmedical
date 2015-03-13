@@ -700,8 +700,10 @@ public class Application extends Controller {
 		//assistantReg.get(0).assitentId;
 		
 			
-		List	<Person> personAssistant =Person.getAssistentByDoctorId(id);
-		for(Person person: personAssistant){
+		//List	<Person> personAssistant =Person.getAssistentByDoctorId(id);
+		//for(Person person: personAssistant){
+		for(AssistentRegister ass:assistantReg){
+			Person person = Person.getAssistantByAssistantRegisterId(ass.assitentId);
 			AssistantRegisterVM assistantRegisterVM = new AssistantRegisterVM();
 			//assistantRegisterVM.bloodGroup = person.bloodGroup;
 		//	assistantRegisterVM.dateOfBirth = person.dateOfBirth;
@@ -718,30 +720,6 @@ public class Application extends Controller {
 		
 		return ok(Json.toJson(assistantRegisterVMDetais));
 	}  
-	
-	public static Result  removeDoctorAssistants(){
-		
-		String doctorEmailId = "";
-		 String id = "0";
-		 try {
-				 doctorEmailId = URLDecoder.decode(
-						request().getQueryString("doctorEmailId"), "UTF-8");
-				 id  = URLDecoder.decode(
-							request().getQueryString("assistantId"), "UTF-8");
-		 
-		 	} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		Person p =Person.getDoctorIdByEmail(doctorEmailId);
-		int doctorId =  p.doctor;
-		List<Person> person = Person.getAssistentByDoctorId(doctorId);
-		for(Person per:person){
-			
-			
-		}
-		return ok();
-	}
 	
 	public static Result getClinicDetails() {
 		List<Clinic> clinic = Clinic.getClinic(request().getQueryString(
@@ -857,14 +835,27 @@ public class Application extends Controller {
 			AssistentRegister assist = AssistentRegister.getAssistantById(Integer
 					.parseInt(array[i]));
 			doctor.assistentRegister.remove(assist);
-			Person p = Person.getAssistantByAssistantRegisterId(Integer.parseInt(array[i]));
-			p.delete();
-			assist.delete();
 		}
 		doctor.save();
 		System.out.println("assist doctors close");
 		return ok();
 	}
+	
+	public static Result getAllAssistants(){
+		List<AssistantRegisterVM> assistants = new ArrayList<>();
+		List<Person> asses = Person
+				.getAllAssistantById();
+		for (Person ass : asses) {
+			AssistantRegisterVM vm = new AssistantRegisterVM();
+			vm.id = ass.assistent.assitentId;
+			vm.emailID = ass.emailID;
+			vm.name = ass.name;
+			vm.location = ass.location;
+			assistants.add(vm);
+		}
+		return ok(Json.toJson(assistants));
+	}
+	
 	
 	public static Result getDoctorsClinic() throws UnsupportedEncodingException{
 		String decryptedValue = URLDecoder.decode(request()
@@ -875,6 +866,31 @@ public class Application extends Controller {
 		List<Clinic> clinics = new ArrayList<>();
 		clinics = Clinic.findAllByDoctorId(doctor.doctorId);
 		return ok(Json.toJson(clinics));
+	}
+	
+	public static Result addDoctorsAssistants() throws UnsupportedEncodingException{
+		System.out.println("assist doctors");
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+				.getDoctorByMail(decryptedValue)));
+		String ids = request().getQueryString("assistants");
+		String[] array = null;
+		if(ids.contains(",")){
+			array = request().getQueryString("assistants").split(",");
+		} else {
+			array = new String[1];
+			array[0] = request().getQueryString("assistants");
+		}
+		for (Integer i = 0; i < array.length; i++) {
+			AssistentRegister ass = AssistentRegister.getAssistantById(Integer
+					.parseInt(array[i]));
+			doctor.assistentRegister.add(ass);
+			System.out.println("assist doctors close");
+		}
+		doctor.save();
+		return ok();
 	}
 	
 }
