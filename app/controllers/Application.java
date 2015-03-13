@@ -681,7 +681,7 @@ public class Application extends Controller {
 		 int id = 0;
 		 try {
 				 doctorEmailId = URLDecoder.decode(
-						request().getQueryString("doctorEmailId"), "UTF-8");
+						request().getQueryString("id"), "UTF-8");
 		 
 		 	} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
