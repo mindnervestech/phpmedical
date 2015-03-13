@@ -8,13 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
 @Entity
 public class Person extends Model {
 	@Id
@@ -146,7 +143,7 @@ public class Person extends Model {
 		return find.where().eq("emailID", docEmail).findUnique();
 	}
 	
-	public static Person getAssistantByAssistantRegisterId(int id) {
+	public static Person getAssistantByAssistantRegisterId(AssistentRegister id) {
 		return find.where().eq("assistent", id).eq("role", 3).findUnique();
 	}
 	
