@@ -90,6 +90,11 @@ public class Person extends Model {
 	public static List<Person> getDoctor(String name){
 		return find.where().like("name", "%" + name +"%").eq("role", 2).findList();
 	}
+	
+	public static List<Person> getAssistant(String name){
+		return find.where().like("name", "%" + name +"%").eq("role", 3).findList();
+	}
+	
 	public static Person getPersonById(Integer id) {
 		return find.byId(id);
 	}

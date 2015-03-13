@@ -893,4 +893,58 @@ public class Application extends Controller {
 		return ok();
 	}
 	
+	public static Result getAssistantDetails() {
+		List<AssistantRegisterVM> assistants = new ArrayList<>();
+		List<Person> asses = Person
+				.getAssistant(request().getQueryString("name"));
+		for (Person ass : asses) {
+			AssistantRegisterVM vm = new AssistantRegisterVM();
+			vm.id = ass.assistent.assitentId;
+			vm.emailID = ass.emailID;
+			vm.name = ass.name;
+			vm.location = ass.location;
+			assistants.add(vm);
+		}
+		return ok(Json.toJson(assistants));
+	}
+	
+	public static Result addAssistant() throws IOException{
+		System.out.println("called...............");
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+		RegisterVM register = mapper.readValue(json.traverse(),RegisterVM.class);
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+		Person registration = new Person();
+		AssistentRegister assistent = new AssistentRegister();
+		assistent.save();
+		registration.role = 3;
+		registration.name = register.name;
+		registration.emailID = register.emailID;
+		registration.gender = register.gender;
+		registration.mobileNumber = register.mobileNumber;
+		try {
+			registration.dateOfBirth = format.parse(register.dateOfBirth);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		registration.location = register.location;
+		registration.bloodGroup = register.bloodGroup;
+
+		registration.assistent = assistent;
+		registration.save();
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("doctorId"), "UTF-8");
+		System.out.println(decryptedValue);
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+				.getDoctorByMail(decryptedValue)));
+		doctor.assistentRegister.add(assistent);
+		doctor.save();
+		System.out.println("Return");
+		return ok();
+	}
+
+	
 }

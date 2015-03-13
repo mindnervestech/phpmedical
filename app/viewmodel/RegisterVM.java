@@ -38,4 +38,5 @@ public class RegisterVM {
 	public String clinics;
 	public String speciality;
 	public int doctorId;
+	public boolean selected;
 }
