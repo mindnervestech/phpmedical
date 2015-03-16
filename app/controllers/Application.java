@@ -19,6 +19,7 @@ import models.BucketDoctors;
 import models.Clinic;
 import models.DoctorClinicSchedule;
 import models.DoctorRegister;
+import models.PatientDependency;
 import models.PatientRegister;
 import models.Person;
 
@@ -521,7 +522,7 @@ public class Application extends Controller {
 			System.out.println(patient.mobileNumber);
 			System.out.println(patient.location);
 			patientDoctor.add(new PatientSearch(patient.patient.toString(),
-					patient.name, patient.mobileNumber, patient.location));
+					patient.name, patient.mobileNumber, patient.location, patient.emailID));
 		}
 		return ok(Json.toJson(patientDoctor));
 	}
@@ -945,6 +946,69 @@ public class Application extends Controller {
 		System.out.println("Return");
 		return ok();
 	}
-
 	
+	public static Result addPatientDependent() throws UnsupportedEncodingException{
+		System.out.println("patient dependent");
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person
+				.getPatientByMail(decryptedValue)));
+		String ids = request().getQueryString("dependents");
+		String[] array = null;
+		if(ids.contains(",")){
+			array = request().getQueryString("dependents").split(",");
+		} else {
+			array = new String[1];
+			array[0] = request().getQueryString("dependents");
+		}
+		for (Integer i = 0; i < array.length; i++) {
+			PatientRegister p = PatientRegister.getPatientById(Integer
+					.parseInt(array[i]));
+			PatientDependency pd = new PatientDependency();
+			pd.patient = patient.patientId;
+			pd.dependent = p.patientId;
+			pd.save();
+			System.out.println("patient dependent");
+		}
+		return ok();
+	}
+
+	public static Result getAllPatientDependents() throws UnsupportedEncodingException{
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+		List<PatientSearch> dependents = new ArrayList<>();
+		List<PatientDependency> deps = PatientDependency.getAllByPatient(patient.patientId);
+		for(PatientDependency pd:deps){
+			Person p = Person.getPatientsById(pd.dependent);
+			dependents.add(new PatientSearch(p.patient.toString(),
+					p.name, p.mobileNumber, p.location, p.emailID));
+		}
+		return ok(Json.toJson(dependents));
+	}
+	
+	public static Result removePatientDependent() throws UnsupportedEncodingException{	
+		System.out.println("patient dependent");
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+		String ids = request().getQueryString("dependents");
+		String[] array = null;
+		if(ids.contains(",")){
+			array = request().getQueryString("dependents").split(",");
+		} else {
+			array = new String[1];
+			array[0] = request().getQueryString("dependents");
+		}
+		for(int i=0;i<array.length;i++){
+			PatientDependency pd = PatientDependency.findByPatientDependent(patient.patientId,Integer.parseInt(array[i]));
+			pd.delete();
+		}
+		System.out.println("patient dependent close");
+		return ok();
+	}
 }
+	
