@@ -15,6 +15,8 @@ public class PatientDependency extends Model {
 	
 	public Integer patient;
 	public Integer dependent;
+	public String status;
+	public String accessLevel;
 	
 	public static Finder<Integer,PatientDependency> find = new Finder<>(Integer.class,PatientDependency.class);
 
@@ -24,6 +26,14 @@ public class PatientDependency extends Model {
 
 	public static List<PatientDependency> getAllByPatient(Integer patientId) {
 		return find.where().eq("patient", patientId).findList();
+	}
+
+	public static List<PatientDependency> getAllByDependent(Integer patientId) {
+		return find.where().eq("dependent", patientId).findList();
+	}
+
+	public static PatientDependency getByPatientDependent(Integer patientId, Integer dep) {
+		return find.where().eq("patient", patientId).eq("dependent", dep).findUnique();
 	}
 	
 }

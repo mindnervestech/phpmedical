@@ -949,28 +949,23 @@ public class Application extends Controller {
 	
 	public static Result addPatientDependent() throws UnsupportedEncodingException{
 		System.out.println("patient dependent");
-		String decryptedValue = URLDecoder.decode(request()
-				.getQueryString("id"), "UTF-8");
-		System.out.println(decryptedValue);
-		PatientRegister patient = PatientRegister.getPatientById((Person
-				.getPatientByMail(decryptedValue)));
-		String ids = request().getQueryString("dependents");
-		String[] array = null;
-		if(ids.contains(",")){
-			array = request().getQueryString("dependents").split(",");
-		} else {
-			array = new String[1];
-			array[0] = request().getQueryString("dependents");
-		}
-		for (Integer i = 0; i < array.length; i++) {
-			PatientRegister p = PatientRegister.getPatientById(Integer
-					.parseInt(array[i]));
+		JsonNode json = request().body().asJson();
+		String email = json.path("patientId").asText();
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+		ArrayNode docs = (ArrayNode) json.path("dependents");
+		for(int i=0;i<docs.size();i++){
+			JsonNode dep = docs.get(i);
+			Integer id = dep.path("id").asInt();
+			String accessLevel = dep.path("accessLevel").asText();
+			PatientRegister p = PatientRegister.getPatientById(id);
 			PatientDependency pd = new PatientDependency();
 			pd.patient = patient.patientId;
 			pd.dependent = p.patientId;
+			pd.status = "WC";
+			pd.accessLevel = accessLevel;
 			pd.save();
-			System.out.println("patient dependent");
 		}
+		System.out.println("patient dependent");
 		return ok();
 	}
 
@@ -984,7 +979,7 @@ public class Application extends Controller {
 		for(PatientDependency pd:deps){
 			Person p = Person.getPatientsById(pd.dependent);
 			dependents.add(new PatientSearch(p.patient.toString(),
-					p.name, p.mobileNumber, p.location, p.emailID));
+					p.name, p.mobileNumber, p.location, p.emailID, pd.status, pd.accessLevel));
 		}
 		return ok(Json.toJson(dependents));
 	}
@@ -1008,6 +1003,42 @@ public class Application extends Controller {
 			pd.delete();
 		}
 		System.out.println("patient dependent close");
+		return ok();
+	}
+	
+	public static Result getAllParents() throws UnsupportedEncodingException{
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+		List<PatientSearch> dependents = new ArrayList<>();
+		List<PatientDependency> deps = PatientDependency.getAllByDependent(patient.patientId);
+		for(PatientDependency pd:deps){
+			Person p = Person.getPatientsById(pd.patient);
+			dependents.add(new PatientSearch(p.patient.toString(),
+					p.name, p.mobileNumber, p.location, p.emailID, pd.status, pd.accessLevel));
+		}
+		return ok(Json.toJson(dependents));
+	}
+	
+	public static Result confirmOrDenyParent(){
+		System.out.println("patient dependent");
+		JsonNode json = request().body().asJson();
+		String email = json.path("patientId").asText();
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+		ArrayNode docs = (ArrayNode) json.path("parents");
+		for(int i=0;i<docs.size();i++){
+			JsonNode par = docs.get(i);
+			Integer id = par.path("id").asInt();
+			String status = par.path("status").asText();
+			String accessLevel = par.path("accessLevel").asText();
+			PatientRegister p = PatientRegister.getPatientById(id);
+			PatientDependency pd = PatientDependency.getByPatientDependent(patient.patientId, id);
+			pd.status = status;
+			pd.accessLevel = accessLevel;
+			pd.update();
+		}
+		System.out.println("patient dependent");
 		return ok();
 	}
 }
