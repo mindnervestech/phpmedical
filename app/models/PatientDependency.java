@@ -32,8 +32,8 @@ public class PatientDependency extends Model {
 		return find.where().eq("dependent", patientId).findList();
 	}
 
-	public static PatientDependency getByPatientDependent(Integer patientId, Integer dep) {
-		return find.where().eq("patient", patientId).eq("dependent", dep).findUnique();
+	public static PatientDependency getByPatientDependent(Integer dep, Integer parent) {
+		return find.where().eq("patient", parent).eq("dependent", dep).findUnique();
 	}
 	
 }

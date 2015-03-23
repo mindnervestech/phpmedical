@@ -1032,7 +1032,6 @@ public class Application extends Controller {
 			Integer id = par.path("id").asInt();
 			String status = par.path("status").asText();
 			String accessLevel = par.path("accessLevel").asText();
-			PatientRegister p = PatientRegister.getPatientById(id);
 			PatientDependency pd = PatientDependency.getByPatientDependent(patient.patientId, id);
 			pd.status = status;
 			pd.accessLevel = accessLevel;
