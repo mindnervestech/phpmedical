@@ -17,6 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 import models.AssistentRegister;
 import models.BucketDoctors;
 import models.Clinic;
+import models.Delegates;
 import models.DoctorClinicSchedule;
 import models.DoctorRegister;
 import models.PatientDependency;
@@ -38,6 +39,7 @@ import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
 import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
+import viewmodel.PersonVM;
 import viewmodel.RegisterDoctor;
 import viewmodel.RegisterVM;
 
@@ -1038,6 +1040,200 @@ public class Application extends Controller {
 			pd.update();
 		}
 		System.out.println("patient dependent");
+		return ok();
+	}
+	
+	public static Result getAllDoctorsAndAssistants(){
+		List<Person> docs = Person.getAllDoctorById();
+		List<Person> asses = Person.getAllAssistantById();
+		List<PersonVM> all = new ArrayList<>();
+		for(Person p:docs){
+			all.add(new PersonVM(p.doctor.toString(), p.name, p.mobileNumber, p.location, p.emailID, "D"));
+		}
+		for(Person p:asses){
+			all.add(new PersonVM(p.assistent.assitentId.toString(), p.name, p.mobileNumber, p.location, p.emailID, "A"));
+		}
+		return ok(Json.toJson(all));
+	}
+	
+	public static Result addDeleagatesForParent() throws UnsupportedEncodingException{
+		JsonNode json = request().body().asJson();
+		String email = json.path("id").asText();
+		String type = json.path("type").asText();
+		ArrayNode dels = (ArrayNode) json.path("delegates");
+		if(type.equalsIgnoreCase("D")){
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(email)));
+			for(int i=0;i<dels.size();i++){
+				JsonNode del = dels.get(i);
+				Integer id = del.path("id").asInt();
+				String delType = del.path("type").asText();
+				String accessLevel = del.path("accessLevel").asText();
+				Delegates d = new Delegates();
+				d.parent = doctor.doctorId;
+				if(delType.equalsIgnoreCase("D")){
+					DoctorRegister doc = DoctorRegister.getDoctorById(id);
+					d.delegate = doc.doctorId;
+					d.delType = "D";
+				} else {
+					AssistentRegister ass = AssistentRegister.getAssistantById(id);
+					d.delegate = ass.assitentId;
+					d.delType = "A";
+				}
+				d.parentType = "D";
+				d.status = "WC";
+				d.accessLevel = accessLevel;
+				d.save();
+			}
+		}
+		if(type.equalsIgnoreCase("P")){
+			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+			for(int i=0;i<dels.size();i++){
+				JsonNode del = dels.get(i);
+				Integer id = del.path("id").asInt();
+				String accessLevel = del.path("accessLevel").asText();
+				PatientRegister p = PatientRegister.getPatientById(id);
+				Delegates d = new Delegates();
+				d.parent = patient.patientId;
+				d.delegate = p.patientId;
+				d.status = "WC";
+				d.parentType = "P";
+				d.delType = "P";
+				d.accessLevel = accessLevel;
+				d.save();
+			}
+		}
+		return ok();
+	}
+
+	public static Result getAllDelegatesForParent() throws UnsupportedEncodingException{
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		String type = request().getQueryString("type");
+		List<PersonVM> delegates = new ArrayList<>();
+		List<Delegates> dels = new ArrayList<>();
+		if(type.equalsIgnoreCase("D")){
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(decryptedValue)));
+			dels = Delegates.getAllByParentDoctor(doctor.doctorId);
+		} else {
+			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+			dels = Delegates.getAllByParentPatient(patient.patientId);
+		}
+		for(Delegates del:dels){
+			if(del.delType.equalsIgnoreCase("D")){
+				Person p = Person.getDoctorsById(del.delegate);
+				delegates.add(new PersonVM(p.doctor.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.delType));
+			} else if(del.delType.equalsIgnoreCase("A")){
+				Person p = Person.getAssistantByAssistantRegisterId(AssistentRegister.getAssistantById(del.delegate));
+				delegates.add(new PersonVM(del.delegate.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.delType));
+			} else {
+				Person p = Person.getPatientsById(del.delegate);
+				delegates.add(new PersonVM(p.patient.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.delType));
+			}
+		}
+		return ok(Json.toJson(delegates));
+	}
+	
+	
+	//remaining
+	public static Result removeDelegatesForParent() throws UnsupportedEncodingException{	
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+		String ids = request().getQueryString("dependents");
+		String[] array = null;
+		if(ids.contains(",")){
+			array = request().getQueryString("dependents").split(",");
+		} else {
+			array = new String[1];
+			array[0] = request().getQueryString("dependents");
+		}
+		for(int i=0;i<array.length;i++){
+			PatientDependency pd = PatientDependency.findByPatientDependent(patient.patientId,Integer.parseInt(array[i]));
+			pd.delete();
+		}
+		return ok();
+	}
+	
+	public static Result getAllParentsForDelegates() throws UnsupportedEncodingException{
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		String type = request().getQueryString("type");
+		List<PersonVM> parents = new ArrayList<>();
+		List<Delegates> dels = new ArrayList<>();
+		if(type.equalsIgnoreCase("D")){
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(decryptedValue)));
+			dels = Delegates.getAllByDelDoctor(doctor.doctorId);
+		} else if(type.equalsIgnoreCase("A")){
+			AssistentRegister ass = AssistentRegister.getAssistantById((Person.getAssistentByMail(decryptedValue)));
+			dels = Delegates.getAllByDelAssistent(ass.assitentId);
+		} else {
+			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
+			dels = Delegates.getAllByDelPatient(patient.patientId);
+		}
+		for(Delegates del:dels){
+			if(del.parentType.equalsIgnoreCase("D")){
+				Person p = Person.getDoctorsById(del.parent);
+				parents.add(new PersonVM(p.doctor.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.parentType));
+			} else if(del.parentType.equalsIgnoreCase("A")){
+				Person p = Person.getAssistantByAssistantRegisterId(AssistentRegister.getAssistantById(del.parent));
+				parents.add(new PersonVM(del.delegate.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.parentType));
+			} else {
+				Person p = Person.getPatientsById(del.parent);
+				parents.add(new PersonVM(p.patient.toString(),p.name, p.mobileNumber, p.location, p.emailID, del.status, del.accessLevel, del.parentType));
+			}
+		}
+		return ok(Json.toJson(parents));
+	}
+	
+	
+	public static Result confirmOrDenyParentForDelegates(){
+		JsonNode json = request().body().asJson();
+		String email = json.path("id").asText();
+		String type = json.path("type").asText();
+		ArrayNode docs = (ArrayNode) json.path("parents");
+		if(type.equalsIgnoreCase("D")){
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(email)));
+			for(int i=0;i<docs.size();i++){
+				JsonNode par = docs.get(i);
+				Integer id = par.path("id").asInt();
+				String status = par.path("status").asText();
+				String accessLevel = par.path("accessLevel").asText();
+				String parType = par.path("type").asText();
+				Delegates d = Delegates.getByParentDelegate(doctor.doctorId,parType,id,type);
+				d.status = status;
+				d.accessLevel = accessLevel;
+				d.update();
+			}
+		} else if(type.equalsIgnoreCase("A")){
+			AssistentRegister ass = AssistentRegister.getAssistantById((Person.getAssistentByMail(email)));
+			for(int i=0;i<docs.size();i++){
+				JsonNode par = docs.get(i);
+				Integer id = par.path("id").asInt();
+				String status = par.path("status").asText();
+				String accessLevel = par.path("accessLevel").asText();
+				String parType = par.path("type").asText();
+				Delegates d = Delegates.getByParentDelegate(ass.assitentId,parType,id,type);
+				d.status = status;
+				d.accessLevel = accessLevel;
+				d.update();
+			}
+		} else {
+			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+			for(int i=0;i<docs.size();i++){
+				JsonNode par = docs.get(i);
+				Integer id = par.path("id").asInt();
+				String status = par.path("status").asText();
+				String accessLevel = par.path("accessLevel").asText();
+				String parType = par.path("type").asText();
+				Delegates d = Delegates.getByParentDelegate(patient.patientId,parType,id,type);
+				d.status = status;
+				d.accessLevel = accessLevel;
+				d.update();
+			}
+		}
 		return ok();
 	}
 }

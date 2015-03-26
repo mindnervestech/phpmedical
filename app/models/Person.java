@@ -147,6 +147,8 @@ public class Person extends Model {
 		return find.where().eq("assistent", id).eq("role", 3).findUnique();
 	}
 	
-	
+	public static Integer getAssistentByMail(String emailID) {
+		return find.where().eq("emailID", emailID).eq("role", "3").findUnique().assistent.assitentId;
+	}
 	
 }
