@@ -42,5 +42,6 @@ POST	/addDeleagatesForParent			controllers.Application.addDeleagatesForParent()
 GET		/getAllDelegatesForParent       controllers.Application.getAllDelegatesForParent()
 GET		/getAllParentsForDelegates		controllers.Application.getAllParentsForDelegates()
 POST	/confirmOrDenyParentForDelegates		controllers.Application.confirmOrDenyParentForDelegates()
+POST	/removeDelegatesForParent				controllers.Application.removeDelegatesForParent()	
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

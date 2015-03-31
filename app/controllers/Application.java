@@ -1137,21 +1137,29 @@ public class Application extends Controller {
 	
 	//remaining
 	public static Result removeDelegatesForParent() throws UnsupportedEncodingException{	
-		String decryptedValue = URLDecoder.decode(request()
-				.getQueryString("id"), "UTF-8");
-		System.out.println(decryptedValue);
-		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
-		String ids = request().getQueryString("dependents");
-		String[] array = null;
-		if(ids.contains(",")){
-			array = request().getQueryString("dependents").split(",");
-		} else {
-			array = new String[1];
-			array[0] = request().getQueryString("dependents");
+		JsonNode json = request().body().asJson();
+		String email = json.path("id").asText();
+		String type = json.path("type").asText();
+		ArrayNode dels = (ArrayNode) json.path("delegates");
+		if(type.equalsIgnoreCase("D")){
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(email)));
+			for(int i=0;i<dels.size();i++){
+				JsonNode del = dels.get(i);
+				Integer id = del.path("id").asInt();
+				String delType = del.path("type").asText();
+				Delegates d = Delegates.getByParentDelegate(doctor.doctorId,type,id,delType);
+				d.delete();
+			}
 		}
-		for(int i=0;i<array.length;i++){
-			PatientDependency pd = PatientDependency.findByPatientDependent(patient.patientId,Integer.parseInt(array[i]));
-			pd.delete();
+		if(type.equalsIgnoreCase("P")){
+			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+			for(int i=0;i<dels.size();i++){
+				JsonNode del = dels.get(i);
+				Integer id = del.path("id").asInt();
+				String delType = del.path("type").asText();
+				Delegates d = Delegates.getByParentDelegate(patient.patientId,type,id,delType);
+				d.delete();
+			}
 		}
 		return ok();
 	}
@@ -1202,7 +1210,7 @@ public class Application extends Controller {
 				String status = par.path("status").asText();
 				String accessLevel = par.path("accessLevel").asText();
 				String parType = par.path("type").asText();
-				Delegates d = Delegates.getByParentDelegate(doctor.doctorId,parType,id,type);
+				Delegates d = Delegates.getByParentDelegate(id,parType,doctor.doctorId,type);
 				d.status = status;
 				d.accessLevel = accessLevel;
 				d.update();
@@ -1215,7 +1223,7 @@ public class Application extends Controller {
 				String status = par.path("status").asText();
 				String accessLevel = par.path("accessLevel").asText();
 				String parType = par.path("type").asText();
-				Delegates d = Delegates.getByParentDelegate(ass.assitentId,parType,id,type);
+				Delegates d = Delegates.getByParentDelegate(id,parType,ass.assitentId,type);
 				d.status = status;
 				d.accessLevel = accessLevel;
 				d.update();
@@ -1228,7 +1236,7 @@ public class Application extends Controller {
 				String status = par.path("status").asText();
 				String accessLevel = par.path("accessLevel").asText();
 				String parType = par.path("type").asText();
-				Delegates d = Delegates.getByParentDelegate(patient.patientId,parType,id,type);
+				Delegates d = Delegates.getByParentDelegate(id,parType,patient.patientId,type);
 				d.status = status;
 				d.accessLevel = accessLevel;
 				d.update();
