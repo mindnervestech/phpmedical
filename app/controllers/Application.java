@@ -355,10 +355,10 @@ public class Application extends Controller {
 			Integer type = doc.path("type").asInt();
 			if(type == 1){
 				PatientRegister patients = PatientRegister.getPatientById(id);
-				doctor.patient.remove(doctor);
+				doctor.patient.remove(patients);
 			} else {
 				BucketPatients patient = BucketPatients.getPatientById(id);
-				doctor.delete();
+				patient.delete();
 			}
 		}
 		System.out.println("patient doctors close");
