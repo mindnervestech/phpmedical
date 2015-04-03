@@ -345,26 +345,23 @@ public class Application extends Controller {
 	}
 
 	public static Result removeDoctorsPatient() throws Exception {
-		System.out.println("patient doctors");
-		String decryptedValue = URLDecoder.decode(request()
-				.getQueryString("id"), "UTF-8");
-		System.out.println(decryptedValue);
-		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
-				.getDoctorByMail(decryptedValue)));
-		String ids = request().getQueryString("patients");
-		String[] array = null;
-		if(ids.contains(",")){
-			array = request().getQueryString("patients").split(",");
-		} else {
-			array = new String[1];
-			array[0] = request().getQueryString("patients");
+		JsonNode json = request().body().asJson();
+		String email = json.path("doctorId").asText();
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(email)));
+		ArrayNode docs = (ArrayNode) json.path("patients");
+		for(int i=0;i<docs.size();i++){
+			JsonNode doc = docs.get(i);
+			Integer id = doc.path("id").asInt();
+			Integer type = doc.path("type").asInt();
+			if(type == 1){
+				PatientRegister patients = PatientRegister.getPatientById(id);
+				doctor.patient.remove(doctor);
+			} else {
+				BucketPatients patient = BucketPatients.getPatientById(id);
+				doctor.delete();
+			}
 		}
-		for (Integer i = 0; i < array.length; i++) {
-			PatientRegister patient = PatientRegister.getPatientById(Integer
-					.parseInt(array[i]));
-			doctor.patient.remove(patient);
-			System.out.println("patient doctors close");
-		}
+		System.out.println("patient doctors close");
 		doctor.save();
 		return ok();
 	}
@@ -511,15 +508,27 @@ public class Application extends Controller {
 			System.out.println("3");
 			Person p = Person.getPatientsById(patient.patientId);
 			doctorsPatient.add(new DoctorsPatient(patient.patientId.toString(),
-					p.name, p.emailID, p.mobileNumber, p.location));
+					p.name, p.emailID, p.mobileNumber, p.location,1));
+		}
+		System.out.println("before::::::"+doctorsPatient.size());
+		List<BucketPatients> bucketPatients= BucketPatients.getPersonByDoctor(doctor.doctorId);
+		if (!bucketPatients.isEmpty()) {
+			for (BucketPatients patient : bucketPatients) {
+				System.out.println("2");
+				doctorsPatient.add(new DoctorsPatient(
+					    patient.patientId.toString(), patient.name,
+					    patient.email, patient.mobileNumber,
+						patient.location, 2));
+			}
 		}
 
+		System.out.println("Size:::::"+doctorsPatient.size());
 		return ok(Json.toJson(doctorsPatient));
 
 	}
 
 	
-	public static class ClinicDetailsVM{
+    public static class ClinicDetailsVM{
 		
 		public ClinicVM  clinicDetails;
 		
