@@ -16,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import models.AssistentRegister;
 import models.BucketDoctors;
+import models.BucketPatients;
 import models.Clinic;
 import models.Delegates;
 import models.DoctorClinicSchedule;
@@ -41,6 +42,7 @@ import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
 import viewmodel.PersonVM;
 import viewmodel.RegisterDoctor;
+import viewmodel.RegisterPatient;
 import viewmodel.RegisterVM;
 
 public class Application extends Controller {
@@ -364,6 +366,38 @@ public class Application extends Controller {
 			System.out.println("patient doctors close");
 		}
 		doctor.save();
+		return ok();
+	}
+	
+	public static Result addPatient() throws IOException
+	{
+		System.out.println("start");
+		JsonNode json = request().body().asJson();
+		System.out.println("Json"+json);
+		ObjectMapper mapper = new ObjectMapper();
+		RegisterPatient register = mapper.readValue(json.traverse(), RegisterPatient.class);
+		BucketPatients patients = new BucketPatients();
+		patients.name = register.name;
+		patients.email = register.email;
+		patients.mobileNumber = register.mobileNumber;
+		patients.location = register.location;
+		System.out.println("1");
+		
+		try
+		{
+			String decryptedValue = URLDecoder.decode(
+					request().getQueryString("id"), "UTF-8");
+			System.out.println("2");
+			patients.doctor = DoctorRegister.getDoctorById((Person
+					.getDoctorByMail(decryptedValue))).doctorId;
+			System.out.println("3");
+		}
+		catch(Exception e)
+		{
+			System.out.println("4");
+			return null;
+		}
+		patients.save();
 		return ok();
 	}
 
