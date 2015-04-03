@@ -378,7 +378,7 @@ public class Application extends Controller {
 		RegisterPatient register = mapper.readValue(json.traverse(), RegisterPatient.class);
 		BucketPatients patients = new BucketPatients();
 		patients.name = register.name;
-		patients.email = register.email;
+		patients.email = register.emailID;
 		patients.mobileNumber = register.mobileNumber;
 		patients.location = register.location;
 		System.out.println("1");
