@@ -24,6 +24,9 @@ import models.DoctorRegister;
 import models.PatientDependency;
 import models.PatientRegister;
 import models.Person;
+import models.TemplateAttribute;
+import models.TemplateClass;
+import models.TemplateField;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
@@ -38,12 +41,17 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
+import viewmodel.FieldEditVm;
+import viewmodel.FieldVm;
 import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
 import viewmodel.PersonVM;
 import viewmodel.RegisterDoctor;
 import viewmodel.RegisterPatient;
 import viewmodel.RegisterVM;
+import viewmodel.ShowFieldVm;
+import viewmodel.ShowTemplatesVm;
+import viewmodel.TemplateVm;
 
 public class Application extends Controller {
 
@@ -346,6 +354,7 @@ public class Application extends Controller {
 
 	public static Result removeDoctorsPatient() throws Exception {
 		JsonNode json = request().body().asJson();
+		System.out.println("Json::::"+json.toString());
 		String email = json.path("doctorId").asText();
 		DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(email)));
 		ArrayNode docs = (ArrayNode) json.path("patients");
@@ -555,6 +564,124 @@ public class Application extends Controller {
 		System.out.println("return");
 		return ok(Json.toJson(clinics.idClinic));
 		
+	}
+	
+	public static Result addTemplate() throws JsonParseException,JsonMappingException,IOException
+	{
+		JsonNode json = request().body().asJson();
+		System.out.println("Called");
+		System.out.println("json "+json);
+		ObjectMapper mapper = new ObjectMapper();
+		TemplateVm templateVm = mapper.readValue(json.traverse(), TemplateVm.class);
+		
+		TemplateClass template = new TemplateClass();
+		template.templateName = templateVm.templateName;
+		template.procedureName = templateVm.procedureName;
+		template.doctorId = DoctorRegister.getDoctorById(Person.getDoctorByMail(templateVm.doctorId)).doctorId;
+		template.save();
+		
+		System.out.println("return");
+		return ok(Json.toJson(template.templateId));
+	}
+	
+	public static Result addField() throws JsonParseException,JsonMappingException,IOException
+	{
+		JsonNode json = request().body().asJson();
+		System.out.println("Callled");
+		System.out.println("json "+json);
+		ObjectMapper mapper = new ObjectMapper();
+		FieldVm fieldVm = mapper.readValue(json.traverse(), FieldVm.class);
+		
+		TemplateAttribute field = new TemplateAttribute();
+		field.fieldName = fieldVm.fieldName;
+		field.fieldType = fieldVm.fieldType;
+		field.templateClass = TemplateClass.findTemplateById(Integer.parseInt(fieldVm.templateId));
+		field.save();
+		System.out.println("return");
+		return ok(Json.toJson(field.fieldId));
+	}
+	
+	public static Result updateField() throws JsonParseException,JsonMappingException,IOException
+	{
+		JsonNode json = request().body().asJson();
+		System.out.println("Called.....");
+		System.out.println("json::"+json);
+		String id = json.path("fieldId").asText();
+		ArrayNode docs = (ArrayNode)json.path("fields");
+		
+		for(int i=0;i<docs.size();i++)
+		{
+			JsonNode par = docs.get(i);
+			String fieldName = par.path("name").asText();
+			String fieldType = par.path("type").asText();
+			TemplateAttribute attribute = TemplateAttribute.getAttribute(Integer.parseInt(id));
+			attribute.fieldName = fieldName;
+			attribute.fieldType = fieldType;
+			attribute.save();
+		}
+		System.out.println("Attribute Update");
+		return ok();
+	}
+	
+	public static Result removeFields() throws UnsupportedEncodingException
+	{
+		System.out.println("In RemoveFields.......");
+		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		TemplateClass tempateClass = TemplateClass.findTemplateById(Integer.parseInt(decryptedValue));
+		String ids = request().getQueryString("fields");
+		String[] array = null;
+		if(ids.contains(",")){
+			array = request().getQueryString("fields").split(",");
+		} else {
+			array = new String[1];
+			array[0] = request().getQueryString("fields");
+		}
+		
+		for(int i=0;i<array.length;i++)
+		{
+			TemplateAttribute attribute = TemplateAttribute.getAttribute(Integer.parseInt(array[i]));
+			attribute.delete();
+		}
+		System.out.println("Fields are removed.......");
+		return ok();
+	}
+	
+	public static Result getAllTemplates() throws UnsupportedEncodingException
+	{
+		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		System.out.println("Email "+decryptedValue);
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(decryptedValue)));
+		List<ShowTemplatesVm> templates = new ArrayList<ShowTemplatesVm>();
+		List<TemplateClass> temps = TemplateClass.getTemplatesDoctor(doctor.doctorId);
+		for(TemplateClass temp : temps)
+		{
+			ShowTemplatesVm vm = new ShowTemplatesVm();
+			vm.templateName = temp.templateName;
+			vm.procedureName = temp.procedureName;
+			templates.add(vm);
+			
+		}
+		return ok(Json.toJson(templates));
+	}
+	
+	public static Result getAllFields() throws UnsupportedEncodingException
+	{
+		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		System.out.println("Email "+decryptedValue);
+		TemplateClass template = TemplateClass.findTemplateById(Integer.parseInt(decryptedValue));
+		List<TemplateAttribute> attributes = TemplateAttribute.getAllAttributes(template);
+		System.out.println("Attributes:::"+attributes.size());
+		List<ShowFieldVm> fields = new ArrayList<ShowFieldVm>();
+		for(TemplateAttribute attribute:attributes)
+		{
+			ShowFieldVm vm = new ShowFieldVm();
+			vm.fieldId = attribute.fieldId;
+			vm.fieldName = attribute.fieldName;
+			vm.fieldType = attribute.fieldType;
+			fields.add(vm);
+		}
+		return ok(Json.toJson(fields));
 	}
 
 	public static Result getPatientDetails() {
