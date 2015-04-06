@@ -658,6 +658,7 @@ public class Application extends Controller {
 			ShowTemplatesVm vm = new ShowTemplatesVm();
 			vm.templateName = temp.templateName;
 			vm.procedureName = temp.procedureName;
+			vm.templateId  = temp.templateId;
 			templates.add(vm);
 			
 		}
