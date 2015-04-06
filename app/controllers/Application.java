@@ -41,7 +41,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
-import viewmodel.FieldEditVm;
 import viewmodel.FieldVm;
 import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
