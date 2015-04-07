@@ -39,6 +39,7 @@ import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import viewmodel.ChatVm;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
@@ -697,6 +698,64 @@ public class Application extends Controller {
 					patient.name, patient.mobileNumber, patient.location, patient.emailID));
 		}
 		return ok(Json.toJson(patientDoctor));
+	}
+	
+	public static Result getAllMembersForChat()
+	{
+		
+		System.out.println("1");
+		String decryptedValue = null;
+		try {
+			decryptedValue = URLDecoder.decode(request().getQueryString("id"),
+					"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+				.getDoctorByMail(decryptedValue)));
+		List<ChatVm> chatList = new ArrayList<ChatVm>();
+		for (PatientRegister patient : doctor.patient) {
+			
+			ChatVm chat = new ChatVm();
+			Person p = Person.getPatientsById(patient.patientId);
+			chat.name = p.name;
+			chat.type = "P";
+			chat.id = patient.patientId;
+			chatList.add(chat);
+		
+		}
+		List<Delegates> dels = new ArrayList<>();
+		dels = Delegates.getAllByParentDoctor(doctor.doctorId);
+		for(Delegates del:dels){
+		
+			if(del.delType.equals("D")){
+				
+				if((del.status.equals("C")) || (del.status.equals("WC")))
+				{
+				
+					Person p = Person.getDoctorsById(del.delegate);
+					System.out.println("dels:::"+p.idPerson);
+					ChatVm chat = new ChatVm();
+					chat.name = p.name;
+					chat.type = "D";
+					chat.id = del.id;
+					chatList.add(chat);
+				}
+			}
+		}
+		List<AssistentRegister>	 assistantReg = doctor.assistentRegister;
+		for(AssistentRegister as:assistantReg)
+		{
+			Person person = Person.getAssistantByAssistantRegisterId(as);
+			ChatVm chat = new ChatVm();
+			chat.name = person.name;
+			chat.type = "A";
+			chat.id = as.assitentId;
+			chatList.add(chat);
+			
+		}
+     	return ok(Json.toJson(chatList));
 	}
 
 	public static Result getDoctorDetails() {

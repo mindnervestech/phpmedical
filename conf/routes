@@ -18,6 +18,7 @@ POST    /removePatientsDoctor       controllers.Application.removePatientsDoctor
 POST    /removeDoctorsPatient       controllers.Application.removeDoctorsPatient()
 GET		/getPatientsDoctors			controllers.Application.getPatientsDoctors()
 GET     /getDoctorsPatients			controllers.Application.getDoctorsPatients()
+GET		/getChatMember              controllers.Application.getAllMembersForChat()
 POST    /addClinic					controllers.Application.addClinic()
 POST	/updateField				controllers.Application.updateField()
 POST    /removeFields				controllers.Application.removeFields()
