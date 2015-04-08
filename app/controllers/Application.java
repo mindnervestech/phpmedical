@@ -705,57 +705,100 @@ public class Application extends Controller {
 		
 		System.out.println("1");
 		String decryptedValue = null;
+		String type = null;
+		List<ChatVm> chatList = new ArrayList<ChatVm>();
 		try {
 			decryptedValue = URLDecoder.decode(request().getQueryString("id"),
 					"UTF-8");
+			type = URLDecoder.decode(request().getQueryString("type"),
+					"UTF-8");
+			
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
-				.getDoctorByMail(decryptedValue)));
-		List<ChatVm> chatList = new ArrayList<ChatVm>();
-		for (PatientRegister patient : doctor.patient) {
+		
+		if(type.equals("Doctor"))
+		{
+		
+			DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+									.getDoctorByMail(decryptedValue)));
 			
-			ChatVm chat = new ChatVm();
-			Person p = Person.getPatientsById(patient.patientId);
-			chat.name = p.name;
-			chat.type = "P";
-			chat.id = patient.patientId;
-			chatList.add(chat);
+			for (PatientRegister patient : doctor.patient) 
+			{
+			
+				ChatVm chat = new ChatVm();
+				Person p = Person.getPatientsById(patient.patientId);
+				chat.name = p.name;
+				chat.type = "P";
+				chat.id = patient.patientId;
+				chatList.add(chat);
 		
-		}
-		List<Delegates> dels = new ArrayList<>();
-		dels = Delegates.getAllByParentDoctor(doctor.doctorId);
-		for(Delegates del:dels){
+			}
+			List<Delegates> dels = new ArrayList<>();
+			dels = Delegates.getAllByParentDoctor(doctor.doctorId);
+			for(Delegates del:dels)
+			{
 		
-			if(del.delType.equals("D")){
-				
-				if((del.status.equals("C")) || (del.status.equals("WC")))
+				if(del.delType.equals("D"))
 				{
 				
-					Person p = Person.getDoctorsById(del.delegate);
-					System.out.println("dels:::"+p.idPerson);
-					ChatVm chat = new ChatVm();
-					chat.name = p.name;
-					chat.type = "D";
-					chat.id = del.id;
-					chatList.add(chat);
+					if((del.status.equals("C")) || (del.status.equals("WC")))
+					{
+				
+						Person p = Person.getDoctorsById(del.delegate);
+						System.out.println("dels:::"+p.idPerson);
+						ChatVm chat = new ChatVm();
+						chat.name = p.name;
+						chat.type = "D";
+						chat.id = del.id;
+						chatList.add(chat);
+					}
 				}
 			}
-		}
-		List<AssistentRegister>	 assistantReg = doctor.assistentRegister;
-		for(AssistentRegister as:assistantReg)
-		{
-			Person person = Person.getAssistantByAssistantRegisterId(as);
-			ChatVm chat = new ChatVm();
-			chat.name = person.name;
-			chat.type = "A";
-			chat.id = as.assitentId;
-			chatList.add(chat);
+			List<AssistentRegister>	 assistantReg = doctor.assistentRegister;
+			for(AssistentRegister as:assistantReg)
+			{
+				Person person = Person.getAssistantByAssistantRegisterId(as);
+				ChatVm chat = new ChatVm();
+				chat.name = person.name;
+				chat.type = "A";
+				chat.id = as.assitentId;
+				chatList.add(chat);
+			
+			}
 			
 		}
-     	return ok(Json.toJson(chatList));
+		else if(type.equals("Patient"))
+		{
+			PatientRegister patient = PatientRegister.getPatientById((Person
+	                                  .getPatientByMail(decryptedValue)));
+			System.out.println("Doctors:::"+patient.doctors.size());
+			for (DoctorRegister doctor : patient.doctors)
+			{
+				System.out.println("3");
+				Person p = Person.getDoctorsById(doctor.doctorId);
+				ChatVm vm = new ChatVm();
+				vm.id = p.doctor;
+				vm.name = p.name;
+				vm.type = "D";
+				chatList.add(vm);
+				
+			}
+			List<PatientDependency> deps = PatientDependency.getAllByPatient(patient.patientId);
+			System.out.println("Dependency::::"+deps.size());
+			for(PatientDependency pd:deps)
+			{
+				Person p = Person.getPatientsById(pd.dependent);
+				ChatVm vm = new ChatVm();
+				vm.name = p.name;
+				vm.type = "P";
+				vm.id = p.patient;
+				chatList.add(vm);
+			}
+		}
+		
+		return ok(Json.toJson(chatList));
 	}
 
 	public static Result getDoctorDetails() {
