@@ -492,7 +492,7 @@ public class Application extends Controller {
 				patientDoctor.add(new PatientsDoctor(
 						doctor.doctorId.toString(), doctor.name,
 						doctor.speciality, doctor.email, doctor.mobileNumber,
-						doctor.location,"","", 2));
+						doctor.location, 2));
 			}
 		}
 
@@ -816,7 +816,7 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location,"","", 1));
+					doctor.mobileNumber, doctor.location, 1));
 		}
 		/*for(BucketDoctors doc:bucketDocs){
 			patientDoctor.add(new PatientsDoctor(doc.doctorId.toString(),
@@ -890,7 +890,7 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location,"","", 1));
+					doctor.mobileNumber, doctor.location,1));
 		}
 		return ok(Json.toJson(patientDoctor));
 		//return ok();
