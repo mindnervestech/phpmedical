@@ -218,7 +218,7 @@ public class Application extends Controller {
 		return ok(Json.toJson(new ErrorResponse(Error.E204.getCode(),
 				Error.E204.getMessage())));
 	}
-
+	
 	public static Result login() throws IOException {
 
 		System.out.println("called...............");
@@ -481,7 +481,7 @@ public class Application extends Controller {
 			Person p = Person.getDoctorsById(doctor.doctorId);
 			patientDoctor.add(new PatientsDoctor(doctor.doctorId.toString(),
 					p.name, doctor.speciality, p.emailID, p.mobileNumber,
-					p.location, 1));
+					p.location, p.dateOfBirth.toString(), p.gender.toString(), 1));
 		}
 
 		List<BucketDoctors> bucketDoctors = BucketDoctors
@@ -492,7 +492,7 @@ public class Application extends Controller {
 				patientDoctor.add(new PatientsDoctor(
 						doctor.doctorId.toString(), doctor.name,
 						doctor.speciality, doctor.email, doctor.mobileNumber,
-						doctor.location, 2));
+						doctor.location,"","", 2));
 			}
 		}
 
@@ -701,8 +701,7 @@ public class Application extends Controller {
 	}
 	
 	public static Result getAllMembersForChat()
-	{
-		
+	{		
 		System.out.println("1");
 		String decryptedValue = null;
 		String type = null;
@@ -817,7 +816,7 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location, 1));
+					doctor.mobileNumber, doctor.location,"","", 1));
 		}
 		/*for(BucketDoctors doc:bucketDocs){
 			patientDoctor.add(new PatientsDoctor(doc.doctorId.toString(),
@@ -891,7 +890,7 @@ public class Application extends Controller {
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location, 1));
+					doctor.mobileNumber, doctor.location,"","", 1));
 		}
 		return ok(Json.toJson(patientDoctor));
 		//return ok();
