@@ -26,7 +26,7 @@ public class DoctorClinicSchedule  extends Model{
 	public String day;
 	public String form;
 	public String  totime;
-
+	public String  shift;
 	
     public long getId() {
 		return id;
@@ -68,8 +68,6 @@ public class DoctorClinicSchedule  extends Model{
 		this.form = form;
 	}
 
-	
-
 	public String getShift() {
 		return shift;
 	}
@@ -77,8 +75,6 @@ public class DoctorClinicSchedule  extends Model{
 	public void setShift(String shift) {
 		this.shift = shift;
 	}
-
-	public String  shift;
      
     public static Finder<Long, DoctorClinicSchedule> find = new Finder<Long, DoctorClinicSchedule>(
 			Long.class, DoctorClinicSchedule.class);
@@ -86,9 +82,11 @@ public class DoctorClinicSchedule  extends Model{
     
     public static List <DoctorClinicSchedule>  getDoctorClinicScheduleById(String clinicId ,String docId){
     	return find.where().eq("clinicId", clinicId).eq("docId", docId).findList();
-    	
-    	
     }
+    
+    public static List<DoctorClinicSchedule> findAllClinicSchedule(String doc_id, String clinicId) {
+		return find.where().eq("doc_id", doc_id).eq("clinicId", clinicId).findList();
+	}
     
     
     public static List <DoctorClinicSchedule> getClinicScheduleshiftDetails(String docId,String clinicId ){

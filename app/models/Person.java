@@ -92,15 +92,21 @@ public class Person extends Model {
 		return find.where().like("name", "%" + name +"%").eq("role", 3).findList();
 	}
 	
+	public static Person getPersonByDoctorID(String doctorId) {
+		return find.where().eq("doctor", doctorId).findUnique();
+	}
+	
 	public static Person getPersonById(Integer id) {
 		return find.byId(id);
 	}
 	public static Person getPersonByMail(String emailID) {
 		return find.where().eq("emailID", emailID).findUnique();
 	}
+	
 	public static Integer getPatientByMail(String emailID) {
 		return find.where().eq("emailID", emailID).eq("role", "1").findUnique().patient;
 	}
+	
 	public static Integer getDoctorByMail(String emailID) {
 		return find.where().eq("emailID", emailID).eq("role", "2").findUnique().doctor;
 	}

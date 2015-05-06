@@ -15,7 +15,6 @@ import play.db.ebean.Model.Finder;
 public class Clinic extends Model {
 	@Id
 	public Integer idClinic;
-		
 	public String clinicName;
 	public Long landLineNumber;
 	public Long mobileNumber;
