@@ -53,11 +53,12 @@ POST	/confirmOrDenyParentForDelegates		controllers.Application.confirmOrDenyPare
 POST	/removeDelegatesForParent				controllers.Application.removeDelegatesForParent()	
 
 
-#Doctors_Urls 
+#Doctors Urls 
 GET     /getDoctorsClinicsDetails 				controllers.Doctor.getDoctorsClinicsDetails()	
 
-
-
+#patient Urls
+POST    /saveClinicsAppointmentDetails		    controllers.Patient.saveClinicsAppointmentDetails()
+GET     /getClinicsAppointmentDetails		    controllers.Patient.getClinicsAppointmentDetails()
 
 
 # Map static resources from the /public folder to the /assets URL path

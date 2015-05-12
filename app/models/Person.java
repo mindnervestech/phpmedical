@@ -48,27 +48,6 @@ public class Person extends Model {
 	public Integer cloudType;
 	public String cloudLoginId;
 	public String cloudLoginPassword;
-	
-/*	public Integer role;
-	public Integer customerType;
-	public String firstName;
-	public String lastName;
-	public String emilID;
-	public String password;
-	public Integer gender;
-	public String mobileNumber;
-	public Date dateOfBirth;
-	public String location;
-	public String socialId;
-	public String bloodGroup;
-	public String allergicTo;
-	public Integer cloudType;
-	public String cloudLoginId;
-	public String cloudLoginPassword;
-	public Integer cashDays;
-	public Date registrationDate;
-	public Integer emailConfirmation;*/
-	
 	public Integer patient;
 	
 /*	@OneToOne

@@ -35,13 +35,8 @@ public class Doctor extends Controller {
 			e.printStackTrace();
 		}
 		
-		System.out.println("decryptedValue:" + decryptedValue);
-		System.out.println("type:" + type);
-		
 		Person person = Person.getPersonByDoctorID(decryptedValue);
-		
 		String doctorEmail = person.emailID;
-		
 		List<DoctorClinicDetails> ClinicDetailsList = new ArrayList<DoctorClinicDetails>();
 		
 		if(type.equals("1")){
@@ -49,9 +44,7 @@ public class Doctor extends Controller {
 			System.out.println("Size = "+clinicList.size());
 			
 			for(Clinic clinic : clinicList){
-				/*String daysOfWeekSlot1 = null;
-				String daysOfWeekSlot2 = null;
-				String daysOfWeekSlot3 = null;*/
+				
 				TimeTable timeTable1 = new TimeTable();
 				TimeTable timeTable2 = new TimeTable();
 				TimeTable timeTable3 = new TimeTable();
@@ -103,14 +96,10 @@ public class Doctor extends Controller {
 					
 				}
 				
-				System.out.println(" timeTable1 = "+timeTable1.days);
 				ClinicDetailsList.add(new DoctorClinicDetails(decryptedValue, clinic.idClinic.toString(), clinic.clinicName, 
 															clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3));
 			}
-			
-			System.out.println("ClinicDetailsList = "+ClinicDetailsList.size());
-		
-			
+				
 		}else{
 			
 		}
