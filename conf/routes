@@ -59,7 +59,9 @@ GET     /getDoctorsClinicsDetails 				controllers.Doctor.getDoctorsClinicsDetail
 #patient Urls
 POST    /saveClinicsAppointmentDetails		    controllers.Patient.saveClinicsAppointmentDetails()
 GET     /getClinicsAppointmentDetails		    controllers.Patient.getClinicsAppointmentDetails()
-
+GET     /cancelClinicsAppointment		        controllers.Patient.cancelClinicsAppointment()
+GET     /getAllPatientAppointment		        controllers.Patient.getAllPatientAppointment()
+GET     /saveVisitedPatientAppointment		    controllers.Patient.saveVisitedPatientAppointment()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
