@@ -95,6 +95,11 @@ public class Person extends Model {
 	public static Person getPatientsById(Integer id){
 		return find.where().eq("patient", id).eq("role", "1").findUnique();
 	}
+	
+	public static Person getAllPatientsById(Integer id){
+		return find.where().eq("patient", id).findUnique();
+	}
+	
 	public static List<Person> getPatient(String name){
 		return find.where().like("name", "%" + name +"%").eq("role", 1).findList();
 	}

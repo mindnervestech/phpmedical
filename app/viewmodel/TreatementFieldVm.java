@@ -1,6 +1,6 @@
 package viewmodel;
 
-public class FieldVm {
+public class TreatementFieldVm {
 	
 	public String fieldId;
 	public String templateId;
@@ -9,5 +9,9 @@ public class FieldVm {
 	public String fieldDisplayName;
 	public String fieldDefaultValue;
 	public boolean selected;
+	public String doctorId;
+	public String patientId;
+	
+	
 
 }

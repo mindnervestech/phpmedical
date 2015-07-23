@@ -84,14 +84,27 @@ public class DoctorClinicSchedule  extends Model{
     	return find.where().eq("clinicId", clinicId).eq("docId", docId).findList();
     }
     
+    public static List <DoctorClinicSchedule> getAllDoctorOfClinicById(String clinicId){
+    	return find.where().eq("clinicId", clinicId).findList();
+    }
+    
     public static List<DoctorClinicSchedule> findAllClinicSchedule(String doc_id, String clinicId) {
 		return find.where().eq("doc_id", doc_id).eq("clinicId", clinicId).findList();
+	}
+    
+    public static List<DoctorClinicSchedule> findAllDoctorClinicSchedule(String clinicId) {
+		return find.where().eq("clinicId", clinicId).findList();
 	}
     
     
     public static List <DoctorClinicSchedule> getClinicScheduleshiftDetails(String docId,String clinicId ){
 	return find.where().eq("clinicId", clinicId).eq("docId", docId).findList();
-    
+	
     }
+    
+    
+    public static List<DoctorClinicSchedule> findAllClinicScheduleByShift(String doc_id, String clinicId, String shift) {
+		return find.where().eq("doc_id", doc_id).eq("clinicId", clinicId).eq("shift", shift).findList();
+	}
 
 }

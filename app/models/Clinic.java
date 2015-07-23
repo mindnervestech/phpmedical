@@ -30,8 +30,17 @@ public class Clinic extends Model {
 	public static List<Clinic> getClinic(String queryString) {
 		return find.where().like("clinicName", "%" + queryString +"%").findList();
 	}
+	
+	public static List<Clinic> getAllClinic() {
+		return find.where().findList();
+	}
+	
 	public static List<Clinic> findAllByDoctorId(Integer doctorId2) {
 		return find.where().eq("doctorId", doctorId2).findList();
+	}
+	
+	public static Clinic findClinicById(Integer idClinic) {
+		return find.where().eq("idClinic", idClinic).findUnique();
 	}
 	
 }

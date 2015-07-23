@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -24,6 +25,7 @@ import models.BucketPatients;
 import models.Clinic;
 import models.Delegates;
 import models.DoctorClinicSchedule;
+import models.DoctorProcedure;
 import models.DoctorRegister;
 import models.PatientClientBookAppointment;
 import models.PatientDependency;
@@ -32,6 +34,7 @@ import models.Person;
 import models.TemplateAttribute;
 import models.TemplateClass;
 import models.TemplateField;
+import models.UploadFiles;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
@@ -39,10 +42,13 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 
+
+import play.api.mvc.MultipartFormData;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import viewmodel.ChatVm;
 import viewmodel.ClinicVM;
@@ -57,6 +63,7 @@ import viewmodel.RegisterVM;
 import viewmodel.ShowFieldVm;
 import viewmodel.ShowTemplatesVm;
 import viewmodel.TemplateVm;
+import viewmodel.totalInvoiceVM;
 
 public class Application extends Controller {
 
@@ -79,7 +86,6 @@ public class Application extends Controller {
 			return ok(Json.toJson(new ErrorResponse(Error.E210.getCode(),
 					Error.E210.getMessage())));
 		}
-		
 		
 		Person registration = new Person();
 
@@ -468,7 +474,7 @@ public class Application extends Controller {
 		//System.out.println("id:" + decryptedValue);
 		PatientRegister patient = PatientRegister.getPatientById((Person
 				.getPatientByMail(decryptedValue)));
-		List<PatientsDoctor> patientDoctor = new ArrayList<>();
+		List<PatientsDoctor> patientDoctor = new ArrayList<PatientsDoctor>();
 		for (DoctorRegister doctor : patient.doctors) {
 			
 			List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getNextAppointment(doctor.doctorId,patient.patientId,"Occupied");
@@ -574,8 +580,11 @@ public class Application extends Controller {
 			
 			List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
 			for( PatientClientBookAppointment appointment: appointmentList){
-				if(appointment.isVisited == 1){
-					visitedList.add(appointment);
+				
+				if(appointment.isVisited != null){
+					if(appointment.isVisited == 1){
+						visitedList.add(appointment);
+					}
 				}
 			}
 			
@@ -587,7 +596,6 @@ public class Application extends Controller {
 		    	Calendar calTwo = Calendar.getInstance();
 		    	if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
 		    		lastVisted = formatter.format(calOne.getTime());
-		    		
 		    	}
 			}
 			
@@ -613,17 +621,6 @@ public class Application extends Controller {
 
 	}
 
-	/*public class CustomDateComparator implements Comparator<PatientClientBookAppointment> {
-	   
-		@Override
-		public int compare(PatientClientBookAppointment arg0,PatientClientBookAppointment arg1) {
-			// TODO Auto-generated method stub
-			
-			
-			return 0;
-		}
-	}*/
-	
 	public static Result getDoctorsPatients() {
 		System.out.println("1");
 		String decryptedValue = null;
@@ -699,20 +696,28 @@ public class Application extends Controller {
 		ObjectMapper mapper = new ObjectMapper();
 		TemplateVm templateVm = mapper.readValue(json.traverse(), TemplateVm.class);
 		
-		TemplateClass template = new TemplateClass();
-		template.templateName = templateVm.templateName;
-		template.procedureName = templateVm.procedureName;
-		template.doctorId = DoctorRegister.getDoctorById(Person.getDoctorByMail(templateVm.doctorId)).doctorId;
-		template.save();
+		//System.out.println("doctorId = "+templateVm.templateName);
+		Integer doctor_id = Person.getDoctorByMail(templateVm.doctorId);
+		DoctorProcedure  doctorProcedure = DoctorProcedure.searchProcedureByIDName(doctor_id,templateVm.procedureName);
 		
-		System.out.println("return");
-		return ok(Json.toJson(template.templateId));
+		TemplateClass template = TemplateClass.getTemplateClassByName(doctor_id,templateVm.templateName,doctorProcedure.procedureName);
+		
+		if(template == null){
+			TemplateClass temp = new TemplateClass();
+			temp.templateName = templateVm.templateName;
+			temp.procedureName = doctorProcedure.procedureName;
+			temp.doctorId = doctor_id;
+			temp.doctorProcedure = doctorProcedure;
+			temp.save();
+			template = temp;
+		}
+		//System.out.println("return");
+		return ok(Json.toJson(template));
 	}
 	
-	public static Result addField() throws JsonParseException,JsonMappingException,IOException
-	{
+	public static Result addField() throws JsonParseException,JsonMappingException,IOException{
 		JsonNode json = request().body().asJson();
-		System.out.println("Callled");
+		//System.out.println("Callled");
 		System.out.println("json "+json);
 		ObjectMapper mapper = new ObjectMapper();
 		FieldVm fieldVm = mapper.readValue(json.traverse(), FieldVm.class);
@@ -720,9 +725,12 @@ public class Application extends Controller {
 		TemplateAttribute field = new TemplateAttribute();
 		field.fieldName = fieldVm.fieldName;
 		field.fieldType = fieldVm.fieldType;
+		field.fieldDisplayName = fieldVm.fieldDisplayName;
+		field.fieldDefaultValue = fieldVm.fieldDefaultValue;
+		
 		field.templateClass = TemplateClass.findTemplateById(Integer.parseInt(fieldVm.templateId));
 		field.save();
-		System.out.println("return");
+		//System.out.println("return");
 		return ok(Json.toJson(field.fieldId));
 	}
 	
@@ -748,8 +756,7 @@ public class Application extends Controller {
 		return ok();
 	}
 	
-	public static Result removeFields() throws UnsupportedEncodingException
-	{
+	public static Result removeFields() throws UnsupportedEncodingException{
 		System.out.println("In RemoveFields.......");
 		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
 		System.out.println(decryptedValue);
@@ -775,36 +782,38 @@ public class Application extends Controller {
 	public static Result getAllTemplates() throws UnsupportedEncodingException
 	{
 		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		
+		String procedureName = request().getQueryString("procedureName");
+		
 		System.out.println("Email "+decryptedValue);
 		DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(decryptedValue)));
 		List<ShowTemplatesVm> templates = new ArrayList<ShowTemplatesVm>();
-		List<TemplateClass> temps = TemplateClass.getTemplatesDoctor(doctor.doctorId);
-		for(TemplateClass temp : temps)
-		{
+		List<TemplateClass> temps = TemplateClass.getTemplatesDoctor(doctor.doctorId,procedureName);
+		for(TemplateClass temp : temps){
 			ShowTemplatesVm vm = new ShowTemplatesVm();
 			vm.templateName = temp.templateName;
 			vm.procedureName = temp.procedureName;
 			vm.templateId  = temp.templateId;
 			templates.add(vm);
-			
 		}
 		return ok(Json.toJson(templates));
 	}
 	
-	public static Result getAllFields() throws UnsupportedEncodingException
-	{
+	public static Result getAllFields() throws UnsupportedEncodingException{
 		String decryptedValue = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
 		System.out.println("Email "+decryptedValue);
 		TemplateClass template = TemplateClass.findTemplateById(Integer.parseInt(decryptedValue));
 		List<TemplateAttribute> attributes = TemplateAttribute.getAllAttributes(template);
 		System.out.println("Attributes:::"+attributes.size());
 		List<ShowFieldVm> fields = new ArrayList<ShowFieldVm>();
-		for(TemplateAttribute attribute:attributes)
-		{
+		for(TemplateAttribute attribute:attributes){
 			ShowFieldVm vm = new ShowFieldVm();
 			vm.fieldId = attribute.fieldId;
 			vm.fieldName = attribute.fieldName;
 			vm.fieldType = attribute.fieldType;
+			vm.templateId = template.templateId;
+			vm.fieldDisplayName = attribute.fieldDisplayName;
+			vm.fieldDefaultValue = attribute.fieldDefaultValue;
 			fields.add(vm);
 		}
 		return ok(Json.toJson(fields));
@@ -967,22 +976,32 @@ public class Application extends Controller {
 
 	}
 	
-	public static Result saveDoctorClinicScheduleTime() {
+	public static Result saveDoctorClinicScheduleTime() throws JsonParseException, JsonMappingException, IOException {
 
-		Form<DoctorClinicScheduleVM> form = DynamicForm.form(
+/*		Form<DoctorClinicScheduleVM> form = DynamicForm.form(
 				DoctorClinicScheduleVM.class).bindFromRequest();
 		System.out.println("form"+form);
-		DoctorClinicScheduleVM doctorClinicScheduleVM = form.get();
-
+		DoctorClinicScheduleVM doctorClinicScheduleVM = form.get();*/
 		
+		JsonNode json = request().body().asJson();
+		System.out.println("saveTreatmentPlan json" + json);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		DoctorClinicScheduleVM doctorClinicScheduleVM = mapper.readValue(json.traverse(),DoctorClinicScheduleVM.class);
+
+		System.out.println("doctorClinicScheduleVM.schedules delete" + doctorClinicScheduleVM.schedules);
 		// int size = doctorClinicScheduleVM.schedules.size();
-		for (int i = 0; i < doctorClinicScheduleVM.schedules.size(); i++) {
-			List <DoctorClinicSchedule> dClinicSchedule =  DoctorClinicSchedule.getDoctorClinicScheduleById(doctorClinicScheduleVM.clinicId,doctorClinicScheduleVM.doctorId);
-			   for(DoctorClinicSchedule dcs:dClinicSchedule){
-				   dcs.delete();
-			   }
-			
+		if(doctorClinicScheduleVM.schedules != null){
+			System.out.println("doctorClinicScheduleVM.schedules delete" + doctorClinicScheduleVM.schedules);
+			for (int i = 0; i < doctorClinicScheduleVM.schedules.size(); i++) {
+				List <DoctorClinicSchedule> dClinicSchedule =  DoctorClinicSchedule.getDoctorClinicScheduleById(doctorClinicScheduleVM.clinicId,doctorClinicScheduleVM.doctorId);
+				   for(DoctorClinicSchedule dcs:dClinicSchedule){
+					   dcs.delete();
+				   }
+				
+			}
 		}
+		if(doctorClinicScheduleVM.schedules != null){
 			for (int j = 0; j < doctorClinicScheduleVM.schedules.size(); j++){
 				DoctorClinicSchedule doctorClinicSchedule = new DoctorClinicSchedule();
 				doctorClinicSchedule.clinicId = doctorClinicScheduleVM.clinicId;
@@ -993,8 +1012,11 @@ public class Application extends Controller {
 				doctorClinicSchedule.form = doctorClinicScheduleVM.schedules.get(j).from;
 				System.out.println("doctorClinicScheduleVM.schedules.get(i).from"+doctorClinicScheduleVM.schedules.get(j).from);
 				doctorClinicSchedule.shift = doctorClinicScheduleVM.schedules.get(j).shift;
+				System.out.println("doctorClinicScheduleVM.schedules"+ doctorClinicScheduleVM.schedules);
 				doctorClinicSchedule.save();
 			}
+		}
+
 			
 		
 		return ok(Json.toJson(new ErrorResponse(Error.E212.getCode(),
@@ -1639,6 +1661,140 @@ public class Application extends Controller {
 			}
 		}
 		return ok();
+	}
+	public static Result uploadFiles() {
+		  play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+
+		  DynamicForm form = DynamicForm.form().bindFromRequest();
+
+			String type = form.get("type");
+			String doctorId = null;
+			String patientId = null;
+			String assistentId = null;
+
+			if(!form.get("doctorId").equalsIgnoreCase("null")){
+				doctorId = form.get("doctorId");				
+			}
+			
+			if(!form.get("patientId").equalsIgnoreCase("null")){
+				 patientId = form.get("patientId");				
+			}
+			
+			if(!form.get("assistentId").equalsIgnoreCase("null")){
+			    System.out.println("assistentId +++++++++++" + assistentId);
+				 assistentId = form.get("assistentId");				
+			}
+
+			String appointmentDate = form.get("appointmentDate");
+			String appointmentTime = form.get("appointmentTime");
+			String category = form.get("category");
+			String documentType = form.get("documentType");
+			String name = form.get("name");
+		
+			String clinicName = form.get("clinicName");
+			String clinicId = form.get("clinicId");
+
+		    System.out.println("doctorId" + doctorId);
+		    System.out.println("patientId" + patientId);
+		    System.out.println("assistentId" + assistentId);
+		    
+			
+			String path = null;
+	    	FilePart picture = body.getFile("picture");
+		  
+		  if (picture != null) {
+		    String fileName = picture.getFilename();
+		    String contentType = picture.getContentType(); 
+		    File file = picture.getFile();
+		    System.out.println("fileName" + fileName);
+		    System.out.println("contentType" + contentType);
+		    System.out.println("file" + file.getAbsolutePath());
+		    File newFile = null;
+		    UploadFiles uploadFile = new UploadFiles();
+		    if(type.equalsIgnoreCase("doctor")){
+
+		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//doctors//" + doctorId);
+		    	if(folder.exists()){
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//doctors//"+ doctorId + "//" +  fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}else{
+		    		folder.mkdirs();
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//doctors//"+ doctorId + "//" + fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}
+		    	path = "192.168.1.13:9000/assets/documents/doctors/" + doctorId + "/"+  fileName;		    	
+		    }else if(type.equalsIgnoreCase("assistent")){
+
+		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//assistents//" + assistentId);
+		    	if(folder.exists()){
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//assistents//"+ assistentId + "//" +  fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}else{
+		    		folder.mkdirs();
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//assistents//"+ assistentId + "//" + fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}
+		    	path = "192.168.1.13:9000/assets/documents/assistents/" + assistentId + "/"+  fileName;
+		    }else if(type.equalsIgnoreCase("patient")){
+		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//patients//" + patientId);
+		    	if(folder.exists()){
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}else{
+		    		folder.mkdirs();
+				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
+		            file.renameTo(newFile); //here you are moving photo to new directory
+		    	}
+		    	path = "192.168.1.13:9000/assets/documents/patients/" + patientId + "/"+  fileName;
+		    }
+
+		    if(newFile.exists()){
+		    	if(!doctorId.equalsIgnoreCase("0")){
+		    		uploadFile.doctorId = Person.getDoctorByMail(doctorId); 
+		    	}else{
+		    		uploadFile.doctorId = 0;
+		    	}
+		    	if(!patientId.equalsIgnoreCase("0")){
+				    System.out.println("patientId" + patientId);
+		    		uploadFile.patientId = Person.getPatientByMail(patientId); 
+		    	}else{
+		    		uploadFile.patientId = 0;
+		    	}
+		    	if(!assistentId.equalsIgnoreCase("0")){
+				    System.out.println("assistentId" + assistentId);
+		    		uploadFile.assistentId = Person.getAssistentByMail(assistentId); 
+		    	}else{
+		    		uploadFile.assistentId = 0;
+		    	}
+		    	uploadFile.appointmentDate = appointmentDate;
+		    	uploadFile.appointmentTime = appointmentTime;
+		    	uploadFile.category = category;
+		    	uploadFile.name = name;
+		    	uploadFile.fileName = fileName;
+		    	uploadFile.documentType = documentType;
+		    	uploadFile.type = type;
+		    	uploadFile.Url = path;
+		    	uploadFile.clinicId = clinicId;
+		    	uploadFile.clinicName = clinicName;
+		    	
+		    	uploadFile.save();
+		    }
+		    return ok(Json.toJson(uploadFile));
+		  } else {
+		    flash("error", "Missing file");
+		    return ok("File not Found");    
+		  }
+		}
+	public static Result getUploadedFiles(){
+		Integer docID = Person.getDoctorByMail(request().getQueryString("doctorId"));
+		Integer pId = Person.getPatientByMail(request().getQueryString("patientId"));
+		String aDate = request().getQueryString("appointmentDate");
+		String aTime = request().getQueryString("appointmentTime");
+		
+		List<UploadFiles> uploadedFiles =  UploadFiles.getUploadedFiles(docID, pId,aDate,aTime);
+		System.out.println(Json.toJson(uploadedFiles));
+		return ok(Json.toJson(uploadedFiles));
+		
 	}
 }
 	

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
@@ -15,8 +14,11 @@ public class TemplateAttribute extends Model {
 	
 	@Id
 	public Integer fieldId;
+	
 	public String fieldName;
 	public String fieldType;
+	public String fieldDisplayName;
+	public String fieldDefaultValue;
 	
 	@ManyToOne
 	public TemplateClass templateClass;
@@ -28,11 +30,13 @@ public class TemplateAttribute extends Model {
 		return find.byId(id);
 	}
 	
+	public static TemplateAttribute getById(Integer id){
+		return find.where().eq("fieldId", id).findUnique();
+	}
+	
 	public static List<TemplateAttribute> getAllAttributes(TemplateClass id)
 	{
 		return find.where().eq("templateClass", id).findList();
 	}
 	
-	
-
 }

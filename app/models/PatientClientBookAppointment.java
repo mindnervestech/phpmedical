@@ -1,6 +1,5 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +23,7 @@ public class PatientClientBookAppointment extends Model {
 	public String timeSlot;
 	public Date appointmentDate;
 	public String status;
+	public String visitType;
 	public Integer isVisited;
 	
 	public static Finder<Integer,PatientClientBookAppointment> find = new Finder<>(Integer.class,PatientClientBookAppointment.class);
@@ -51,6 +51,14 @@ public class PatientClientBookAppointment extends Model {
 		return find.where().eq("doctorId", doctorId).eq("patientId", patient_id).eq("status", status).findList();
 	}
 	
+	public static List<PatientClientBookAppointment> getNextClinicAppointment(Integer doctorId, String status) {
+		return find.where().eq("doctorId", doctorId).eq("status", status).findList();
+	}
+	
+	public static List<PatientClientBookAppointment> getNextDoctorClinicAppointment(Integer patient_id, String status) {
+		return find.where().eq("patientId", patient_id).eq("status", status).findList();
+	}
+	
 	public static String deleteNextAppointment(Integer doctorId, Integer patient_id, Integer clinicId, String shift) {
 		PatientClientBookAppointment appointment = find.where().eq("doctorId", doctorId).eq("patientId", patient_id).eq("clinicId", clinicId).eq("shift", shift).findUnique();
 		
@@ -60,12 +68,18 @@ public class PatientClientBookAppointment extends Model {
 		}else{
 			return "Appointment Not Found  !!!";
 		}
-		
 	}
 	
 	public static List<PatientClientBookAppointment> getAllAppointment(Integer doctorId, Integer patient_id) {
 		return find.where().eq("doctorId", doctorId).eq("patientId", patient_id).findList();
 	}
 	
+	public static List<PatientClientBookAppointment> getAllPatientOfDoctor(Integer doctorId) {
+		return find.where().eq("doctorId", doctorId).findList();
+	}
+	
+	public static List<PatientClientBookAppointment> getAllClinicAppointment(Integer doctorId, Integer clinicId) {
+		return find.where().eq("doctorId", doctorId).eq("clinicId", clinicId).findList();
+	}
 	
 }

@@ -9,4 +9,5 @@ public class PatientClinicsAppointmentVM {
 	public String timeSlot;
 	public String appointmentDate;
 	public String status;
+	public String visitType;
 }
