@@ -53,6 +53,7 @@ POST	/confirmOrDenyParentForDelegates	controllers.Application.confirmOrDenyParen
 POST	/removeDelegatesForParent			controllers.Application.removeDelegatesForParent()	
 POST    /uploadFiles						controllers.Application.uploadFiles()
 GET		/getUploadedFiles					controllers.Application.getUploadedFiles()
+GET     /getAllClinics                      controllers.Application.getAllClinic()
 
 #Doctors Urls
  

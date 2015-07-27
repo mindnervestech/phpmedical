@@ -43,6 +43,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 
 
+import play.Play;
 import play.api.mvc.MultipartFormData;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -239,6 +240,8 @@ public class Application extends Controller {
 		System.out.println("json" + json);
 		ObjectMapper mapper = new ObjectMapper();
 		RegisterVM register = mapper.readValue(json.traverse(),RegisterVM.class);
+		String url = Play.application().configuration().getString("base_url");
+		System.out.println("url::::::::"+url);
 		
 		String email = null;
 		String type = null;
@@ -687,7 +690,15 @@ public class Application extends Controller {
 		return ok(Json.toJson(clinics.idClinic));
 		
 	}
-	
+	 public static Result getAllClinic()
+     {
+    	 List<Clinic> clinics = Clinic.getAllClinic();
+    	 for(Clinic c : clinics)
+    	 {
+    		 System.out.println("Clinic Name:::::"+c.clinicName);
+    	 }
+    	 return ok(Json.toJson(clinics));
+     }
 	public static Result addTemplate() throws JsonParseException,JsonMappingException,IOException
 	{
 		JsonNode json = request().body().asJson();
@@ -1701,6 +1712,9 @@ public class Application extends Controller {
 			
 			String path = null;
 	    	FilePart picture = body.getFile("picture");
+	    	String remote = request().remoteAddress();
+	    	System.out.println("IP Address::::::"+remote);
+	    	String url = Play.application().configuration().getString("base_url");
 		  
 		  if (picture != null) {
 		    String fileName = picture.getFilename();
@@ -1722,7 +1736,7 @@ public class Application extends Controller {
 				    newFile = new File(play.Play.application().path().toString() + "//public//documents//doctors//"+ doctorId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = "192.168.1.13:9000/assets/documents/doctors/" + doctorId + "/"+  fileName;		    	
+		    	path = url+"/assets/documents/doctors/" + doctorId + "/"+  fileName;		    	
 		    }else if(type.equalsIgnoreCase("assistent")){
 
 		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//assistents//" + assistentId);
@@ -1734,7 +1748,7 @@ public class Application extends Controller {
 				    newFile = new File(play.Play.application().path().toString() + "//public//documents//assistents//"+ assistentId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = "192.168.1.13:9000/assets/documents/assistents/" + assistentId + "/"+  fileName;
+		    	path = url+"/assets/documents/assistents/" + assistentId + "/"+  fileName;
 		    }else if(type.equalsIgnoreCase("patient")){
 		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//patients//" + patientId);
 		    	if(folder.exists()){
@@ -1745,7 +1759,7 @@ public class Application extends Controller {
 				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = "192.168.1.13:9000/assets/documents/patients/" + patientId + "/"+  fileName;
+		    	path = url+"/assets/documents/patients/" + patientId + "/"+  fileName;
 		    }
 
 		    if(newFile.exists()){
@@ -1792,7 +1806,7 @@ public class Application extends Controller {
 		String aTime = request().getQueryString("appointmentTime");
 		
 		List<UploadFiles> uploadedFiles =  UploadFiles.getUploadedFiles(docID, pId,aDate,aTime);
-		System.out.println(Json.toJson(uploadedFiles));
+		System.out.println("KBJSOn:::::::"+Json.toJson(uploadedFiles));
 		return ok(Json.toJson(uploadedFiles));
 		
 	}

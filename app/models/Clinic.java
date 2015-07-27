@@ -43,4 +43,6 @@ public class Clinic extends Model {
 		return find.where().eq("idClinic", idClinic).findUnique();
 	}
 	
+	
+	
 }

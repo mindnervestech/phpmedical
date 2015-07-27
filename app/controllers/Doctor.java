@@ -31,6 +31,8 @@ import models.Invoices;
 import models.PatientClientBookAppointment;
 import models.PatientRegister;
 import models.Person;
+import models.ReminderData;
+import models.ReminderTimeTable;
 import models.TemplateAttribute;
 import models.TemplateClass;
 import models.TotalInvoice;
@@ -39,6 +41,7 @@ import models.TreatmentPlan;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.libs.Json;
+import viewmodel.AlarmReminderVM;
 import viewmodel.AllClinicAppointment;
 import viewmodel.AllPatientsData;
 import viewmodel.AllProcedureVm;
@@ -50,6 +53,7 @@ import viewmodel.DoctorNotesVM;
 import viewmodel.DoctorProcedureVm;
 import viewmodel.FieldVm;
 import viewmodel.PersonVM;
+import viewmodel.ReminderVM;
 import viewmodel.ShiftAppointment;
 import viewmodel.ShiftDetails;
 import viewmodel.ShowFieldVm;
@@ -260,6 +264,8 @@ public class Doctor extends Controller {
 	     
 	    }
 	     
+	    
+	     
 	     public static Result getAllClinicsAppointment() {
 				
 			String doctorId = null;
@@ -382,9 +388,10 @@ public class Doctor extends Controller {
 			return ok(Json.toJson(ClinicList));
 	     
 	    }
-		
-		
-	      public static Result getAllInvoices() {
+	     
+	 
+				
+	    public static Result getAllInvoices() {
 	  		
 	  		String doctorId = null;
 	  		String patientId = null;
@@ -510,6 +517,7 @@ public class Doctor extends Controller {
 	  		
 	  	}
 		
+	    
 		
 		public static Result saveInvoices() throws IOException {
 			
@@ -570,9 +578,9 @@ public class Doctor extends Controller {
 				}
 				
 				Integer doctor_Id = Person.getDoctorByMail(doctorId);
-				
+				System.out.println("doctorId = "+doctorId);
 				List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getNextDoctorClinicAppointment(doctor_Id,"Occupied");
-				//System.out.println("appointmentList = "+appointmentList.size());
+				System.out.println("appointmentList = "+appointmentList.size());
 				if(appointmentList.size() > 0){
 					
 					for(PatientClientBookAppointment appointment : appointmentList){
@@ -1489,17 +1497,18 @@ public static Result getAllDoctorPatientClinics() {
 	
 	}
 	public static Result getTotalInvoice() throws IOException{
-		Integer doctorId = null;
-		Integer patientId = null;
+		String doctorId = null;
+		String patientId = null;
 		String appointmentDate = null;
 		String appointmentTime = null;
-		
-		doctorId = Integer.parseInt(request().getQueryString("doctorId"));
-		patientId = Integer.parseInt(request().getQueryString("patientId"));
+		doctorId = request().getQueryString("doctorId");
+		patientId = request().getQueryString("patientId");
+		int docId = Person.getDoctorByMail(doctorId);
+		int patId = Person.getPatientByMail(patientId);
 		appointmentDate = request().getQueryString("appointmentDate");
 		appointmentTime = request().getQueryString("appointmentTime");
 		
-		TotalInvoice totalInvoice = TotalInvoice.returnTotalInvoice(doctorId, patientId, appointmentDate, appointmentTime);
+		TotalInvoice totalInvoice = TotalInvoice.returnTotalInvoice(docId, patId, appointmentDate, appointmentTime);
 		
 		if(totalInvoice != null){
 			return ok(Json.toJson(totalInvoice));
@@ -1507,6 +1516,8 @@ public static Result getAllDoctorPatientClinics() {
 			return ok(Json.toJson(new TotalInvoice()));
 		}
 	}
+	
+	
 	
 	public static Result saveTreatementTemplate() throws IOException{
 		System.out.println("saveTreatementTemplate ");
@@ -1542,9 +1553,7 @@ public static Result getAllDoctorPatientClinics() {
 			treatmentPlan = new TreatmentPlan();
 		}
 		
-		
-		
-		
+	
 			for(TreatementFieldVm vm : planVm.fieldArrayList){
 
 				if(vm.fieldId.equals("")){

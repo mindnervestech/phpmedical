@@ -31,7 +31,6 @@ public class ReminderData extends Model {
 	public Integer numberOfDoses;
 	public String schedule;
 	public String doctorInstruction;
-	
 	public String visitDate;
 	public String visitType;
 	public String referredBy;
@@ -217,6 +216,8 @@ public class ReminderData extends Model {
 	public static ReminderData getAllClinicAppointment(int doctor_id, int patientId){
 		return find.where().eq("doctorId", doctor_id).eq("patientId", patientId).findUnique();
 	}
+
+	
 	
 		
 }

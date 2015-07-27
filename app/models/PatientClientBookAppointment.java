@@ -56,7 +56,7 @@ public class PatientClientBookAppointment extends Model {
 	}
 	
 	public static List<PatientClientBookAppointment> getNextDoctorClinicAppointment(Integer patient_id, String status) {
-		return find.where().eq("patientId", patient_id).eq("status", status).findList();
+		return find.where().eq("doctor_id", patient_id).eq("status", status).findList();
 	}
 	
 	public static String deleteNextAppointment(Integer doctorId, Integer patient_id, Integer clinicId, String shift) {
