@@ -1751,6 +1751,7 @@ public class Application extends Controller {
 		    	path = url+"/assets/documents/assistents/" + assistentId + "/"+  fileName;
 		    }else if(type.equalsIgnoreCase("patient")){
 		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//patients//" + patientId);
+		    	System.out.println("patient Condition::::"+folder.exists());
 		    	if(folder.exists()){
 				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
@@ -1810,5 +1811,21 @@ public class Application extends Controller {
 		return ok(Json.toJson(uploadedFiles));
 		
 	}
+	
+	public static Result getUploadedFilesForPatient(){
+		String docString = request().getQueryString("doctorId");
+		System.out.println("Doc id::::"+docString);
+		Integer docID = Integer.parseInt(docString);
+		Integer pId = Person.getPatientByMail(request().getQueryString("patientId"));
+		String aDate = request().getQueryString("appointmentDate");
+		String aTime = request().getQueryString("appointmentTime");
+		
+		List<UploadFiles> uploadedFiles =  UploadFiles.getUploadedFiles(docID, pId,aDate,aTime);
+		System.out.println("KBJSOn:::::::"+Json.toJson(uploadedFiles));
+		return ok(Json.toJson(uploadedFiles));
+		
+	}
+	
+	
 }
 	

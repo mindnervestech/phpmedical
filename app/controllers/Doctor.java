@@ -1588,6 +1588,8 @@ public static Result getAllDoctorPatientClinics() {
 		return ok(Json.toJson(planVm));
 		
 	}
+	
+	
 	public static Result saveShareWithPatientTotalInvoice() throws IOException{
 		JsonNode json = request().body().asJson();
 		System.out.println("saveShareWithPatientTotalInvoice json" + json);
