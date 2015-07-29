@@ -70,6 +70,30 @@ import viewmodel.totalInvoiceVM;
 public class Application extends Controller {
 
 	public static Result index() {
+		System.out.println("String path:::::"+Play.application().configuration().getString("folder_create_url_doctor"));
+		File folderParent = new File(Play.application().configuration().getString("folder_parent"));
+		if(!folderParent.exists())
+		{
+			folderParent.mkdir();
+		}
+		File folderCreateDoctor = new File(Play.application().configuration().getString("folder_create_url_doctor"));
+		File folderCreatePatient = new File(Play.application().configuration().getString("folder_create_url_patient"));
+		File folderCreateAssistant = new File(Play.application().configuration().getString("folder_create_url_assistant"));
+		if(!folderCreateDoctor.exists())
+		{
+			System.out.println("Doctor Condition:::::");
+			folderCreateDoctor.mkdir();
+		}
+		if(!folderCreatePatient.exists())
+		{
+			folderCreatePatient.mkdir();
+		}
+		if(!folderCreateAssistant.exists())
+		{
+			folderCreateAssistant.mkdir();
+		}
+		
+		
 		return ok(views.html.index.render("Your new application is ready."));
 	}
 
