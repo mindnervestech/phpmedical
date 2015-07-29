@@ -1765,40 +1765,41 @@ public class Application extends Controller {
 		    UploadFiles uploadFile = new UploadFiles();
 		    if(type.equalsIgnoreCase("doctor")){
 
-		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//doctors//" + doctorId);
-		    	if(folder.exists()){
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//doctors//"+ doctorId + "//" +  fileName);
+		    	File folder = new File(Play.application().configuration().getString("folder_create_url_doctor")+ "//" + doctorId);
+		    	System.out.println("Condition:::::::"+folder.exists());
+			   	if(folder.exists()){
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_doctor")+ "//"+ doctorId + "//" +  fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}else{
 		    		folder.mkdirs();
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//doctors//"+ doctorId + "//" + fileName);
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_doctor") + "//"+ doctorId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = url+"/assets/documents/doctors/" + doctorId + "/"+  fileName;		    	
+		    	path = Play.application().configuration().getString("folder_create_url_doctor")+"/" + doctorId + "/"+  fileName;		    	
 		    }else if(type.equalsIgnoreCase("assistent")){
 
-		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//assistents//" + assistentId);
+		    	File folder = new File(Play.application().configuration().getString("folder_create_url_assistant") + "//" + assistentId);
 		    	if(folder.exists()){
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//assistents//"+ assistentId + "//" +  fileName);
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_assistant") + "//"+ assistentId + "//" +  fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}else{
 		    		folder.mkdirs();
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//assistents//"+ assistentId + "//" + fileName);
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_assistant")+ "//"+ assistentId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = url+"/assets/documents/assistents/" + assistentId + "/"+  fileName;
+		    	path = Play.application().configuration().getString("folder_create_url_assistant")+"/" + assistentId + "/"+  fileName;
 		    }else if(type.equalsIgnoreCase("patient")){
-		    	File folder = new File(play.Play.application().path().toString() + "//public//documents//patients//" + patientId);
+		    	File folder = new File(Play.application().configuration().getString("folder_create_url_patient") + "//" + patientId);
 		    	System.out.println("patient Condition::::"+folder.exists());
 		    	if(folder.exists()){
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_patient") + "//"+ patientId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}else{
 		    		folder.mkdirs();
-				    newFile = new File(play.Play.application().path().toString() + "//public//documents//patients//"+ patientId + "//" + fileName);
+				    newFile = new File(Play.application().configuration().getString("folder_create_url_patient") + "//"+ patientId + "//" + fileName);
 		            file.renameTo(newFile); //here you are moving photo to new directory
 		    	}
-		    	path = url+"/assets/documents/patients/" + patientId + "/"+  fileName;
+		    	path = Play.application().configuration().getString("folder_create_url_patient")+"/" + patientId + "/"+  fileName;
 		    }
 
 		    if(newFile.exists()){
