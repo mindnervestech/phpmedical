@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1675,6 +1676,9 @@ public class Application extends Controller {
 	}
 	public static Result uploadFiles() {
 		  play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		  List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
 
 		  DynamicForm form = DynamicForm.form().bindFromRequest();
 
@@ -1720,7 +1724,17 @@ public class Application extends Controller {
 		    String fileName = picture.getFilename();
 		    String contentType = picture.getContentType(); 
 		    File file = picture.getFile();
-		    System.out.println("fileName" + fileName);
+		    String fileNameString = fileName;
+		    for(String s : specialCharactersInSolr)
+		    {
+		    	if(fileNameString.contains(s))
+		    	{
+		    		fileNameString = fileNameString.replace(""+s, "");
+		    	}
+		    }
+		    fileName = fileNameString;
+		    System.out.println("fileNameString::::::"+fileNameString);
+		    System.out.println("fileName" + fileNameString);
 		    System.out.println("contentType" + contentType);
 		    System.out.println("file" + file.getAbsolutePath());
 		    File newFile = null;
