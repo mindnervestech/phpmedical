@@ -51,4 +51,9 @@ public class UploadFiles extends Model {
 		return find.where().eq("doctorId", doctorId).eq("patientId", patientId).eq("appointmentDate", appointmentDate).eq("appointmentTime", appointmentTime).findList();
 	}
 	
+	public static UploadFiles getUploadFile(Long id)
+	{
+		return find.where().eq("id", id).findUnique();
+	}
+	
 }
