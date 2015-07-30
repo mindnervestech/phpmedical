@@ -55,6 +55,7 @@ POST    /uploadFiles						controllers.Application.uploadFiles()
 GET		/getUploadedFiles					controllers.Application.getUploadedFiles()
 GET     /getUploadedFilesForPatient         controllers.Application.getUploadedFilesForPatient()
 GET     /getAllClinics                      controllers.Application.getAllClinic()
+GET     /getFile/:id                        controllers.Application.getFile(id:Long)
 
 #Doctors Urls
  

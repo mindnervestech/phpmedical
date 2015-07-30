@@ -1743,6 +1743,7 @@ public class Application extends Controller {
 	    	String remote = request().remoteAddress();
 	    	System.out.println("IP Address::::::"+remote);
 	    	String url = Play.application().configuration().getString("base_url");
+	    		    	
 		  
 		  if (picture != null) {
 		    String fileName = picture.getFilename();
@@ -1858,10 +1859,19 @@ public class Application extends Controller {
 		Integer pId = Person.getPatientByMail(request().getQueryString("patientId"));
 		String aDate = request().getQueryString("appointmentDate");
 		String aTime = request().getQueryString("appointmentTime");
-		
 		List<UploadFiles> uploadedFiles =  UploadFiles.getUploadedFiles(docID, pId,aDate,aTime);
 		System.out.println("KBJSOn:::::::"+Json.toJson(uploadedFiles));
 		return ok(Json.toJson(uploadedFiles));
+		
+	}
+	
+	public static Result getFile(Long id)
+	{		
+		
+		System.out.println("panmkaj .........:::::::"+id);
+		UploadFiles uploadFile = UploadFiles.getUploadFile(id);
+		File file = new File(uploadFile.Url);
+		return ok(file);
 		
 	}
 	
