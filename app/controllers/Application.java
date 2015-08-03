@@ -84,9 +84,9 @@ public class Application extends Controller {
 		File folderCreateDoctor = new File(Play.application().configuration().getString("folder_create_url_doctor"));
 		File folderCreatePatient = new File(Play.application().configuration().getString("folder_create_url_patient"));
 		File folderCreateAssistant = new File(Play.application().configuration().getString("folder_create_url_assistant"));
-		File folderProfileDoctor = new File(Play.application().configuration().getString("folder_create_url_doctor"));
-		File folderProfilePatient = new File(Play.application().configuration().getString("folder_create_url_patient"));
-		File folderProfileAssistant = new File(Play.application().configuration().getString("folder_create_url_assistant"));
+		File folderProfileDoctor = new File(Play.application().configuration().getString("profile_pic_url_doctors"));
+		File folderProfilePatient = new File(Play.application().configuration().getString("profile_pic_url_patients"));
+		File folderProfileAssistant = new File(Play.application().configuration().getString("profile_pic_url_assistant"));
 		if(!folderCreateDoctor.exists())
 		{
 			System.out.println("Doctor Condition:::::");
