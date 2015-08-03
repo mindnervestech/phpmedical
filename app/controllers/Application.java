@@ -222,8 +222,53 @@ public class Application extends Controller {
 		registration.save();
 
 		System.out.println("Return");
-		return ok(Json.toJson(new ErrorResponse(Error.E204.getCode(),
-				Error.E204.getMessage())));
+		return ok(Json.toJson(registration.idPerson));
+	}
+	
+	public static Result registerProfilePicturePatient() throws IOException{
+		
+		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		 DynamicForm form = DynamicForm.form().bindFromRequest();
+		 
+		 String path = null;
+		 int patId = 0;
+			if(!form.get("patientId").equalsIgnoreCase("null")){
+				 patId = Integer.parseInt(form.get("patientId"));				
+			}
+	     FilePart picture = body.getFile("picture");
+	     if (picture != null) 
+	     {
+	    	 String fileName = picture.getFilename();
+			 String contentType = picture.getContentType(); 
+			 File file = picture.getFile();
+			 String fileNameString = fileName;
+			 for(String s : specialCharactersInSolr)
+			 {
+			     if(fileNameString.contains(s))
+			     {
+			    	fileNameString = fileNameString.replace(""+s, "");
+			     }
+			  }
+			  fileName = fileNameString;
+			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_patients")+ "//"+  fileName);
+			  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName;
+			  Person p = Person.getPersonById(patId);
+			  p.Url = path;
+			  p.update();
+			 
+	     }
+	     else
+	     {	
+	    	 path = "none";
+	    	 Person p = Person.getPersonById(patId);
+			 p.Url = path;
+			 p.update();
+	     }
+		
+		return ok(path);
 	}
 
 	public static Result registerDoctor() throws IOException {

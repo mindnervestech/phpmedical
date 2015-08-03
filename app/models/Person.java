@@ -49,6 +49,7 @@ public class Person extends Model {
 	public String cloudLoginId;
 	public String cloudLoginPassword;
 	public Integer patient;
+	public String Url;
 	
 /*	@OneToOne
 	public DoctorRegister doctor;
