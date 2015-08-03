@@ -72,13 +72,21 @@ public class Application extends Controller {
 	public static Result index() {
 		System.out.println("String path:::::"+Play.application().configuration().getString("folder_create_url_doctor"));
 		File folderParent = new File(Play.application().configuration().getString("folder_parent"));
+		File folderProfilePic = new File (Play.application().configuration().getString("folder_profile_pic"));
 		if(!folderParent.exists())
 		{
 			folderParent.mkdir();
 		}
+		if(!folderProfilePic.exists())
+		{
+			folderProfilePic.mkdir();
+		}
 		File folderCreateDoctor = new File(Play.application().configuration().getString("folder_create_url_doctor"));
 		File folderCreatePatient = new File(Play.application().configuration().getString("folder_create_url_patient"));
 		File folderCreateAssistant = new File(Play.application().configuration().getString("folder_create_url_assistant"));
+		File folderProfileDoctor = new File(Play.application().configuration().getString("folder_create_url_doctor"));
+		File folderProfilePatient = new File(Play.application().configuration().getString("folder_create_url_patient"));
+		File folderProfileAssistant = new File(Play.application().configuration().getString("folder_create_url_assistant"));
 		if(!folderCreateDoctor.exists())
 		{
 			System.out.println("Doctor Condition:::::");
@@ -91,6 +99,18 @@ public class Application extends Controller {
 		if(!folderCreateAssistant.exists())
 		{
 			folderCreateAssistant.mkdir();
+		}
+		if(!folderProfileDoctor.exists())
+		{
+			folderProfileDoctor.mkdir();
+		}
+		if(!folderProfilePatient.exists())
+		{
+			folderProfilePatient.mkdir();
+		}
+		if(!folderProfileAssistant.exists())
+		{
+			folderProfileAssistant.mkdir();
 		}
 		
 		
