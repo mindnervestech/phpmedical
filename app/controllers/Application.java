@@ -356,7 +356,7 @@ public class Application extends Controller {
 			  newFile.createNewFile();
 			  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
-			  Person p = Person.getDoctorsById(docId);
+			  Person p = Person.getPersonById(docId);
 			  System.out.println("Person name:::::"+p.name);
 			  p.url = path;
 			  p.update();
@@ -364,7 +364,7 @@ public class Application extends Controller {
 		   else
 	       {	
 	    	  path = "none";
-	    	  Person p = Person.getDoctorsById(docId);
+	    	  Person p = Person.getPersonById(docId);
 			  p.url = path;
 			  p.update();
 	       }
