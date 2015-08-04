@@ -260,7 +260,7 @@ public class Application extends Controller {
 			  System.out.println("Path:::::::"+path);
 			  Person p = Person.getPersonById(patId);
 			  System.out.println("Person name:::::"+p.name);
-			  p.Url = "Path";
+			  p.url = "Path";
 			  p.update();
 			 
 	     }
@@ -268,7 +268,7 @@ public class Application extends Controller {
 	     {	
 	    	 path = "none";
 	    	 Person p = Person.getPersonById(patId);
-			 p.Url = path;
+			 p.url = path;
 			 p.update();
 	     }
 		
