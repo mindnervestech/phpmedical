@@ -259,6 +259,7 @@ public class Application extends Controller {
 			  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
 			  Person p = Person.getPersonById(patId);
+			  System.out.println("Person name:::::"+p.name);
 			  p.Url = path;
 			  p.update();
 			 
