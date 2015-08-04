@@ -169,10 +169,56 @@ public class Application extends Controller {
 		registration.save();
 
 		System.out.println("Return");
-		return ok(Json.toJson(new ErrorResponse(Error.E204.getCode(),
-				Error.E204.getMessage())));
+		return ok(Json.toJson(registration.idPerson));
 	}
 
+	public static Result registerProfilePictureAssistant() throws IOException
+	{
+		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		DynamicForm form = DynamicForm.form().bindFromRequest();
+		 
+		String path = null;
+		int assistantId = 0;
+		if(!form.get("assistantId").equalsIgnoreCase("null")){
+				assistantId = Integer.parseInt(form.get("assistantId"));				
+		}
+		FilePart picture = body.getFile("picture");
+		if (picture != null) 
+	    {
+			String fileName = picture.getFilename();
+			String contentType = picture.getContentType(); 
+			File file = picture.getFile();
+			String fileNameString = fileName;
+			for(String s : specialCharactersInSolr)
+			{
+			    if(fileNameString.contains(s))
+			    {
+			    	fileNameString = fileNameString.replace(""+s, "");
+			    }
+			}
+			fileName = fileNameString;
+			System.out.println("File name::::::"+fileName);
+			File  newFile = new File(Play.application().configuration().getString("profile_pic_url_assistant")+ "//"+  fileName);
+			newFile.createNewFile();
+			path = Play.application().configuration().getString("profile_pic_url_assistant")+"/" + fileName;
+			System.out.println("Path:::::::"+path);
+			Person p = Person.getPersonById(assistantId);
+			System.out.println("Person name:::::"+p.name);
+			p.url = path;
+			p.update();
+	    }
+		else
+		{
+			 path = "none";
+	    	 Person p = Person.getPersonById(assistantId);
+			 p.url = path;
+			 p.update();
+		}
+		return ok(path);
+	}
 	public static Result registerPatient() throws IOException {
 		System.out.println("called...............");
 
