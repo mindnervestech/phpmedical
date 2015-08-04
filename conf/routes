@@ -57,6 +57,8 @@ GET     /getUploadedFilesForPatient         controllers.Application.getUploadedF
 GET     /getAllClinics                      controllers.Application.getAllClinic()
 GET     /getFile/:id                        controllers.Application.getFile(id:Long)
 POST    /profilePicturePatient		        controllers.Application.registerProfilePicturePatient()
+POST    /profilePictureDoctor		        controllers.Application.registerProfilePictureDoctor()
+
 
 #Doctors Urls
  
