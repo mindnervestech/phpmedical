@@ -253,8 +253,11 @@ public class Application extends Controller {
 			     }
 			  }
 			  fileName = fileNameString;
+			  System.out.println("File name::::::"+fileName);
 			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_patients")+ "//"+  fileName);
+			  newFile.createNewFile();
 			  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName;
+			  System.out.println("Path:::::::"+path);
 			  Person p = Person.getPersonById(patId);
 			  p.Url = path;
 			  p.update();
