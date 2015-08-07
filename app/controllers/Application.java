@@ -67,6 +67,7 @@ import viewmodel.ChatVm;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
+import viewmodel.PDAEditVm;
 import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
 import viewmodel.PersonVM;
@@ -2272,6 +2273,12 @@ public class Application extends Controller {
 		
 	}
 	
+	public static Result getPicture()
+	{
+		String path = request().getQueryString("path");
+	    File file = new File(path);
+	    return ok(file);
+	}
 	
 }
 	

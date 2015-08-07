@@ -27,6 +27,7 @@ import models.Clinic;
 import models.DoctorClinicSchedule;
 import models.DoctorNotes;
 import models.DoctorProcedure;
+import models.DoctorRegister;
 import models.Invoices;
 import models.PatientClientBookAppointment;
 import models.PatientRegister;
@@ -52,6 +53,7 @@ import viewmodel.DoctorClinicDetails;
 import viewmodel.DoctorNotesVM;
 import viewmodel.DoctorProcedureVm;
 import viewmodel.FieldVm;
+import viewmodel.PDAEditVm;
 import viewmodel.PersonVM;
 import viewmodel.ReminderVM;
 import viewmodel.ShiftAppointment;
@@ -263,8 +265,7 @@ public class Doctor extends Controller {
 			return ok(Json.toJson(ClinicList));
 	     
 	    }
-	     
-	    
+	        
 	     
 	     public static Result getAllClinicsAppointment() {
 				
@@ -1662,6 +1663,25 @@ public static Result getAllDoctorPatientClinics() {
 
 		return ok(Json.toJson(treatementField));
 		
+	}
+	public static Result getProfileDoctor() throws IOException
+	{
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		PDAEditVm vm = new PDAEditVm();
+		vm.setName(person.name);
+		vm.setEmailID(person.emailID);
+		vm.setPassword(person.password);
+		vm.setMobileNumber(""+person.mobileNumber);
+		vm.setGender(""+person.gender);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		vm.setDateOfBirth(""+df.format(person.dateOfBirth));
+		vm.setLocation(person.location);
+		vm.setBloodGroup(person.bloodGroup);
+		vm.setUrl(person.url);
+		DoctorRegister doctor = DoctorRegister.getDoctorById(person.doctor);
+		vm.setSpeciality(doctor.speciality);
+		return ok(Json.toJson(vm));
 	}
 	
 }

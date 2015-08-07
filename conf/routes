@@ -63,6 +63,7 @@ GET     /availableEmail					    controllers.Application.availableEmail()
 GET  	/verifyCompleted                    controllers.Application.verifyCompleted()
 GET     /getVerificationCode                controllers.Application.getVerificationCode()
 POST    /verification                       controllers.Application.verification()
+GET     /getPicture                         controllers.Application.getPicture()
 
 
 #Doctors Urls
@@ -87,7 +88,9 @@ POST    /saveTotalInvoice				    	controllers.Doctor.saveTotalInvoice()
 GET     /getTotalInvoice             			controllers.Doctor.getTotalInvoice()
 POST    /saveTreatementTemplate				    controllers.Doctor.saveTreatementTemplate()
 POST    /saveShareWithPatientTotalInvoice		controllers.Doctor.saveShareWithPatientTotalInvoice()
-POST    /updateTreatementTemplate				controllers.Doctor.updateTreatementTemplate() 
+POST    /updateTreatementTemplate				controllers.Doctor.updateTreatementTemplate()   
+GET     /getProfileDoctor                       controllers.Doctor.getProfileDoctor()
+
 
 #patient Urls
 
