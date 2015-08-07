@@ -2273,10 +2273,9 @@ public class Application extends Controller {
 		
 	}
 	
-	public static Result getPicture()
+	public static Result getPicture(String id)
 	{
-		String path = request().getQueryString("path");
-	    File file = new File(path);
+	    File file = new File(id);
 	    return ok(file);
 	}
 	
