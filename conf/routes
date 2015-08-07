@@ -63,7 +63,7 @@ GET     /availableEmail					    controllers.Application.availableEmail()
 GET  	/verifyCompleted                    controllers.Application.verifyCompleted()
 GET     /getVerificationCode                controllers.Application.getVerificationCode()
 POST    /verification                       controllers.Application.verification()
-GET     /getPicture/:id                     controllers.Application.getPicture(id:String)
+GET     /getPicture/:id                     controllers.Application.getPicture(id:Integer)
 
 
 #Doctors Urls

@@ -1,6 +1,7 @@
 package viewmodel;
 
 public class PDAEditVm {
+     private Integer id;
 	 private String name;
 	 private String emailID;
 	 private String password;

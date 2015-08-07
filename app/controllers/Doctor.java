@@ -1679,6 +1679,7 @@ public static Result getAllDoctorPatientClinics() {
 		vm.setLocation(person.location);
 		vm.setBloodGroup(person.bloodGroup);
 		vm.setUrl(person.url);
+		vm.setId(person.idPerson);
 		DoctorRegister doctor = DoctorRegister.getDoctorById(person.doctor);
 		vm.setSpeciality(doctor.speciality);
 		return ok(Json.toJson(vm));

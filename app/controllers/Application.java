@@ -2273,9 +2273,10 @@ public class Application extends Controller {
 		
 	}
 	
-	public static Result getPicture(String id)
+	public static Result getPicture(Integer id)
 	{
-	    File file = new File(id);
+		Person person = Person.getPersonById(id);
+	    File file = new File(person.url);
 	    return ok(file);
 	}
 	
