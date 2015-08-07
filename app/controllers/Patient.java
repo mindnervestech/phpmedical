@@ -753,6 +753,7 @@ public class Patient extends Controller {
 		return ok(Json.toJson(clinicList));
 	}
 
+	
 	public static Result cancelClinicsAppointment() {
 
 		String decryptedValue = null;

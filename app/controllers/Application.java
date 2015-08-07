@@ -17,8 +17,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Properties;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import models.AssistentRegister;
 import models.BucketDoctors;
@@ -66,6 +77,7 @@ import viewmodel.ShowFieldVm;
 import viewmodel.ShowTemplatesVm;
 import viewmodel.TemplateVm;
 import viewmodel.totalInvoiceVM;
+import javax.activation.*;
 
 public class Application extends Controller {
 
@@ -117,6 +129,32 @@ public class Application extends Controller {
 		return ok(views.html.index.render("Your new application is ready."));
 	}
 
+	public static Result availableEmail() throws IOException
+	{
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		if(person == null)
+		{
+			return ok("Available");
+		}
+		else
+		{
+			return ok(Json.toJson("Not Available"));
+		}
+		
+	}
+	
+	public static Result verifyCompleted() throws IOException 
+	{
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		person.verficationCode = "000000";
+		person.update();
+		return ok(Json.toJson("Completed"));
+	}
+	
+	
+	
 	public static Result registerAssistent() throws IOException {
 		System.out.println("called...............");
 		//Form<RegisterVM> form = DynamicForm.form(RegisterVM.class).bindFromRequest();
@@ -134,10 +172,8 @@ public class Application extends Controller {
 		}
 		
 		Person registration = new Person();
-
 		AssistentRegister assistent = new AssistentRegister();
-		
-		
+			
 		//Person p = Person.getDoctorByMail()
 		//int id= 1;
 		//assistent.doctorRegister.doctorId
@@ -178,16 +214,35 @@ public class Application extends Controller {
 		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
 		            "~", "*", "?", ":","\"","\\"," "});
-		DynamicForm form = DynamicForm.form().bindFromRequest();
-		 
+		 int aNumber = 0;
+		 DynamicForm form = DynamicForm.form().bindFromRequest();
+		 final String username="kaustubh.kbh@gmail.com";
+	     final String password="krrish007";
+	     System.out.println("username="+username);
+	     System.out.println("Password="+password);
+	     Properties props = new Properties();
+	 	 props.put("mail.smtp.auth", "true");
+	 	 props.put("mail.smtp.starttls.enable", "true");
+	 	 props.put("mail.smtp.host", "smtp.gmail.com");
+	 	 props.put("mail.smtp.port", "587");
+	 	 Session session = Session.getInstance(props,
+	 	 		  new javax.mail.Authenticator() {
+	 	 			protected PasswordAuthentication getPasswordAuthentication() {
+	 	 				return new PasswordAuthentication(username, password);
+	 	 			}
+	 	  });
 		String path = null;
 		int assistantId = 0;
-		if(!form.get("assistantId").equalsIgnoreCase("null")){
+		
+  
+		if(!form.get("assistantId").equalsIgnoreCase("null"))
+		{
 				assistantId = Integer.parseInt(form.get("assistantId"));				
 		}
 		FilePart picture = body.getFile("picture");
 		if (picture != null) 
 	    {
+			Person p = Person.getPersonById(assistantId);
 			String fileName = picture.getFilename();
 			String contentType = picture.getContentType(); 
 			File file = picture.getFile();
@@ -202,22 +257,63 @@ public class Application extends Controller {
 			fileName = fileNameString;
 			System.out.println("File name::::::"+fileName);
 			File  newFile = new File(Play.application().configuration().getString("profile_pic_url_assistant")+ "//"+  fileName);
-			newFile.createNewFile();
+			file.renameTo(newFile);
 			path = Play.application().configuration().getString("profile_pic_url_assistant")+"/" + fileName;
 			System.out.println("Path:::::::"+path);
-			Person p = Person.getPersonById(assistantId);
+			try
+			{ 				
+		 			aNumber = (int)((Math.random() * 900000)+100000); 
+		 			System.out.println("Random Number:::::::"+aNumber);
+		  			Message feedback = new MimeMessage(session);
+		  			feedback.setFrom(new InternetAddress(username));
+		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+		  			feedback.setSubject("MedicalDiary Verification Code");	  			
+		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+		  	        messageBodyPart.setText(""+aNumber);	  	    
+		  	        Multipart multipart = new MimeMultipart();	  	    
+		  	        multipart.addBodyPart(messageBodyPart);	            
+		  	        feedback.setContent(multipart);
+		  		    Transport.send(feedback);
+		     } 
+			 catch (MessagingException e)
+			 {
+		       		e.printStackTrace();
+		     }
+				
+			
 			System.out.println("Person name:::::"+p.name);
 			p.url = path;
+			p.verficationCode = ""+aNumber;
 			p.update();
 	    }
 		else
 		{
 			 path = "none";
 	    	 Person p = Person.getPersonById(assistantId);
+	    	 try
+			 { 				
+			 			aNumber = (int)((Math.random() * 900000)+100000); 
+			 			System.out.println("Random Number:::::::"+aNumber);
+			  			Message feedback = new MimeMessage(session);
+			  			feedback.setFrom(new InternetAddress(username));
+			  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+			  			feedback.setSubject("MedicalDiary Verification Code");	  			
+			  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+			  	        messageBodyPart.setText(""+aNumber);	  	    
+			  	        Multipart multipart = new MimeMultipart();	  	    
+			  	        multipart.addBodyPart(messageBodyPart);	            
+			  	        feedback.setContent(multipart);
+			  		    Transport.send(feedback);
+			   } 
+			   catch (MessagingException e)
+			   {
+			       		e.printStackTrace();
+			   }
+			 p.verficationCode = ""+aNumber;	
 			 p.url = path;
 			 p.update();
 		}
-		return ok(path);
+		return ok(Json.toJson(""+aNumber));
 	}
 	public static Result registerPatient() throws IOException {
 		System.out.println("called...............");
@@ -272,12 +368,27 @@ public class Application extends Controller {
 	}
 	
 	public static Result registerProfilePicturePatient() throws IOException{
-		
+		 int aNumber = 0; 
 		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
 		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
 		            "~", "*", "?", ":","\"","\\"," "});
 		 DynamicForm form = DynamicForm.form().bindFromRequest();
+		 final String username="kaustubh.kbh@gmail.com";
+	     final String password="krrish007";
+	     System.out.println("username="+username);
+	     System.out.println("Password="+password);
+	     Properties props = new Properties();
+	 	 props.put("mail.smtp.auth", "true");
+	 	 props.put("mail.smtp.starttls.enable", "true");
+	 	 props.put("mail.smtp.host", "smtp.gmail.com");
+	 	 props.put("mail.smtp.port", "587");
+	 	 Session session = Session.getInstance(props,
+	 	 		  new javax.mail.Authenticator() {
+	 	 			protected PasswordAuthentication getPasswordAuthentication() {
+	 	 				return new PasswordAuthentication(username, password);
+	 	 			}
+	 	  });
 		 
 		 String path = null;
 		 int patId = 0;
@@ -301,24 +412,67 @@ public class Application extends Controller {
 			  fileName = fileNameString;
 			  System.out.println("File name::::::"+fileName);
 			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_patients")+ "//"+  fileName);
-			  newFile.createNewFile();
+			  file.renameTo(newFile);
 			  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
 			  Person p = Person.getPersonById(patId);
 			  System.out.println("Person name:::::"+p.name);
+			  try
+			  { 				
+		 			aNumber = (int)((Math.random() * 900000)+100000); 
+		 			System.out.println("Random Number:::::::"+aNumber);
+		  			Message feedback = new MimeMessage(session);
+		  			feedback.setFrom(new InternetAddress(username));
+		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+		  			feedback.setSubject("MedicalDiary Verification Code");	  			
+		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+		  	        messageBodyPart.setText(""+aNumber);	  	    
+		  	        Multipart multipart = new MimeMultipart();	  	    
+		  	        multipart.addBodyPart(messageBodyPart);	            
+		  	        feedback.setContent(multipart);
+		  		    Transport.send(feedback);
+		        } 
+			    catch (MessagingException e)
+			    {
+		       			e.printStackTrace();
+		  		}
+				
+			 
 			  p.url = path;
+			  p.verficationCode = ""+aNumber;
 			  p.update();
 			 
 	     }
 	     else
 	     {	
-	    	 path = "none";
-	    	 Person p = Person.getPersonById(patId);
-			 p.url = path;
-			 p.update();
+	    	  Person p = Person.getPersonById(patId);
+	    	  try
+			  {
+		 			aNumber = (int)((Math.random() * 900000)+100000); 
+		 			System.out.println("Random Number:::::::"+aNumber);
+		  			Message feedback = new MimeMessage(session);
+		  			feedback.setFrom(new InternetAddress(username));
+		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+		  			feedback.setSubject("MedicalDiary Verification Code");	  			
+		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+		  	        messageBodyPart.setText(""+aNumber);	  	    
+		  	        Multipart multipart = new MimeMultipart();	  	    
+		  	        multipart.addBodyPart(messageBodyPart);	            
+		  	        feedback.setContent(multipart);
+		  		    Transport.send(feedback);
+		        } 
+			    catch (MessagingException e)
+			    {
+		       			e.printStackTrace();
+		  		}
+		    	path = "none";
+		    	
+		    	p.verficationCode = ""+aNumber;
+				p.url = path;
+				p.update();
 	     }
 		
-		return ok(path);
+		return ok(Json.toJson(""+aNumber));
 	}
 
 	public static Result registerDoctor() throws IOException {
@@ -376,7 +530,23 @@ public class Application extends Controller {
 		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
 		            "~", "*", "?", ":","\"","\\"," "});
+		 int aNumber = 0;
 		 DynamicForm form = DynamicForm.form().bindFromRequest();
+		 final String username="kaustubh.kbh@gmail.com";
+	     final String password="krrish007";
+	     System.out.println("username="+username);
+	     System.out.println("Password="+password);
+	     Properties props = new Properties();
+	 	 props.put("mail.smtp.auth", "true");
+	 	 props.put("mail.smtp.starttls.enable", "true");
+	 	 props.put("mail.smtp.host", "smtp.gmail.com");
+	 	 props.put("mail.smtp.port", "587");
+	 	 Session session = Session.getInstance(props,
+	 	 		  new javax.mail.Authenticator() {
+	 	 			protected PasswordAuthentication getPasswordAuthentication() {
+	 	 				return new PasswordAuthentication(username, password);
+	 	 			}
+	 	  });
 		 String path = null;
 		 int docId = 0;
 		 if(!form.get("doctorId").equalsIgnoreCase("null")){
@@ -385,6 +555,7 @@ public class Application extends Controller {
 		 FilePart picture = body.getFile("picture");
 		 if (picture != null) 
 	     {
+			 Person p = Person.getPersonById(docId);
 	    	 String fileName = picture.getFilename();
 			 String contentType = picture.getContentType(); 
 			 File file = picture.getFile();
@@ -396,25 +567,65 @@ public class Application extends Controller {
 			    	fileNameString = fileNameString.replace(""+s, "");
 			     }
 			  }
+			 try
+			  { 				
+		 			aNumber = (int)((Math.random() * 900000)+100000); 
+		 			System.out.println("Random Number:::::::"+aNumber);
+		  			Message feedback = new MimeMessage(session);
+		  			feedback.setFrom(new InternetAddress(username));
+		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+		  			feedback.setSubject("MedicalDiary Verification Code");	  			
+		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+		  	        messageBodyPart.setText(""+aNumber);	  	    
+		  	        Multipart multipart = new MimeMultipart();	  	    
+		  	        multipart.addBodyPart(messageBodyPart);	            
+		  	        feedback.setContent(multipart);
+		  		    Transport.send(feedback);
+		        } 
+			    catch (MessagingException e)
+			    {
+		       			e.printStackTrace();
+		  		}
 			  fileName = fileNameString;
 			  System.out.println("File name::::::"+fileName);
 			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_doctors")+ "//"+  fileName);
-			  newFile.createNewFile();
+			  file.renameTo(newFile);
 			  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
-			  Person p = Person.getPersonById(docId);
+			  
 			  System.out.println("Person name:::::"+p.name);
 			  p.url = path;
+			  p.verficationCode = ""+aNumber;
 			  p.update();
 		   }
 		   else
 	       {	
 	    	  path = "none";
 	    	  Person p = Person.getPersonById(docId);
+	    	  try
+			  { 				
+		 			aNumber = (int)((Math.random() * 900000)+100000); 
+		 			System.out.println("Random Number:::::::"+aNumber);
+		  			Message feedback = new MimeMessage(session);
+		  			feedback.setFrom(new InternetAddress(username));
+		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
+		  			feedback.setSubject("MedicalDiary Verification Code");	  			
+		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+		  	        messageBodyPart.setText(""+aNumber);	  	    
+		  	        Multipart multipart = new MimeMultipart();	  	    
+		  	        multipart.addBodyPart(messageBodyPart);	            
+		  	        feedback.setContent(multipart);
+		  		    Transport.send(feedback);
+		        } 
+			    catch (MessagingException e)
+			    {
+		       			e.printStackTrace();
+		  		}
 			  p.url = path;
+			  p.verficationCode = ""+aNumber;
 			  p.update();
 	       }
-		   return ok(path);
+		   return ok(Json.toJson(""+aNumber));
 	}
 	
 	public static Result login() throws IOException {

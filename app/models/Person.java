@@ -50,6 +50,7 @@ public class Person extends Model {
 	public String cloudLoginPassword;
 	public Integer patient;
 	public String url;
+	public String verficationCode;
 	
 /*	@OneToOne
 	public DoctorRegister doctor;
