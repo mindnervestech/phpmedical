@@ -153,7 +153,32 @@ public class Application extends Controller {
 		return ok(Json.toJson("Completed"));
 	}
 	
-	
+	public static Result getVerificationCode() throws IOException
+	{
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		return ok(Json.toJson(person.verficationCode));
+	}
+	public static Result verification() throws IOException
+	{
+		System.out.println("called...............");
+		//Form<RegisterVM> form = DynamicForm.form(RegisterVM.class).bindFromRequest();
+		//RegisterVM register = form.get();
+		String email = request().getQueryString("email");
+		String verificationCode = request().getQueryString("verifyCode");
+		Person person = Person.getPersonByMail(email);
+		if((person.verficationCode).equalsIgnoreCase(verificationCode))
+		{
+			person.verficationCode = "000000";
+			person.update();
+			return ok(Json.toJson("Verified"));
+		}
+		else
+		{
+			return ok(Json.toJson("Not Verified"));
+		}
+		
+	}
 	
 	public static Result registerAssistent() throws IOException {
 		System.out.println("called...............");
