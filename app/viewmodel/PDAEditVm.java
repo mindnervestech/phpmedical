@@ -72,5 +72,11 @@ public class PDAEditVm {
 	public void setSpeciality(String speciality) {
 		this.speciality = speciality;
 	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	
 }
