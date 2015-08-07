@@ -90,6 +90,7 @@ POST    /saveTreatementTemplate				    controllers.Doctor.saveTreatementTemplate
 POST    /saveShareWithPatientTotalInvoice		controllers.Doctor.saveShareWithPatientTotalInvoice()
 POST    /updateTreatementTemplate				controllers.Doctor.updateTreatementTemplate()   
 GET     /getProfileDoctor                       controllers.Doctor.getProfileDoctor()
+POST    /profilePictureUpdateDoctor                   controllers.Doctor.profilePictureUpdate()
 
 
 #patient Urls

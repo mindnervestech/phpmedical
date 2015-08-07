@@ -1684,6 +1684,45 @@ public static Result getAllDoctorPatientClinics() {
 		vm.setSpeciality(doctor.speciality);
 		return ok(Json.toJson(vm));
 	}
+	public static Result profilePictureUpdate() throws IOException
+	{
+		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		String path = "";
+		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		DynamicForm form = DynamicForm.form().bindFromRequest();
+		FilePart picture = body.getFile("picture");
+		String email = form.get("email");
+		Person person = Person.getPersonByMail(email);
+		File file = new File(person.url);
+		Boolean result = file.delete();
+		if(result)
+		{
+			String fileName = picture.getFilename();
+			 String contentType = picture.getContentType(); 
+			 File fileSave = picture.getFile();
+			 String fileNameString = fileName;
+			 for(String s : specialCharactersInSolr)
+			 {
+			     if(fileNameString.contains(s))
+			     {
+			    	fileNameString = fileNameString.replace(""+s, "");
+			     }
+			  }
+			  fileName = fileNameString;
+			  System.out.println("File name::::::"+fileName);
+			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_doctors")+ "//"+  fileName);
+			  file.renameTo(newFile);
+			  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName;
+			  System.out.println("Path:::::::"+path);
+			  System.out.println("Person name:::::"+person.name);
+			  person.url = path;
+			  person.update();
+		}
+		
+		return ok(Json.toJson("Success"));
+    }
 	
 }
 	
