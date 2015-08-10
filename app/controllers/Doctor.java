@@ -1721,6 +1721,10 @@ public static Result getAllDoctorPatientClinics() {
 			  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
 			  System.out.println("Person name:::::"+person.name);
+			  System.out.println("fileNameString::::::"+fileNameString);
+			    System.out.println("fileName" + fileNameString);
+			    System.out.println("contentType" + contentType);
+			    System.out.println("file" + file.getAbsolutePath());
 			  person.url = path;
 			  person.update();
 		}
