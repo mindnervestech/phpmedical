@@ -1717,7 +1717,7 @@ public static Result getAllDoctorPatientClinics() {
 			  fileName = fileNameString;
 			  System.out.println("File name::::::"+fileName);
 			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_doctors")+ "//"+  fileName);
-			  file.renameTo(newFile);
+			  fileSave.renameTo(newFile);
 			  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName;
 			  System.out.println("Path:::::::"+path);
 			  System.out.println("Person name:::::"+person.name);
@@ -1732,7 +1732,6 @@ public static Result getAllDoctorPatientClinics() {
 	{
 		GenderType genderJSon;
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
 		PDAEditVm personVm = mapper.readValue(request().body().asJson(),PDAEditVm.class);
 		Person person = Person.getPersonByMail(personVm.getEmailID());
