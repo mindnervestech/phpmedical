@@ -539,7 +539,8 @@ public class Doctor extends Controller {
 			Invoices invoices = Invoices.checkInvoicesById(doctor_id,patient_id,Integer.parseInt(planVm.procedureId),
 					Integer.parseInt(planVm.templateId),planVm.patientAppointmentDate,planVm.patientAppointmentTime);
 			
-			if(invoices == null){
+			if(invoices == null)
+			{
 				
 				invoices = new Invoices();
 				invoices.doctorId = doctor_id;//Person.getDoctorByMail(planVm.doctorId);
@@ -1722,9 +1723,9 @@ public static Result getAllDoctorPatientClinics() {
 			  System.out.println("Path:::::::"+path);
 			  System.out.println("Person name:::::"+person.name);
 			  System.out.println("fileNameString::::::"+fileNameString);
-			    System.out.println("fileName" + fileNameString);
-			    System.out.println("contentType" + contentType);
-			    System.out.println("file" + file.getAbsolutePath());
+			  System.out.println("fileName" + fileNameString);
+			  System.out.println("contentType" + contentType);
+			  System.out.println("file" + file.getAbsolutePath());
 			  person.url = path;
 			  person.update();
 		}

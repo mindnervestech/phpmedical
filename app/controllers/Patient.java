@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,11 +22,15 @@ import models.PatientClientBookAppointment;
 import models.Person;
 import models.ReminderData;
 import models.ReminderTimeTable;
+import models.Person.GenderType;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Http.MultipartFormData.FilePart;
 import viewmodel.AlarmReminderVM;
 import viewmodel.ClinicDoctorVM;
 import viewmodel.DoctorClinicDetails;
@@ -34,6 +39,7 @@ import viewmodel.PatientClinicsAppointmentVM;
 import viewmodel.RegisterVM;
 import viewmodel.ReminderVM;
 import viewmodel.TimeTable;
+import play.data.DynamicForm;
 import play.libs.Json;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -810,6 +816,76 @@ public class Patient extends Controller {
 				doctor_id, patient_id, clinic_id, shift);
 
 		return ok(Json.toJson(status));
+	}
+	public static Result profilePictureUpdatePatient() throws IOException
+	{
+		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		String path = "";
+		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		DynamicForm form = DynamicForm.form().bindFromRequest();
+		FilePart picture = body.getFile("picture");
+		String email = form.get("email");
+		Person person = Person.getPersonByMail(email);
+		File file = new File(person.url);
+		Boolean result = file.delete();
+		if(result)
+		{
+			 String fileName = picture.getFilename();
+			 String contentType = picture.getContentType(); 
+			 File fileSave = picture.getFile();
+			 String fileNameString = fileName;
+			 for(String s : specialCharactersInSolr)
+			 {
+			     if(fileNameString.contains(s))
+			     {
+			    	fileNameString = fileNameString.replace(""+s, "");
+			     }
+			  }
+			  fileName = fileNameString;
+			  System.out.println("File name::::::"+fileName);
+			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_patients")+ "//"+  fileName);
+			  fileSave.renameTo(newFile);
+			  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName;
+			  System.out.println("Path:::::::"+path);
+			  System.out.println("Person name:::::"+person.name);
+			  System.out.println("fileNameString::::::"+fileNameString);
+			  System.out.println("fileName" + fileNameString);
+			  System.out.println("contentType" + contentType);
+			  System.out.println("file" + file.getAbsolutePath());
+			  person.url = path;
+			  person.update();
+		}
+		
+		return ok(Json.toJson("Success"));
+    }
+	public static Result updatePatientProfile() throws IOException 
+	{
+		GenderType genderJSon;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		ObjectMapper mapper = new ObjectMapper();
+		PDAEditVm personVm = mapper.readValue(request().body().asJson(),PDAEditVm.class);
+		Person person = Person.getPersonByMail(personVm.getEmailID());
+		person.name = personVm.getName();
+		person.location = personVm.getLocation();
+		person.password = personVm.getPassword();
+		person.bloodGroup = personVm.getBloodGroup();
+		genderJSon = GenderType.valueOf(personVm.getGender());
+		person.gender = genderJSon;
+		person.allergicTo = personVm.getAllegricTo();
+		
+		try
+		{
+			person.dateOfBirth = format.parse(personVm.getDateOfBirth());
+			person.update();
+		}
+		catch(ParseException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ok(Json.toJson("Success"));
 	}
 
 	public static class ErrorResponse {
