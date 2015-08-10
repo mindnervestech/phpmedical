@@ -79,6 +79,12 @@ public class PDAEditVm {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+	public String getAllegricTo() {
+		return allegricTo;
+	}
+	public void setAllegricTo(String allegricTo) {
+		this.allegricTo = allegricTo;
+	}
 	
 	
 }
