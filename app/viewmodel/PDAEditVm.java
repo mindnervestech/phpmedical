@@ -12,6 +12,7 @@ public class PDAEditVm {
 	 private String bloodGroup;
 	 private String url;
 	 private String speciality;
+	 private String allegricTo;
 	public String getName() {
 		return name;
 	}
