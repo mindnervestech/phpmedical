@@ -3,6 +3,7 @@ package controllers;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 import models.AssistentRegister;
 import models.Clinic;
 import models.DoctorClinicSchedule;
+import models.DoctorRegister;
 import models.PatientClientBookAppointment;
 import models.Person;
 import models.ReminderData;
@@ -27,6 +29,7 @@ import play.mvc.Result;
 import viewmodel.AlarmReminderVM;
 import viewmodel.ClinicDoctorVM;
 import viewmodel.DoctorClinicDetails;
+import viewmodel.PDAEditVm;
 import viewmodel.PatientClinicsAppointmentVM;
 import viewmodel.RegisterVM;
 import viewmodel.ReminderVM;
@@ -753,6 +756,27 @@ public class Patient extends Controller {
 		return ok(Json.toJson(clinicList));
 	}
 
+	public static Result getProfilePatient() throws IOException
+	{
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		PDAEditVm vm = new PDAEditVm();
+		vm.setName(person.name);
+		vm.setEmailID(person.emailID);
+		vm.setPassword(person.password);
+		vm.setMobileNumber(""+person.mobileNumber);
+		vm.setGender(""+person.gender);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		vm.setDateOfBirth(""+df.format(person.dateOfBirth));
+		vm.setLocation(person.location);
+		vm.setBloodGroup(person.bloodGroup);
+		vm.setUrl(person.url);
+		vm.setId(person.idPerson);
+		vm.setAllegricTo(person.allergicTo);
+		return ok(Json.toJson(vm));
+	}
+	
+	
 	
 	public static Result cancelClinicsAppointment() {
 
