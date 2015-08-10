@@ -34,6 +34,7 @@ import models.Invoices;
 import models.PatientClientBookAppointment;
 import models.PatientRegister;
 import models.Person;
+import models.Person.GenderType;
 import models.ReminderData;
 import models.ReminderTimeTable;
 import models.TemplateAttribute;
@@ -1523,7 +1524,6 @@ public static Result getAllDoctorPatientClinics() {
 	}
 	
 	
-	
 	public static Result saveTreatementTemplate() throws IOException{
 		System.out.println("saveTreatementTemplate ");
 		JsonNode json = request().body().asJson();
@@ -1728,5 +1728,35 @@ public static Result getAllDoctorPatientClinics() {
 		return ok(Json.toJson("Success"));
     }
 	
+	public static Result updateDoctorProfile() throws IOException 
+	{
+		GenderType genderJSon;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		PDAEditVm personVm = mapper.readValue(request().body().asJson(),PDAEditVm.class);
+		Person person = Person.getPersonByMail(personVm.getEmailID());
+		person.name = personVm.getName();
+		person.location = personVm.getLocation();
+		person.password = personVm.getPassword();
+		person.bloodGroup = personVm.getBloodGroup();
+		genderJSon = GenderType.valueOf(personVm.getGender());
+		person.gender = genderJSon;
+		DoctorRegister doctor = DoctorRegister.getDoctorById(person.doctor);
+		doctor.speciality = personVm.getSpeciality();
+		doctor.update();
+		
+		try
+		{
+			person.dateOfBirth = format.parse(personVm.getDateOfBirth());
+			person.update();
+		}
+		catch(ParseException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ok(Json.toJson("Success"));
+	}
 }
 	
