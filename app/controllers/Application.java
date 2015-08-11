@@ -1823,6 +1823,39 @@ public class Application extends Controller {
 		return ok();
 	}
 
+	public static Result addPatientDependentWithoutConfirmaton() throws UnsupportedEncodingException{
+		System.out.println("patient dependent");
+		JsonNode json = request().body().asJson();
+		String email = json.path("patientId").asText();
+		String emailId = json.path("email").asText();
+		String password = json.path("password").asText();
+		PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(email)));
+		ArrayNode docs = (ArrayNode) json.path("dependents");
+		
+		JsonNode dep = docs.get(0);
+		Integer id = dep.path("id").asInt();
+		String accessLevel = dep.path("accessLevel").asText();
+		PatientRegister p = PatientRegister.getPatientById(id);
+		PatientDependency pd = new PatientDependency();
+		Person person = Person.getPatientsById(id);
+		System.out.println("email db :::::::"+person.emailID);
+		System.out.println("Condition :::::::"+(person.emailID).equalsIgnoreCase(emailId));
+		if(((person.emailID).equalsIgnoreCase(emailId))&&((person.password).equalsIgnoreCase(password)))
+		{
+			pd.patient = patient.patientId;
+			pd.dependent = p.patientId;
+			pd.status = "C";
+			pd.accessLevel = accessLevel;
+			pd.save();
+			System.out.println("patient dependent");
+			return ok();
+		}
+		else
+		{
+			return ok(Json.toJson("Error"));
+		}
+			
+	}
 	public static Result getAllPatientDependents() throws UnsupportedEncodingException{
 		String decryptedValue = URLDecoder.decode(request()
 				.getQueryString("id"), "UTF-8");
