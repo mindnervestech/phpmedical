@@ -2004,15 +2004,30 @@ public class Application extends Controller {
 			for(int i=0;i<dels.size();i++){
 				JsonNode del = dels.get(i);
 				Integer id = del.path("id").asInt();
+				String delType = del.path("type").asText();
 				String accessLevel = del.path("accessLevel").asText();
 				PatientRegister p = PatientRegister.getPatientById(id);
 				Delegates d = new Delegates();
 				d.parent = patient.patientId;
-				d.delegate = p.patientId;
-				d.status = "WC";
+				if(delType.equalsIgnoreCase("D")){
+					DoctorRegister doc = DoctorRegister.getDoctorById(id);
+					d.delegate = doc.doctorId;
+					d.delType = "D";
+				} else if(delType.equalsIgnoreCase("A")){
+					AssistentRegister ass = AssistentRegister.getAssistantById(id);
+					d.delegate = ass.assitentId;
+					d.delType = "A";
+				}
+				else
+				{
+					PatientRegister patientRequest = PatientRegister.getPatientById(id);
+					d.delegate = patient.patientId;
+					d.delType = "P";
+				}
 				d.parentType = "P";
-				d.delType = "P";
+				d.status = "WC";
 				d.accessLevel = accessLevel;
+				d.save();
 				d.save();
 			}
 		}
