@@ -740,6 +740,23 @@ public class Application extends Controller {
 		patient.save();
 		return ok();
 	}
+	
+	public static Result patientDoctorAdd() throws Exception
+	{
+		System.out.println("Doctor Add");
+		String decryptedValue = URLDecoder.decode(request()
+				.getQueryString("id"), "UTF-8");
+		System.out.println(decryptedValue);
+		PatientRegister patient = PatientRegister.getPatientById((Person
+				.getPatientByMail(decryptedValue)));
+		String id = request().getQueryString("doctor");
+		DoctorRegister doctor = DoctorRegister.getDoctorById(Integer
+				.parseInt(id));
+		patient.doctors.add(doctor);
+		System.out.println("patient doctors close");
+		patient.save();
+		return ok();
+	}
 
 	public static Result removePatientsDoctor() throws Exception {
 		System.out.println("patient doctors");
@@ -1931,6 +1948,7 @@ public class Application extends Controller {
 	public static Result getAllDoctorsAndAssistants(){
 		List<Person> docs = Person.getAllDoctorById();
 		List<Person> asses = Person.getAllAssistantById();
+		List<Person> patients = Person.getAllPatientsById();
 		List<PersonVM> all = new ArrayList<>();
 		for(Person p:docs){
 			all.add(new PersonVM(p.doctor.toString(), p.name, p.mobileNumber, p.location, p.emailID, "D"));
@@ -1938,6 +1956,11 @@ public class Application extends Controller {
 		for(Person p:asses){
 			all.add(new PersonVM(p.assistent.assitentId.toString(), p.name, p.mobileNumber, p.location, p.emailID, "A"));
 		}
+		
+		for(Person p:patients){
+			all.add(new PersonVM(p.patient.toString(), p.name, p.mobileNumber, p.location, p.emailID, "P"));
+		}
+		
 		return ok(Json.toJson(all));
 	}
 	
@@ -1959,10 +1982,16 @@ public class Application extends Controller {
 					DoctorRegister doc = DoctorRegister.getDoctorById(id);
 					d.delegate = doc.doctorId;
 					d.delType = "D";
-				} else {
+				} else if(delType.equalsIgnoreCase("A")){
 					AssistentRegister ass = AssistentRegister.getAssistantById(id);
 					d.delegate = ass.assitentId;
 					d.delType = "A";
+				}
+				else
+				{
+					PatientRegister patient = PatientRegister.getPatientById(id);
+					d.delegate = patient.patientId;
+					d.delType = "P";
 				}
 				d.parentType = "D";
 				d.status = "WC";
@@ -2176,7 +2205,8 @@ public class Application extends Controller {
 	    	String url = Play.application().configuration().getString("base_url");
 	    		    	
 		  
-		  if (picture != null) {
+		  if (picture != null) 
+		  {
 		    String fileName = picture.getFilename();
 		    String contentType = picture.getContentType(); 
 		    File file = picture.getFile();
@@ -2297,8 +2327,7 @@ public class Application extends Controller {
 	}
 	
 	public static Result getFile(Long id)
-	{		
-		
+	{			
 		System.out.println("panmkaj .........:::::::"+id);
 		UploadFiles uploadFile = UploadFiles.getUploadFile(id);
 		File file = new File(uploadFile.Url);

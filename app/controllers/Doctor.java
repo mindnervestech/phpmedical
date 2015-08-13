@@ -1704,7 +1704,7 @@ public static Result getAllDoctorPatientClinics() {
 		Boolean result = file.delete();
 		if(result)
 		{
-			String fileName = picture.getFilename();
+			 String fileName = picture.getFilename();
 			 String contentType = picture.getContentType(); 
 			 File fileSave = picture.getFile();
 			 String fileNameString = fileName;

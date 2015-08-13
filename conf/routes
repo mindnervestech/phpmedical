@@ -65,6 +65,7 @@ GET     /getVerificationCode                controllers.Application.getVerificat
 POST    /verification                       controllers.Application.verification()
 GET     /getPicture/:id                     controllers.Application.getPicture(id:Integer)
 POST	/addPatientDependentWithoutConfirmaton				controllers.Application.addPatientDependentWithoutConfirmaton()
+POST    /patientDoctorAdd                   controllers.Application.patientDoctorAdd()
 
 
 #Doctors Urls

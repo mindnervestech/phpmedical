@@ -111,6 +111,12 @@ public class Person extends Model {
 		return find.where().eq("role",role).findList();
 	}
 	
+	public static List<Person> getAllPatientsById()
+	{
+		String role = "1";
+		return find.where().eq("role", role).findList();
+	}
+	
 	public static List<Person> getAllAssistantById(){
 		String role ="3";
 		return find.where().eq("role",role).findList();
