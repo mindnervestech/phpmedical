@@ -66,6 +66,8 @@ POST    /verification                       controllers.Application.verification
 GET     /getPicture/:id                     controllers.Application.getPicture(id:Integer)
 POST	/addPatientDependentWithoutConfirmaton				controllers.Application.addPatientDependentWithoutConfirmaton()
 POST    /patientDoctorAdd                   controllers.Application.patientDoctorAdd()
+GET     /getPassword                        controllers.Application.getPassword()
+
 
 
 #Doctors Urls
@@ -94,6 +96,7 @@ POST    /updateTreatementTemplate				controllers.Doctor.updateTreatementTemplate
 GET     /getProfileDoctor                       controllers.Doctor.getProfileDoctor()
 POST    /profilePictureUpdateDoctor             controllers.Doctor.profilePictureUpdate()
 POST    /updateDoctorProfile                    controllers.Doctor.updateDoctorProfile()
+GET     /getAllSpeciality					    controllers.Doctor.getAllSpeciality()
 
 
 #patient Urls

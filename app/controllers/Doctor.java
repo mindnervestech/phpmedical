@@ -13,8 +13,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import play.Play;
 import org.codehaus.jackson.JsonNode;
@@ -1762,5 +1764,20 @@ public static Result getAllDoctorPatientClinics() {
 		
 		return ok(Json.toJson("Success"));
 	}
+	
+	public static Result getAllSpeciality() throws IOException
+	{
+		Set<String> speciality = new HashSet<String>();
+		List<DoctorRegister> doctors = DoctorRegister.getAllDoctorSepeciality();
+		for(DoctorRegister doc : doctors)
+		{
+			speciality.add(doc.speciality);
+			System.out.println("Speciality:::::"+doc.speciality);
+		}
+		
+		return ok(Json.toJson(speciality));
+	}
+	
+	
 }
 	
