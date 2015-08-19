@@ -2357,12 +2357,6 @@ public class Application extends Controller {
 	    return ok(file);
 	}
 	
-	public static Result getPassword()
-	{
-		int id = Integer.parseInt(request().getQueryString("id"));
-		Person person = Person.getPersonById(id);
-		return ok(Json.toJson(person.password));
-	}
-	
+
 }
 	
