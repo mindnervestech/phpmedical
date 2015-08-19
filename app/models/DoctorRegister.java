@@ -38,6 +38,11 @@ public class DoctorRegister extends Model {
 		return find.where().eq("doctorId", id).findUnique();
 	}
 	
+	public static List<DoctorRegister> getAllDoctorSepeciality()
+	{
+		return find.findList();
+	}
+	
 	
 	
 }
