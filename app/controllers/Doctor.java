@@ -596,7 +596,7 @@ public class Doctor extends Controller {
 						
 						try {
 					 		Date dbDate = formatter1.parse(appointment.appointmentDate.toString());
-							
+							System.out.println("Condition::::::"+(date.compareTo(dbDate) == 0));
 							if(date.compareTo(dbDate) == 0){
 				        		System.out.println("Date1 is equal to Date2");
 				        		if(clinicDoctorVM.size() != 0){
