@@ -1,5 +1,7 @@
 package viewmodel;
 
+import java.util.List;
+
 public class ClinicVM {
 	public String clinicName;
 	public Long landLineNumber;
@@ -10,4 +12,17 @@ public class ClinicVM {
 	public String doctorId;
 	public String parameter;
 	public boolean selected;
+	public String onlineAppointment;
+	public String speciality;
+	public String idClinic;
+	public List<Schedule> schedules;
+	
+	public static class Schedule {
+
+		public String day;
+		public String shift;
+		public String from;
+		public String to;
+
+	}
 }

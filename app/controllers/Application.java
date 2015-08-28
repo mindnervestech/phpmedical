@@ -1119,16 +1119,41 @@ public class Application extends Controller {
 		
 		clinics.clinicName = clinic.clinicName;
 		clinics.landLineNumber = clinic.landLineNumber;
-		clinics.mobileNumber = clinic.mobileNumber;
-		clinics.address = clinic.address;
+		if(clinic.mobileNumber == null)
+		{
+			clinics.mobileNumber = null;
+		}
+		else
+		{
+			clinics.mobileNumber = clinic.mobileNumber;
+		}
 		clinics.location = clinic.location;
 		clinics.email = clinic.email;
+		clinics.speciality = clinic.speciality;
+		clinics.onlineAppointment = clinic.onlineAppointment;
 		clinics.doctorId = DoctorRegister.getDoctorById((Person.getDoctorByMail(clinic.doctorId))).doctorId;
 		clinics.save();
 		
-		System.out.println("return");
 		return ok(Json.toJson(clinics.idClinic));
 		
+	}
+	
+	public static Result editClinic() throws JsonParseException,JsonMappingException,IOException
+	{
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+		ClinicVM clinic = mapper.readValue(json.traverse(),ClinicVM.class);
+		int id = Integer.parseInt(clinic.idClinic);
+		Clinic clinics = Clinic.getClinicById(id);
+		clinics.clinicName = clinic.clinicName;
+		clinics.email = clinic.email;
+		clinics.landLineNumber = clinic.landLineNumber;
+		clinics.mobileNumber = clinic.mobileNumber;
+		clinics.speciality = clinic.speciality;
+		clinics.onlineAppointment = clinic.onlineAppointment;
+		clinics.update();
+		return ok(Json.toJson(clinics.idClinic));
 	}
 	 public static Result getAllClinic()
      {

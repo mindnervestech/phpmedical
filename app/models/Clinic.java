@@ -22,6 +22,8 @@ public class Clinic extends Model {
 	public String location;
 	public String email;
 	public Integer doctorId;
+	public String onlineAppointment;
+	public String speciality;
 	
 	public static Finder<Integer,Clinic> find = new Finder<>(Integer.class,Clinic.class);
 	public static Clinic getClinicById(Integer id) {
