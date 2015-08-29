@@ -37,6 +37,7 @@ import models.BucketPatients;
 import models.Clinic;
 import models.Delegates;
 import models.DoctorClinicSchedule;
+import models.DoctorDependency;
 import models.DoctorProcedure;
 import models.DoctorRegister;
 import models.PatientClientBookAppointment;
