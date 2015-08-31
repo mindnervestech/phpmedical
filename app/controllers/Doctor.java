@@ -318,7 +318,8 @@ public class Doctor extends Controller {
 					try {
 				 		Date dbDate = formatter1.parse(appointment.appointmentDate.toString());
 						
-						if(date.compareTo(dbDate) == 0){
+						if(date.compareTo(dbDate) == 0)
+						{
 							
 							if(ClinicList.size() != 0){
 								
@@ -1365,7 +1366,7 @@ public class Doctor extends Controller {
 				}
 				
 				ClinicDetailsList.add(new DoctorClinicDetails(decryptedValue, person.name, clinic.idClinic.toString(), clinic.clinicName, 
-															clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3));
+															clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3,clinic.onlineAppointment));
 			}
 				
 		}else{
@@ -1451,7 +1452,7 @@ public static Result getAllDoctorPatientClinics() {
 				}
 				
 				ClinicDetailsList.add(new DoctorClinicDetails(person.doctor.toString(), person.name, clinic.idClinic.toString(), clinic.clinicName, 
-										clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3));
+										clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3,clinic.onlineAppointment));
 			}
 		
 		return ok(Json.toJson(ClinicDetailsList));

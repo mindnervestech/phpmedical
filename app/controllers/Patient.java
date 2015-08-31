@@ -145,7 +145,7 @@ public class Patient extends Controller {
 			ClinicDetailsList.add(new DoctorClinicDetails(person.doctor
 					.toString(), person.name, clinic.idClinic.toString(),
 					clinic.clinicName, clinic.location, clinic.landLineNumber
-							.toString(), timeTable1, timeTable2, timeTable3));
+							.toString(), timeTable1, timeTable2, timeTable3,clinic.onlineAppointment));
 
 		}
 
