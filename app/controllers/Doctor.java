@@ -383,7 +383,7 @@ public class Doctor extends Controller {
 								 }else if(appointment.shift.equals("shift3")){
 									 allClinicAppointment.shift3 = shiftDetailsList;
 								 }
-								
+							
 								ClinicList.add(allClinicAppointment);
 							}
 							
@@ -1002,8 +1002,19 @@ public class Doctor extends Controller {
 		return ok(Json.toJson(fieldVm));
 		
 	}
+	public static Result deleteDoctor()throws IOException 
+	{
+		String id = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		int personId = Integer.parseInt(id);
+		Person person = Person.getPersonById(personId);
+		int doctorId = person.doctor;
+		DoctorRegister registerDoctor = DoctorRegister.getDoctorById(doctorId);
+		registerDoctor.delete();
+		person.delete();
+		return ok(Json.toJson("Success"));
+	}
 	
-     public static Result getDoctorProcedures() {
+    public static Result getDoctorProcedures() {
 		
 		String doctorId = null;
 		

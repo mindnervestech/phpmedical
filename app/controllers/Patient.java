@@ -20,6 +20,7 @@ import models.Clinic;
 import models.DoctorClinicSchedule;
 import models.DoctorRegister;
 import models.PatientClientBookAppointment;
+import models.PatientRegister;
 import models.Person;
 import models.ReminderData;
 import models.ReminderTimeTable;
@@ -861,6 +862,18 @@ public class Patient extends Controller {
 		
 		return ok(Json.toJson("Success"));
     }
+	
+	public static Result deletePatient()throws IOException 
+	{
+		String id = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		int personId = Integer.parseInt(id);
+		Person person = Person.getPersonById(personId);
+		int patientId = person.patient;
+		PatientRegister registerPatient = PatientRegister.getPatientById(patientId);
+		registerPatient.delete();
+		person.delete();
+		return ok(Json.toJson("Success"));
+	}
 	public static Result updatePatientProfile() throws IOException 
 	{
 		GenderType genderJSon;

@@ -234,7 +234,18 @@ public class Application extends Controller {
 		System.out.println("Return");
 		return ok(Json.toJson(registration.idPerson));
 	}
-
+	public static Result deleteAssistant()throws IOException
+	{
+		String id = URLDecoder.decode(request().getQueryString("id"), "UTF-8");
+		int personId = Integer.parseInt(id);
+		Person person = Person.getPersonById(personId);
+		System.out.println("person name:::::"+person.assistent);
+		AssistentRegister registerAssistant = person.assistent;
+		System.out.println("id::::::"+registerAssistant.assitentId);
+		person.delete();
+		registerAssistant.delete();
+		return ok(Json.toJson("Success"));
+	}
 	public static Result registerProfilePictureAssistant() throws IOException
 	{
 		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
