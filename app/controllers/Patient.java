@@ -152,6 +152,45 @@ public class Patient extends Controller {
 
 		return ok(Json.toJson(ClinicDetailsList));
 	}
+	
+	public static Result saveClinicAppointment() throws IOException
+	{
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+
+		PatientClinicsAppointmentVM bookAppointment = mapper.readValue(
+				json.traverse(), PatientClinicsAppointmentVM.class);
+
+		System.out.println("bookAppointment.patientId = "
+				+ bookAppointment.patientId);
+		Integer patient_id = Integer.parseInt(bookAppointment.patientId);
+		PatientClientBookAppointment appointment = PatientClientBookAppointment
+				.getClinicAppointment(bookAppointment.doctorId, patient_id,
+						bookAppointment.clinicId, null);
+		appointment.clinicId = bookAppointment.clinicId;
+		// appointment.patientId = bookAppointment.patientId;
+		appointment.patientId = patient_id;// Person.getPatientByMail(bookAppointment.patientId);
+		appointment.doctorId = bookAppointment.doctorId;
+		appointment.shift = bookAppointment.shift;
+		appointment.bookTime = bookAppointment.bookTime;
+		appointment.timeSlot = null;
+		appointment.visitType = bookAppointment.visitType;
+		appointment.status = bookAppointment.status;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try
+		{
+			appointment.appointmentDate = format
+					.parse(bookAppointment.appointmentDate);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		appointment.save();
+		return ok(Json.toJson(new ErrorResponse(Error.E304.getCode(),
+				Error.E304.getMessage())));
+	}
 
 	public static Result saveClinicsAppointmentDetails() throws IOException {
 
