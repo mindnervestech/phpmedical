@@ -2321,7 +2321,8 @@ public class Application extends Controller {
 		}
 		return ok();
 	}
-	public static Result uploadFiles() {
+	public static Result uploadFiles() 
+	{
 		  play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
 		  List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
@@ -2427,22 +2428,29 @@ public class Application extends Controller {
 		    	path = Play.application().configuration().getString("folder_create_url_patient")+"/" + patientId + "/"+  fileName;
 		    }
 
-		    if(newFile.exists()){
-		    	if(!doctorId.equalsIgnoreCase("0")){
+		    if(newFile.exists())
+		    {
+		    	if(!doctorId.equalsIgnoreCase("0"))
+		    	{
 		    		uploadFile.doctorId = Person.getDoctorByMail(doctorId); 
-		    	}else{
+		    	}
+		    	else
+		    	{
 		    		uploadFile.doctorId = 0;
 		    	}
-		    	if(!patientId.equalsIgnoreCase("0")){
+		    	if(!patientId.equalsIgnoreCase("0"))
+		    	{
 				    System.out.println("patientId" + patientId);
 		    		uploadFile.patientId = Person.getPatientByMail(patientId); 
-		    	}else{
+		    	}
+		    	else{
 		    		uploadFile.patientId = 0;
 		    	}
 		    	if(!assistentId.equalsIgnoreCase("0")){
 				    System.out.println("assistentId" + assistentId);
 		    		uploadFile.assistentId = Person.getAssistentByMail(assistentId); 
-		    	}else{
+		    	}else
+		    	{
 		    		uploadFile.assistentId = 0;
 		    	}
 		    	uploadFile.appointmentDate = appointmentDate;
@@ -2455,13 +2463,47 @@ public class Application extends Controller {
 		    	uploadFile.Url = path;
 		    	uploadFile.clinicId = clinicId;
 		    	uploadFile.clinicName = clinicName;
-		    	
 		    	uploadFile.save();
 		    }
 		    return ok(Json.toJson(uploadFile));
-		  } else {
-		    flash("error", "Missing file");
-		    return ok("File not Found");    
+		  } else 
+		  {
+			    UploadFiles uploadFile = new UploadFiles();
+			    if(!doctorId.equalsIgnoreCase("0"))
+		    	{
+		    		uploadFile.doctorId = Person.getDoctorByMail(doctorId); 
+		    	}
+		    	else
+		    	{
+		    		uploadFile.doctorId = 0;
+		    	}
+		    	if(!patientId.equalsIgnoreCase("0"))
+		    	{
+				    System.out.println("patientId" + patientId);
+		    		uploadFile.patientId = Person.getPatientByMail(patientId); 
+		    	}
+		    	else{
+		    		uploadFile.patientId = 0;
+		    	}
+		    	if(!assistentId.equalsIgnoreCase("0")){
+				    System.out.println("assistentId" + assistentId);
+		    		uploadFile.assistentId = Person.getAssistentByMail(assistentId); 
+		    	}else
+		    	{
+		    		uploadFile.assistentId = 0;
+		    	}
+			  	uploadFile.appointmentDate = appointmentDate;
+		    	uploadFile.appointmentTime = appointmentTime;
+		    	uploadFile.category = category;
+		    	uploadFile.name = name;
+		    	uploadFile.fileName = null;
+		    	uploadFile.documentType = documentType;
+		    	uploadFile.type = type;
+		    	uploadFile.Url = null;
+		    	uploadFile.clinicId = clinicId;
+		    	uploadFile.clinicName = clinicName;
+		    	uploadFile.save();
+		    	return ok(Json.toJson(uploadFile));    
 		  }
 		}
 	public static Result getUploadedFiles(){

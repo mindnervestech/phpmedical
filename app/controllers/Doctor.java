@@ -627,7 +627,7 @@ public class Doctor extends Controller {
 				        					}else if(appointment.shift.equals("shift2")){
 				        						
 				        						ShiftDetails shiftValue2 = 	doctorVM.shift2;
-				        						
+				        						System.out.println("Condition2"+(shiftValue2 == null));
 				        						if(shiftValue2 == null){
 				        							shiftValue2 = new ShiftDetails();
 				        							shiftValue2.appointmentCount = 1;
@@ -642,11 +642,10 @@ public class Doctor extends Controller {
 				        						}
 				        						
 				        					}else if(appointment.shift.equals("shift3")){
-				        						shiftValue.shiftTime = appointment.timeSlot;
-				        						doctorVM.shift3 = shiftValue;
-				        						ShiftDetails shiftValue3 = 	doctorVM.shift3;
 				        						
-				        						if(shiftValue3 == null){
+				        						ShiftDetails shiftValue3 = doctorVM.shift3;
+				        						if(shiftValue3 == null)
+				        						{
 				        							shiftValue3 = new ShiftDetails();
 				        							shiftValue3.appointmentCount = 1;
 				        							shiftValue3.shiftTime = appointment.timeSlot;
