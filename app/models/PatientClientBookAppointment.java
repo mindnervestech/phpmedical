@@ -2,6 +2,7 @@ package models;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -80,6 +81,11 @@ public class PatientClientBookAppointment extends Model {
 	
 	public static List<PatientClientBookAppointment> getAllClinicAppointment(Integer doctorId, Integer clinicId) {
 		return find.where().eq("doctorId", doctorId).eq("clinicId", clinicId).findList();
+	}
+	
+	public static List<PatientClientBookAppointment> getAllPatientAppointments(Integer patientId)
+	{	
+		return find.where().eq("patientId",patientId).order("appointmentDate desc").findList();
 	}
 	
 }

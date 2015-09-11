@@ -13,9 +13,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import models.AssistentRegister;
+import models.BucketDoctors;
 import models.Clinic;
 import models.DoctorClinicSchedule;
 import models.DoctorRegister;
@@ -36,7 +39,9 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import viewmodel.AlarmReminderVM;
 import viewmodel.ClinicDoctorVM;
 import viewmodel.DoctorClinicDetails;
+import viewmodel.HomeCountPatientVM;
 import viewmodel.PDAEditVm;
+import viewmodel.PatientAppointmentVM;
 import viewmodel.PatientClinicsAppointmentVM;
 import viewmodel.RegisterVM;
 import viewmodel.ReminderVM;
@@ -912,6 +917,62 @@ public class Patient extends Controller {
 		registerPatient.delete();
 		person.delete();
 		return ok(Json.toJson("Success"));
+	}
+	
+	public static Result homeCountPatient() throws IOException
+	{
+		String decryptedValue = null;
+		int doctorsCount = 0;
+		int clinicCount = 0;
+		int appointmentCount = 0;
+		try 
+		{
+			decryptedValue = URLDecoder.decode(request().getQueryString("id"),"UTF-8");
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			e.printStackTrace();
+		}
+		PatientRegister patient = PatientRegister.getPatientById((Person
+				.getPatientByMail(decryptedValue)));
+		List<DoctorRegister> doctors = patient.doctors; 
+		System.out.println("Doctor Register::::"+doctors.size());
+		doctorsCount = doctors.size();
+		List<BucketDoctors> bucketDoctors = BucketDoctors.getPersonByPatient(patient.patientId);
+		System.out.println("bucket Doctors::::"+bucketDoctors.size());
+		doctorsCount = doctorsCount + bucketDoctors.size();
+		System.out.println("Doctors Count::::::"+doctorsCount);
+		int patientId = Person.getPatientByMail(decryptedValue);
+		List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllPatientAppointments(patientId);
+		System.out.println("Appointments:::::"+appointments.size());
+		Set<Integer> clinicIds = new HashSet<Integer>();
+		for(PatientClientBookAppointment app : appointments)
+		{
+			System.out.println("clinic ID"+app.clinicId);
+			clinicIds.add(app.clinicId);
+		}
+		System.out.println("count"+clinicIds.size());
+		clinicCount = clinicIds.size();
+		appointmentCount = appointments.size();
+		System.out.println("Appointments"+appointmentCount);
+		HomeCountPatientVM vm = new HomeCountPatientVM();
+		vm.doctorsCount = doctorsCount;
+		vm.clinicsCount = clinicCount;
+		vm.appointmentsCount = appointmentCount;
+		System.out.println("Appointment Date::::::"+appointments.get(0).timeSlot);
+		PatientAppointmentVM appointmentVm = new PatientAppointmentVM();
+		appointmentVm.id = appointments.get(0).id;
+		appointmentVm.doctorId = appointments.get(0).doctorId;
+		appointmentVm.patientId = appointments.get(0).patientId;
+		appointmentVm.clinicId = appointments.get(0).clinicId;
+		appointmentVm.shift = appointments.get(0).shift;
+		appointmentVm.bookTime = appointments.get(0).bookTime;
+		appointmentVm.appointmentDate = appointments.get(0).appointmentDate;
+		appointmentVm.timeSlot = appointments.get(0).timeSlot;
+		appointmentVm.visitType = appointments.get(0).visitType;
+		appointmentVm.isVisited = appointments.get(0).isVisited;
+		vm.appointmentVm = appointmentVm;
+		return ok(Json.toJson(vm));
 	}
 	public static Result updatePatientProfile() throws IOException 
 	{
