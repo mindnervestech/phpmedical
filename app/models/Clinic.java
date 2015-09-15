@@ -18,9 +18,9 @@ public class Clinic extends Model {
 	public String clinicName;
 	public Long landLineNumber;
 	public Long mobileNumber;
-	public String address;
 	public String location;
 	public String email;
+	public String address;
 	public Integer doctorId;
 	public String onlineAppointment;
 	public String speciality;

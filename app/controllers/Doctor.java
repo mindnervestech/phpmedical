@@ -59,7 +59,9 @@ import viewmodel.ClinicDoctorVM;
 import viewmodel.DoctorClinicDetails;
 import viewmodel.DoctorNotesVM;
 import viewmodel.DoctorProcedureVm;
+import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
+import viewmodel.ModeVM;
 import viewmodel.PDAEditVm;
 import viewmodel.PersonVM;
 import viewmodel.ReminderVM;
@@ -272,9 +274,10 @@ public class Doctor extends Controller {
 			return ok(Json.toJson(ClinicList));
 	     
 	    }
-	        
+	    
+	   
 	     
-	     public static Result getAllClinicsAppointment() {
+	    public static Result getAllClinicsAppointment() {
 				
 			String doctorId = null;
 			String appointmentDate = null;
@@ -591,7 +594,66 @@ public class Doctor extends Controller {
 				System.out.println("doctorId = "+doctorId);
 				List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getNextDoctorClinicAppointment(doctor_Id,"Occupied");
 				System.out.println("appointmentList = "+appointmentList.size());
-				if(appointmentList.size() > 0){
+				List<Clinic> clinics = Clinic.findAllByDoctorId(doctor_Id);
+				for(Clinic c: clinics)
+				{
+					System.out.println("Clinic Name:::::"+c.clinicName);
+					ClinicDoctorVM vm = new ClinicDoctorVM();
+					vm.idClinic = c.idClinic;
+					vm.clinicName = c.clinicName;
+					vm.landLineNumber = c.landLineNumber;
+					vm.mobileNumber = c.mobileNumber;
+					vm.address = c.address;
+					vm.location = c.location;
+					vm.email = c.email;
+					vm.doctorId = doctor_Id;
+					
+					
+						List<DoctorClinicSchedule> schedules = DoctorClinicSchedule.findAllClinicSchedule(doctorId, ""+c.idClinic);
+						for(DoctorClinicSchedule clinicSchedule : schedules)
+						{
+							if(clinicSchedule.shift.equalsIgnoreCase("shift1"))
+							{
+								List<DoctorClinicSchedule> schedulesShift1 = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, ""+c.idClinic, "shift1");
+								ShiftDetails shift1Details = new ShiftDetails();
+								shift1Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
+								shift1Details = getDays(schedulesShift1, shift1Details);
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift1");
+								shift1Details.appointmentCount = appointments.size();
+								vm.shift1 = shift1Details;
+							}
+							if(clinicSchedule.shift.equalsIgnoreCase("shift2"))
+							{
+								List<DoctorClinicSchedule> schedulesShift2 = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, ""+c.idClinic, "shift2");
+								ShiftDetails shift2Details = new ShiftDetails();
+								shift2Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
+								shift2Details = getDays(schedulesShift2, shift2Details);
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift2");
+								shift2Details.appointmentCount = appointments.size();
+								vm.shift2 = shift2Details;
+							}
+							if(clinicSchedule.shift.equalsIgnoreCase("shift3"))
+							{
+								List<DoctorClinicSchedule> schedulesShift3 = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, ""+c.idClinic, "shift3");
+								ShiftDetails shift3Details = new ShiftDetails();
+								shift3Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
+								shift3Details = getDays(schedulesShift3, shift3Details);
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift3");
+								shift3Details.appointmentCount = appointments.size();
+								vm.shift3 = shift3Details;
+							}
+							
+						
+					}
+					for(PatientClientBookAppointment app : appointmentList)
+					{
+						System.out.println("Appointment::::::"+app.appointmentDate);
+					}
+					clinicDoctorVM.add(vm);
+					
+				}
+				/*if(appointmentList.size() > 0)
+				{
 					
 					for(PatientClientBookAppointment appointment : appointmentList){
 						
@@ -600,7 +662,8 @@ public class Doctor extends Controller {
 							System.out.println("Condition::::::"+(date.compareTo(dbDate) == 0));
 							if(date.compareTo(dbDate) == 0){
 				        		System.out.println("Date1 is equal to Date2");
-				        		if(clinicDoctorVM.size() != 0){
+				        		if(clinicDoctorVM.size() != 0)
+				        		{
 				        			boolean checkAdd = false;
 				        			for(int i = 0; i<clinicDoctorVM.size(); i++){
 				        			    ClinicDoctorVM doctorVM = clinicDoctorVM.get(i);
@@ -679,7 +742,8 @@ public class Doctor extends Controller {
 							e.printStackTrace();
 						}
 					}
-			    }
+			    }*/
+				
 				
 				return ok(Json.toJson(clinicDoctorVM));
 			}
@@ -1777,6 +1841,35 @@ public static Result getAllDoctorPatientClinics() {
 			e.printStackTrace();
 		}
 		
+		return ok(Json.toJson("Success"));
+	}
+	
+	public static Result setStatusSlot() throws IOException
+	{
+		List<DoctorClinicSchedule> doctorClinicSchedules;
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		ModeVM vm = mapper.readValue(request().body().asJson(),ModeVM.class);	
+		if(vm.markAs.equalsIgnoreCase("All Slots"))
+		{
+			doctorClinicSchedules = DoctorClinicSchedule.getClinicScheduleshiftDetails(vm.doctorId, ""+vm.clinicId);
+		}
+		else if(vm.markAs.equalsIgnoreCase("Selected Slot"))
+		{
+			doctorClinicSchedules = DoctorClinicSchedule.findAllClinicScheduleByShift(vm.doctorId, ""+vm.clinicId,vm.shift);
+		}
+		else
+		{
+			doctorClinicSchedules = DoctorClinicSchedule.findAllClinicScheduleByShift(vm.doctorId, ""+vm.clinicId,vm.shift);
+		}
+		
+		for(DoctorClinicSchedule schedule : doctorClinicSchedules)
+		{
+				schedule.availability = vm.availability;
+				schedule.markAs = vm.markAs;
+				schedule.date = vm.date;
+				schedule.save();
+		}
 		return ok(Json.toJson("Success"));
 	}
 	

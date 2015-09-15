@@ -1501,6 +1501,9 @@ public class Application extends Controller {
 				System.out.println("doctorClinicScheduleVM.schedules.get(i).from"+doctorClinicScheduleVM.schedules.get(j).from);
 				doctorClinicSchedule.shift = doctorClinicScheduleVM.schedules.get(j).shift;
 				System.out.println("doctorClinicScheduleVM.schedules"+ doctorClinicScheduleVM.schedules);
+				doctorClinicSchedule.availability = "Available";
+				doctorClinicSchedule.markAs = "";
+				doctorClinicSchedule.date = "";
 				doctorClinicSchedule.save();
 			}
 		}

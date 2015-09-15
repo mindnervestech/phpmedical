@@ -27,6 +27,9 @@ public class DoctorClinicSchedule  extends Model{
 	public String form;
 	public String  totime;
 	public String  shift;
+	public String availability;
+	public String markAs;
+	public String date;
 	
     public long getId() {
 		return id;
