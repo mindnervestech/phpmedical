@@ -40,5 +40,8 @@ public class Invoices extends Model {
 		return find.where().eq("doctorId", doctorId).eq("patientId", patientId).eq("appointmentDate", appointmentDate)
 				           .eq("appointmentTime", appointmentTime).findList();
 	}
+	public static List<Invoices> getAllInvoicesByDoctorId(Integer doctorId){
+		return find.where().eq("doctorId", doctorId).findList();
+}
 	
 }
