@@ -401,7 +401,106 @@ public class Doctor extends Controller {
 	     
 	    }
 	     
-	 
+	    public static Result getAllDoctorInvoices() throws IOException
+	    {
+	    	String doctorId = null;
+	    	doctorId = URLDecoder.decode(request().getQueryString("doctorId"),"UTF-8");
+	    	int doctor_id = Person.getDoctorByMail(doctorId);
+	    	List<Invoices> list = Invoices.getAllInvoicesByDoctorId(doctor_id);
+	    	AllTreatmentPlanVm allTreatmentPlanVm  = new AllTreatmentPlanVm();
+	  		List<AllProcedureVm> allProcedureList = new ArrayList<AllProcedureVm>();
+	  		for(Invoices invoices  : list){
+  				allTreatmentPlanVm.doctorId = invoices.doctorId;
+  				allTreatmentPlanVm.patientId = invoices.patientId;
+  				allTreatmentPlanVm.patientAppointmentDate = invoices.appointmentDate;
+  				allTreatmentPlanVm.patientAppointmentTime = invoices.appointmentTime;
+  				
+  				//System.out.println("treatmentPlan.procedureId = "+treatmentPlan.procedureId);
+  				
+  				DoctorProcedure doctorProcedureList = DoctorProcedure.getAllProcedureByIDdoctorId(invoices.procedureId, doctor_id);
+  				
+  				if(doctorProcedureList != null){
+  					//List <DoctorProcedureVm>  doctorProcedure = new ArrayList<DoctorProcedureVm>();
+  					AllProcedureVm allProcedureVm = new AllProcedureVm();
+  					allProcedureVm.procedureName = doctorProcedureList.procedureName;
+  					allProcedureVm.category = doctorProcedureList.category;
+  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
+  					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+
+  					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
+  					
+  					Boolean checkProcedure = false;
+  					for(AllProcedureVm procedureVm : allProcedureList){
+  						
+  						if(Long.parseLong(procedureVm.id) == doctorProcedureList.id){
+  							
+  							AllTemplateVm allTemplateVm = new AllTemplateVm();
+  							TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
+  							List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
+  							allTemplateVm.templateName = templateClass.templateName;
+  							allTemplateVm.procedureName = templateClass.procedureName;
+  							
+  							allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+  							
+  							//System.out.println("attributeList = "+attributeList.size());
+  							
+  							for(TemplateAttribute attribute : attributeList){
+  								ShowFieldVm fieldVm = new ShowFieldVm();
+  								fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+  								fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+  								fieldVm.fieldId = attribute.fieldId;
+  								fieldVm.templateId = attribute.templateClass.templateId;
+  								fieldVm.fieldName = attribute.fieldName;
+  								fieldVm.fieldType = attribute.fieldType;
+  								allTemplateVm.templates.add(fieldVm);
+  							}
+  							
+  							//allTemplateVm.templates.add(e)
+  							
+  							procedureVm.allTemplate.add(allTemplateVm);
+  							checkProcedure = true;
+  						}
+  					}
+  					
+  					if(!checkProcedure){
+  						
+  						List<ShowFieldVm> allTemplateList = new ArrayList<ShowFieldVm>();
+  						
+  						TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
+  						
+  						List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
+  						
+  						AllTemplateVm allTemplateVm = new AllTemplateVm();
+  						
+  						allTemplateVm.templateName = templateClass.templateName;
+  						allTemplateVm.procedureName = templateClass.procedureName;
+  						allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+  						
+  						System.out.println("attributeList = "+attributeList.size());
+  						
+  						for(TemplateAttribute attribute : attributeList){
+  							ShowFieldVm fieldVm = new ShowFieldVm();
+  							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+  							fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+  							fieldVm.fieldId = attribute.fieldId;
+  							fieldVm.fieldName = attribute.fieldName;
+  							fieldVm.fieldType = attribute.fieldType;
+  							fieldVm.templateId = attribute.templateClass.templateId;
+  							allTemplateVm.templates.add(fieldVm);
+  						}
+  						
+  						allProcedureVm.allTemplate.add(allTemplateVm);
+  						
+  						allProcedureList.add(allProcedureVm);
+  						
+  					}
+  				}
+  				
+  			}
+  			
+	  		allTreatmentPlanVm.procedure = allProcedureList;
+	    	return ok(Json.toJson(allTreatmentPlanVm));
+	    }
 				
 	    public static Result getAllInvoices() {
 	  		
