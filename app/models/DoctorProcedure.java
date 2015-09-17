@@ -2,7 +2,6 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,9 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
-
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 @Entity
@@ -47,6 +44,16 @@ public class DoctorProcedure extends Model {
 	
 	public static DoctorProcedure searchProcedureByIDName(Integer doctorId,String procedureName) {
 		return find.where().eq("procedureName", procedureName).eq("doctorId", doctorId).findUnique();
+	}
+	
+	public static DoctorProcedure doctorProcedureById(Integer id)
+	{
+		return find.where().eq("id", id).findUnique();
+	}
+	
+	public static List<DoctorProcedure> getAllProcedures(String category)
+	{
+		return find.where().eq("category", category).findList();
 	}
 	
 	

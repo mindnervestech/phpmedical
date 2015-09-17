@@ -90,4 +90,9 @@ public class TotalInvoice extends Model {
 				           .eq("appointmentTime", appointmentTime).findList();
 	}
 	
+	public static List<TotalInvoice> getAllInvoices(Integer doctorId,String date)
+	{
+		return find.where().eq("doctorId", doctorId).eq("appointmentDate", date).findList();
+	}
+	
 }
