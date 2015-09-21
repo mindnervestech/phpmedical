@@ -1435,10 +1435,11 @@ public class Application extends Controller {
 			System.out.println(doctor.emailID);
 			System.out.println(doctor.mobileNumber);
 			System.out.println(doctor.location);
+			System.out.println(doctor.gender);
 			DoctorRegister d = DoctorRegister.getDoctorById(doctor.doctor);
 			patientDoctor.add(new PatientsDoctor(doctor.doctor.toString(),
 					doctor.name, d.speciality, doctor.emailID,
-					doctor.mobileNumber, doctor.location, 1));
+					doctor.mobileNumber, doctor.location, 1,""+doctor.gender));
 		}
 		/*for(BucketDoctors doc:bucketDocs){
 			patientDoctor.add(new PatientsDoctor(doc.doctorId.toString(),

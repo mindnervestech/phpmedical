@@ -70,5 +70,18 @@ public class PatientsDoctor {
 		this.mobileNumber = mobileNumber2;
 		this.location = location2;
 		this.type = type;
+		
+	}
+	public PatientsDoctor(String string, String name2, String speciality2,
+			String email2, Long mobileNumber2, String location2, Integer type,String gender) {
+		this.doctorId = string;
+		this.name = name2;
+		this.speciality = speciality2;
+		this.emailID = email2;
+		this.mobileNumber = mobileNumber2;
+		this.location = location2;
+		this.type = type;
+		this.gender = gender;
+		
 	}
 }
