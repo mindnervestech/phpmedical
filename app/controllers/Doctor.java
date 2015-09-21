@@ -317,7 +317,25 @@ public class Doctor extends Controller {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+			/*List<DoctorClinicSchedule> doctorClinicSchedules = DoctorClinicSchedule.getDoctorClinicScheduleById(""+clinicId,doctorId);
+			System.out.println("Clinic Schedule size::::::::::::::"+doctorClinicSchedules.size());
+			for(DoctorClinicSchedule doctorClinic : doctorClinicSchedules)
+			{
+				System.out.println("available"+doctorClinic.availability);
+				System.out.println("date"+doctorClinic.date);
+				try {
+					Date dateDb = (Date)formatter1.parse(dateStr);
+					dateDb = removeTime(dateDb);
+					System.out.println("DB date:::::::::::"+dateDb.toString());
+					System.out.println("date:::::::::::"+date.toString());
+					System.out.println("Compare Date::::::::::::"+date.compareTo(dateDb));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			}*/
 			for(PatientClientBookAppointment appointment : appointmentList){
 				
 					try {
@@ -402,16 +420,134 @@ public class Doctor extends Controller {
 			return ok(Json.toJson(ClinicList));
 	     
 	    }
+	    
+	    public static Result getAllDoctorFinance() throws IOException
+	    {
+	    	String doctorId = null;
+	  		
+	  		try {
+	  			doctorId = URLDecoder.decode(request().getQueryString("doctorId"),"UTF-8");
+	  			
+	  		} catch (UnsupportedEncodingException e) {
+	  			// TODO Auto-generated catch block
+	  			e.printStackTrace();
+	  		}
+	  		int doctor_id = Person.getDoctorByMail(doctorId);
+	  		List<Invoices> list = Invoices.getAllInvoicesByDoctorId(doctor_id);
+	  		List<AllTreatmentPlanVm> treatmentList  = new ArrayList<AllTreatmentPlanVm>();
+	  		List<AllProcedureVm> allProcedureList = new ArrayList<AllProcedureVm>();
+	  		System.out.println("list size:::::::::"+list.size());
+	  			for(Invoices invoices  : list)
+	  			{
+	  				AllTreatmentPlanVm allTreatmentPlanVm = new AllTreatmentPlanVm();
+	  				allTreatmentPlanVm.doctorId = invoices.doctorId;
+	  				allTreatmentPlanVm.patientId = invoices.patientId;
+	  				allTreatmentPlanVm.patientAppointmentDate = invoices.appointmentDate;
+	  				allTreatmentPlanVm.patientAppointmentTime = invoices.appointmentTime;
+	  				
+	  				//System.out.println("treatmentPlan.procedureId = "+treatmentPlan.procedureId);
+	  				
+	  				DoctorProcedure doctorProcedureList = DoctorProcedure.getAllProcedureByIDdoctorId(invoices.procedureId, doctor_id);
+	  				
+	  				if(doctorProcedureList != null){
+	  					//List <DoctorProcedureVm>  doctorProcedure = new ArrayList<DoctorProcedureVm>();
+	  					AllProcedureVm allProcedureVm = new AllProcedureVm();
+	  					allProcedureVm.procedureName = doctorProcedureList.procedureName;
+	  					allProcedureVm.category = doctorProcedureList.category;
+	  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
+	  					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+
+	  					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
+	  					
+	  					Boolean checkProcedure = false;
+	  					for(AllProcedureVm procedureVm : allProcedureList){
+	  						
+	  						if(Long.parseLong(procedureVm.id) == doctorProcedureList.id){
+	  							
+	  							AllTemplateVm allTemplateVm = new AllTemplateVm();
+	  							TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
+	  							List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
+	  							allTemplateVm.templateName = templateClass.templateName;
+	  							allTemplateVm.procedureName = templateClass.procedureName;
+	  							
+	  							allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+	  							
+	  							//System.out.println("attributeList = "+attributeList.size());
+	  							
+	  							for(TemplateAttribute attribute : attributeList){
+	  								ShowFieldVm fieldVm = new ShowFieldVm();
+	  								fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+	  								fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+	  								fieldVm.fieldId = attribute.fieldId;
+	  								fieldVm.templateId = attribute.templateClass.templateId;
+	  								fieldVm.fieldName = attribute.fieldName;
+	  								fieldVm.fieldType = attribute.fieldType;
+	  								allTemplateVm.templates.add(fieldVm);
+	  							}
+	  							
+	  							//allTemplateVm.templates.add(e)
+	  							
+	  							procedureVm.allTemplate.add(allTemplateVm);
+	  							checkProcedure = true;
+	  						}
+	  					}
+	  					
+	  					if(!checkProcedure){
+	  						
+	  						List<ShowFieldVm> allTemplateList = new ArrayList<ShowFieldVm>();
+	  						
+	  						TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
+	  						
+	  						List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
+	  						
+	  						AllTemplateVm allTemplateVm = new AllTemplateVm();
+	  						
+	  						allTemplateVm.templateName = templateClass.templateName;
+	  						allTemplateVm.procedureName = templateClass.procedureName;
+	  						allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
+	  						
+	  						System.out.println("attributeList = "+attributeList.size());
+	  						
+	  						for(TemplateAttribute attribute : attributeList){
+	  							ShowFieldVm fieldVm = new ShowFieldVm();
+	  							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+	  							fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+	  							fieldVm.fieldId = attribute.fieldId;
+	  							fieldVm.fieldName = attribute.fieldName;
+	  							fieldVm.fieldType = attribute.fieldType;
+	  							fieldVm.templateId = attribute.templateClass.templateId;
+	  							allTemplateVm.templates.add(fieldVm);
+	  						}
+	  						
+	  						allProcedureVm.allTemplate.add(allTemplateVm);
+	  						
+	  						allProcedureList.add(allProcedureVm);
+	  						
+	  					}
+	  				}
+	  				allTreatmentPlanVm.procedure = allProcedureList;
+	  				treatmentList.add(allTreatmentPlanVm);
+	  			}
+	  			
+	  		
+	  		
+	  		return ok(Json.toJson(treatmentList));
+	    }
 	     
-	    public static Result getAllDoctorInvoices() throws IOException
+	   /* public static Result getAllDoctorFinance() throws IOException
 	    {
 	    	String doctorId = null;
 	    	int procedureCount = 0;
 	    	Set<String> dates = new HashSet<String>();
 	    	Set<Integer> procedures = new HashSet<Integer>();
 	    	Set<String> categories = new HashSet<String>();
+	    	Set<Integer> templateIds = new HashSet<Integer>();
+	    	
 	    	doctorId = URLDecoder.decode(request().getQueryString("doctorId"),"UTF-8");
 	    	int doctor_id = Person.getDoctorByMail(doctorId);
+	    	
+	    	System.out.println("doctor_id = "+doctor_id);
+	    	
 	    	List<Invoices> list = Invoices.getAllInvoicesByDoctorId(doctor_id);
 	    	List<DoctorReportVm> treatmentList = new ArrayList<DoctorReportVm>();
 	    	for(Invoices invoice : list)
@@ -419,8 +555,7 @@ public class Doctor extends Controller {
 	    		dates.add(invoice.appointmentDate);
 	    		procedures.add(invoice.procedureId);
 	    	}
-	    	for(String s : dates)
-	    	{
+	    	for(String s : dates){
 	    		double totalInvoiceValue = 0.0;
 	    		int proceudreCount = 0;
 	    		DoctorReportVm vm = new DoctorReportVm();
@@ -434,10 +569,12 @@ public class Doctor extends Controller {
 	    		}
 	    		vm.totalInvoice = totalInvoiceValue;
 	    		List<AllProcedureVm> allProcedureList = new ArrayList<AllProcedureVm>();	
+	    		
 	    		for(Integer pro : procedures)
 	    		{
 	    			DoctorProcedure procedure = DoctorProcedure.doctorProcedureById(pro);
 	    			categories.add(procedure.category);
+	    			    			
 	    		}
 	    		List<CategoryVm> categoryList = new ArrayList<CategoryVm>();
 	    		for(String cat : categories)
@@ -448,6 +585,7 @@ public class Doctor extends Controller {
 	    			categoryVm.procedureList = procedureList;
 	    			procedureCount = procedureCount + procedureList.size();
 	    			categoryList.add(categoryVm);
+	    			
 	    		}
 	    		vm.categoryVm = categoryList;
 	    		vm.countProcedure = procedureCount;
@@ -457,7 +595,7 @@ public class Doctor extends Controller {
 	    	  		
 	    	return ok(Json.toJson(treatmentList));
 	    }
-				
+				*/
 	    public static Result getAllInvoices() {
 	  		
 	  		String doctorId = null;
