@@ -95,4 +95,9 @@ public class TotalInvoice extends Model {
 		return find.where().eq("doctorId", doctorId).eq("appointmentDate", date).findList();
 	}
 	
+	public static TotalInvoice grandTotalAndTotalDue(Integer doctorId,Integer patientId,String appointmentDate,String appointmentTime)
+	{
+		return find.where().eq("doctorId", doctorId).eq("patientId", patientId).eq("appointmentDate",appointmentDate).eq("appointmentTime", appointmentTime).findUnique();
+	}
+	
 }
