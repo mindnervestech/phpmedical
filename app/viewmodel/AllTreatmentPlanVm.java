@@ -9,6 +9,8 @@ public class AllTreatmentPlanVm {
 	public Integer patientId;
 	public String patientAppointmentDate;
 	public String patientAppointmentTime;
+	public String grandTotal;
+	public String totalDue;
 
 	public List<AllProcedureVm> procedure;
 	
