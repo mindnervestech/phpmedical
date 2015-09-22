@@ -48,4 +48,10 @@ public class TemplateClass extends Model {
 		return find.where().eq("doctorId", doctorId).eq("procedureName", procedureName).findRowCount();
 	}
 	
+	public static TemplateClass getTemplateClassByProcedureId(Integer procedureId)
+	{
+		return find.where().eq("doctor_procedure_id",procedureId).findUnique();
+	}
+	
+	
 }

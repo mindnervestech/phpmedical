@@ -440,103 +440,91 @@ public class Doctor extends Controller {
 	  		for(Invoices invoice : list)
 	  		{
 	  			System.out.println("AppointmentTime:::::::::"+invoice.appointmentTime);
-	  		}
-	  	   for(Invoices invoices  : list)
-	  	   {
-	  				AllTreatmentPlanVm allTreatmentPlanVm = new AllTreatmentPlanVm();
-	  				allTreatmentPlanVm.doctorId = invoices.doctorId;
-	  				allTreatmentPlanVm.patientId = invoices.patientId;
-	  				allTreatmentPlanVm.patientAppointmentDate = invoices.appointmentDate;
-	  				allTreatmentPlanVm.patientAppointmentTime = invoices.appointmentTime;
-	  			    TotalInvoice totalInvoice = TotalInvoice.grandTotalAndTotalDue(doctor_id, invoices.patientId, invoices.appointmentDate,invoices.appointmentTime);
+	  			DoctorProcedure doctorProcedure = DoctorProcedure.doctorProcedureById(invoice.procedureId);
+	  			TemplateClass templateClass = TemplateClass.getTemplateClassByProcedureId(invoice.procedureId);
+	  			System.out.println("Template:::::::::"+templateClass.templateName);
+	  			List<TemplateAttribute> attributes = TemplateAttribute.getAllAttributes(templateClass);
+	  			System.out.println("Attribute LIst:::::::::::"+attributes.size());
+	  			Boolean procedureFlag = false;
+	  			for(AllTreatmentPlanVm planVm : treatmentList){
+	  				if(planVm.patientAppointmentDate.equals(invoice.appointmentDate)){
+	  					procedureFlag = true;
+	  					DoctorProcedure procedureDoctor = DoctorProcedure.doctorProcedureById(invoice.procedureId);
+	  					AllProcedureVm allProcedureVm = new AllProcedureVm();
+					    allProcedureVm.procedureName = doctorProcedure.procedureName;
+					    allProcedureVm.category = doctorProcedure.category;
+						allProcedureVm.id = String.valueOf(doctorProcedure.id);
+						allProcedureVm.doctorId = String.valueOf(doctorProcedure.doctorId);
+						TemplateClass tempClass = TemplateClass.getTemplateClassByProcedureId(invoice.procedureId);
+						ArrayList<AllTemplateVm> templates = new ArrayList<AllTemplateVm>();
+						AllTemplateVm allTemplateVm = new AllTemplateVm();
+						allTemplateVm.templateName = templateClass.templateName;
+						allTemplateVm.procedureName = templateClass.procedureName;
+						allTemplateVm.doctorId = String.valueOf(doctorProcedure.doctorId);
+						List<TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
+						for(TemplateAttribute attribute : attributeList){
+							ShowFieldVm fieldVm = new ShowFieldVm();
+							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+							fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+							fieldVm.fieldId = attribute.fieldId;
+							fieldVm.templateId = attribute.templateClass.templateId;
+							fieldVm.fieldName = attribute.fieldName;
+							fieldVm.fieldType = attribute.fieldType;
+							allTemplateVm.templates.add(fieldVm);
+						}
+						templates.add(allTemplateVm);
+						allProcedureVm.allTemplate = templates;
+						planVm.procedure.add(allProcedureVm);
+						
+	  				}
+	  			}
+	  			if(!procedureFlag){
+		  		    AllTreatmentPlanVm allTreatmentPlanVm = new AllTreatmentPlanVm();
+	  				allTreatmentPlanVm.doctorId = invoice.doctorId;
+	  				allTreatmentPlanVm.patientId = invoice.patientId;
+	  				allTreatmentPlanVm.patientAppointmentDate = invoice.appointmentDate;
+	  				allTreatmentPlanVm.patientAppointmentTime = invoice.appointmentTime;
+	  			    TotalInvoice totalInvoice = TotalInvoice.grandTotalAndTotalDue(doctor_id, invoice.patientId, invoice.appointmentDate,invoice.appointmentTime);
 	  				//System.out.println("treatmentPlan.procedureId = "+treatmentPlan.procedureId);
-	  			    System.out.println("Grand Total::::::::"+totalInvoice.grandTotal);
+	  			    System.out.println("Grand Total::::::::"+totalInvoice);
 	  				allTreatmentPlanVm.grandTotal = totalInvoice.grandTotal;
 	  				allTreatmentPlanVm.totalDue = totalInvoice.totalDue;
-	  				
-	  				DoctorProcedure doctorProcedureList = DoctorProcedure.getAllProcedureByIDdoctorId(invoices.procedureId, doctor_id);
-	  				
-	  				if(doctorProcedureList != null){
-	  					//List <DoctorProcedureVm>  doctorProcedure = new ArrayList<DoctorProcedureVm>();
-	  					AllProcedureVm allProcedureVm = new AllProcedureVm();
-	  					allProcedureVm.procedureName = doctorProcedureList.procedureName;
-	  					allProcedureVm.category = doctorProcedureList.category;
-	  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
-	  					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
-
-	  					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
-	  					
-	  					Boolean checkProcedure = false;
-	  					for(AllProcedureVm procedureVm : allProcedureList){
-	  						
-	  						if(Long.parseLong(procedureVm.id) == doctorProcedureList.id){
-	  							
-	  							AllTemplateVm allTemplateVm = new AllTemplateVm();
-	  							TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
-	  							List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
-	  							allTemplateVm.templateName = templateClass.templateName;
-	  							allTemplateVm.procedureName = templateClass.procedureName;
-	  							
-	  							allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
-	  							
-	  							//System.out.println("attributeList = "+attributeList.size());
-	  							
-	  							for(TemplateAttribute attribute : attributeList){
-	  								ShowFieldVm fieldVm = new ShowFieldVm();
-	  								fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
-	  								fieldVm.fieldDisplayName = attribute.fieldDisplayName;
-	  								fieldVm.fieldId = attribute.fieldId;
-	  								fieldVm.templateId = attribute.templateClass.templateId;
-	  								fieldVm.fieldName = attribute.fieldName;
-	  								fieldVm.fieldType = attribute.fieldType;
-	  								allTemplateVm.templates.add(fieldVm);
-	  							}
-	  							
-	  							//allTemplateVm.templates.add(e)
-	  							
-	  							procedureVm.allTemplate.add(allTemplateVm);
-	  							checkProcedure = true;
-	  						}
-	  					}
-	  					
-	  					if(!checkProcedure){
-	  						
-	  						List<ShowFieldVm> allTemplateList = new ArrayList<ShowFieldVm>();
-	  						
-	  						TemplateClass templateClass = TemplateClass.findTemplateById(invoices.templateId);
-	  						
-	  						List <TemplateAttribute> attributeList = TemplateAttribute.getAllAttributes(templateClass);
-	  						
-	  						AllTemplateVm allTemplateVm = new AllTemplateVm();
-	  						
-	  						allTemplateVm.templateName = templateClass.templateName;
-	  						allTemplateVm.procedureName = templateClass.procedureName;
-	  						allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
-	  						
-	  						System.out.println("attributeList = "+attributeList.size());
-	  						
-	  						for(TemplateAttribute attribute : attributeList){
-	  							ShowFieldVm fieldVm = new ShowFieldVm();
-	  							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
-	  							fieldVm.fieldDisplayName = attribute.fieldDisplayName;
-	  							fieldVm.fieldId = attribute.fieldId;
-	  							fieldVm.fieldName = attribute.fieldName;
-	  							fieldVm.fieldType = attribute.fieldType;
-	  							fieldVm.templateId = attribute.templateClass.templateId;
-	  							allTemplateVm.templates.add(fieldVm);
-	  						}
-	  						
-	  						allProcedureVm.allTemplate.add(allTemplateVm);
-	  						
-	  						allProcedureList.add(allProcedureVm);
-	  						
-	  					}
-	  				}
-	  				allTreatmentPlanVm.procedure = allProcedureList;
+	  				List <AllProcedureVm>  doctorProcedures = new ArrayList<AllProcedureVm>();
+	  				AllProcedureVm allProcedureVm = new AllProcedureVm();
+				    allProcedureVm.procedureName = doctorProcedure.procedureName;
+				    allProcedureVm.category = doctorProcedure.category;
+					allProcedureVm.id = String.valueOf(doctorProcedure.id);
+					allProcedureVm.doctorId = String.valueOf(doctorProcedure.doctorId);
+					ArrayList<AllTemplateVm> templates = new ArrayList<AllTemplateVm>();
+					AllTemplateVm allTemplateVm = new AllTemplateVm();
+					allTemplateVm.templateName = templateClass.templateName;
+					allTemplateVm.procedureName = templateClass.procedureName;
+					allTemplateVm.doctorId = String.valueOf(doctorProcedure.doctorId);
+						
+						//System.out.println("attributeList = "+attributeList.size());
+						
+						for(TemplateAttribute attribute : attributes){
+							ShowFieldVm fieldVm = new ShowFieldVm();
+							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
+							fieldVm.fieldDisplayName = attribute.fieldDisplayName;
+							fieldVm.fieldId = attribute.fieldId;
+							fieldVm.templateId = attribute.templateClass.templateId;
+							fieldVm.fieldName = attribute.fieldName;
+							fieldVm.fieldType = attribute.fieldType;
+							allTemplateVm.templates.add(fieldVm);
+						}
+						
+						//allTemplateVm.templates.add(e)
+					templates.add(allTemplateVm);
+					allProcedureVm.allTemplate = templates;
+					doctorProcedures.add(allProcedureVm);
+					allTreatmentPlanVm.procedure = doctorProcedures;
 	  				treatmentList.add(allTreatmentPlanVm);
 	  			}
 	  			
-	       return ok(Json.toJson(treatmentList));
+	  		}
+	  	
+	  	 return ok(Json.toJson(treatmentList));
 	    }
 	     
 	 
