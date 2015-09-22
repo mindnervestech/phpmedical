@@ -437,15 +437,22 @@ public class Doctor extends Controller {
 	  		List<AllTreatmentPlanVm> treatmentList  = new ArrayList<AllTreatmentPlanVm>();
 	  		List<AllProcedureVm> allProcedureList = new ArrayList<AllProcedureVm>();
 	  		System.out.println("list size:::::::::"+list.size());
-	  			for(Invoices invoices  : list)
-	  			{
+	  		for(Invoices invoice : list)
+	  		{
+	  			System.out.println("AppointmentTime:::::::::"+invoice.appointmentTime);
+	  		}
+	  	   for(Invoices invoices  : list)
+	  	   {
 	  				AllTreatmentPlanVm allTreatmentPlanVm = new AllTreatmentPlanVm();
 	  				allTreatmentPlanVm.doctorId = invoices.doctorId;
 	  				allTreatmentPlanVm.patientId = invoices.patientId;
 	  				allTreatmentPlanVm.patientAppointmentDate = invoices.appointmentDate;
 	  				allTreatmentPlanVm.patientAppointmentTime = invoices.appointmentTime;
-	  				
+	  			    TotalInvoice totalInvoice = TotalInvoice.grandTotalAndTotalDue(doctor_id, invoices.patientId, invoices.appointmentDate,invoices.appointmentTime);
 	  				//System.out.println("treatmentPlan.procedureId = "+treatmentPlan.procedureId);
+	  			    System.out.println("Grand Total::::::::"+totalInvoice.grandTotal);
+	  				allTreatmentPlanVm.grandTotal = totalInvoice.grandTotal;
+	  				allTreatmentPlanVm.totalDue = totalInvoice.totalDue;
 	  				
 	  				DoctorProcedure doctorProcedureList = DoctorProcedure.getAllProcedureByIDdoctorId(invoices.procedureId, doctor_id);
 	  				
@@ -529,73 +536,10 @@ public class Doctor extends Controller {
 	  				treatmentList.add(allTreatmentPlanVm);
 	  			}
 	  			
-	  		
-	  		
-	  		return ok(Json.toJson(treatmentList));
+	       return ok(Json.toJson(treatmentList));
 	    }
 	     
-	   /* public static Result getAllDoctorFinance() throws IOException
-	    {
-	    	String doctorId = null;
-	    	int procedureCount = 0;
-	    	Set<String> dates = new HashSet<String>();
-	    	Set<Integer> procedures = new HashSet<Integer>();
-	    	Set<String> categories = new HashSet<String>();
-	    	Set<Integer> templateIds = new HashSet<Integer>();
-	    	
-	    	doctorId = URLDecoder.decode(request().getQueryString("doctorId"),"UTF-8");
-	    	int doctor_id = Person.getDoctorByMail(doctorId);
-	    	
-	    	System.out.println("doctor_id = "+doctor_id);
-	    	
-	    	List<Invoices> list = Invoices.getAllInvoicesByDoctorId(doctor_id);
-	    	List<DoctorReportVm> treatmentList = new ArrayList<DoctorReportVm>();
-	    	for(Invoices invoice : list)
-	    	{
-	    		dates.add(invoice.appointmentDate);
-	    		procedures.add(invoice.procedureId);
-	    	}
-	    	for(String s : dates){
-	    		double totalInvoiceValue = 0.0;
-	    		int proceudreCount = 0;
-	    		DoctorReportVm vm = new DoctorReportVm();
-	    		vm.appointmentDate = s;
-	    		System.out.println("Date from set::::::::"+s);
-	    		List<TotalInvoice> totalInvoiceList = TotalInvoice.getAllInvoices(doctor_id, s);
-	    		for(TotalInvoice totalInvoice : totalInvoiceList)
-	    		{
-	    		    double val = Double.parseDouble(totalInvoice.grandTotal);
-	    		    totalInvoiceValue = totalInvoiceValue + val;
-	    		}
-	    		vm.totalInvoice = totalInvoiceValue;
-	    		List<AllProcedureVm> allProcedureList = new ArrayList<AllProcedureVm>();	
-	    		
-	    		for(Integer pro : procedures)
-	    		{
-	    			DoctorProcedure procedure = DoctorProcedure.doctorProcedureById(pro);
-	    			categories.add(procedure.category);
-	    			    			
-	    		}
-	    		List<CategoryVm> categoryList = new ArrayList<CategoryVm>();
-	    		for(String cat : categories)
-	    		{	
-	    			CategoryVm categoryVm = new CategoryVm();
-	    			categoryVm.category = cat;
-	    			List<DoctorProcedure> procedureList = DoctorProcedure.getAllProcedures(cat);
-	    			categoryVm.procedureList = procedureList;
-	    			procedureCount = procedureCount + procedureList.size();
-	    			categoryList.add(categoryVm);
-	    			
-	    		}
-	    		vm.categoryVm = categoryList;
-	    		vm.countProcedure = procedureCount;
-	    		treatmentList.add(vm);
-	    			    		
-	    	}
-	    	  		
-	    	return ok(Json.toJson(treatmentList));
-	    }
-				*/
+	 
 	    public static Result getAllInvoices() {
 	  		
 	  		String doctorId = null;
