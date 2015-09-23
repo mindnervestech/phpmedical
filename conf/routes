@@ -104,7 +104,7 @@ POST    /updateDoctorProfile                    controllers.Doctor.updateDoctorP
 GET     /getAllSpeciality					    controllers.Doctor.getAllSpeciality()
 POST    /deleteDoctor							controllers.Doctor.deleteDoctor()
 POST    /setStatusSlot							controllers.Doctor.setStatusSlot()
-GET     /getAllDoctorFinance                   controllers.Doctor.getAllDoctorFinance()
+GET     /getAllDoctorFinance                    controllers.Doctor.getAllDoctorFinance()
 
 #patient Urls
 

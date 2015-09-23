@@ -377,6 +377,8 @@ public class Doctor extends Controller {
 								allClinicAppointment.clinicId = appointment.clinicId;
 								allClinicAppointment.doctorId = appointment.doctorId;
 								allClinicAppointment.patientId = appointment.patientId;
+								Clinic clinic = Clinic.findClinicById(appointment.clinicId);
+								
 								//allClinicAppointment.timeSlot = appointment.timeSlot;
 								
 								DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
@@ -745,6 +747,14 @@ public class Doctor extends Controller {
 								shift1Details = getDays(schedulesShift1, shift1Details);
 								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift1");
 								shift1Details.appointmentCount = appointments.size();
+								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
+								{
+									shift1Details.shiftAvailability = "Available";
+								}
+								else
+								{
+									shift1Details.shiftAvailability = clinicSchedule.availability;
+								}
 								vm.shift1 = shift1Details;
 							}
 							if(clinicSchedule.shift.equalsIgnoreCase("shift2"))
@@ -755,6 +765,14 @@ public class Doctor extends Controller {
 								shift2Details = getDays(schedulesShift2, shift2Details);
 								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift2");
 								shift2Details.appointmentCount = appointments.size();
+								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
+								{
+									shift2Details.shiftAvailability = "Available";
+								}
+								else
+								{
+									shift2Details.shiftAvailability = clinicSchedule.availability;
+								}
 								vm.shift2 = shift2Details;
 							}
 							if(clinicSchedule.shift.equalsIgnoreCase("shift3"))
@@ -765,6 +783,14 @@ public class Doctor extends Controller {
 								shift3Details = getDays(schedulesShift3, shift3Details);
 								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift3");
 								shift3Details.appointmentCount = appointments.size();
+								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
+								{
+									shift3Details.shiftAvailability = "Available";
+								}
+								else
+								{
+									shift3Details.shiftAvailability = clinicSchedule.availability;
+								}
 								vm.shift3 = shift3Details;
 							}
 							
