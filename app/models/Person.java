@@ -51,6 +51,7 @@ public class Person extends Model {
 	public Integer patient;
 	public String url;
 	public String verficationCode;
+	public String status;
 	
 /*	@OneToOne
 	public DoctorRegister doctor;

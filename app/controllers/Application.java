@@ -155,12 +155,7 @@ public class Application extends Controller {
 		return ok(Json.toJson("Completed"));
 	}
 	
-	public static Result getVerificationCode() throws IOException
-	{
-		String email = request().getQueryString("email");
-		Person person = Person.getPersonByMail(email);
-		return ok(Json.toJson(person.verficationCode));
-	}
+	
 	public static Result verification() throws IOException
 	{
 		System.out.println("called...............");
@@ -218,6 +213,8 @@ public class Application extends Controller {
 		registration.password = register.password;
 		registration.gender = register.gender;
 		registration.mobileNumber = register.mobileNumber;
+		registration.verficationCode = "000000";
+		registration.status = "Under Verification";
 		//registration.doctor = register.doctorId;
 		try {
 			registration.dateOfBirth = format.parse(register.dateOfBirth);
@@ -248,27 +245,11 @@ public class Application extends Controller {
 	}
 	public static Result registerProfilePictureAssistant() throws IOException
 	{
-		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
-		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
 		            "~", "*", "?", ":","\"","\\"," "});
-		 int aNumber = 0;
-		 DynamicForm form = DynamicForm.form().bindFromRequest();
-		 final String username="kaustubh.kbh@gmail.com";
-	     final String password="krrish007";
-	     System.out.println("username="+username);
-	     System.out.println("Password="+password);
-	     Properties props = new Properties();
-	 	 props.put("mail.smtp.auth", "true");
-	 	 props.put("mail.smtp.starttls.enable", "true");
-	 	 props.put("mail.smtp.host", "smtp.gmail.com");
-	 	 props.put("mail.smtp.port", "587");
-	 	 Session session = Session.getInstance(props,
-	 	 		  new javax.mail.Authenticator() {
-	 	 			protected PasswordAuthentication getPasswordAuthentication() {
-	 	 				return new PasswordAuthentication(username, password);
-	 	 			}
-	 	  });
+		DynamicForm form = DynamicForm.form().bindFromRequest();
 		String path = null;
 		int assistantId = 0;
 		
@@ -298,60 +279,19 @@ public class Application extends Controller {
 			file.renameTo(newFile);
 			path = Play.application().configuration().getString("profile_pic_url_assistant")+"/" + fileName;
 			System.out.println("Path:::::::"+path);
-			try
-			{ 				
-		 			aNumber = (int)((Math.random() * 900000)+100000); 
-		 			System.out.println("Random Number:::::::"+aNumber);
-		  			Message feedback = new MimeMessage(session);
-		  			feedback.setFrom(new InternetAddress(username));
-		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-		  			feedback.setSubject("MedicalDiary Verification Code");	  			
-		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-		  	        messageBodyPart.setText(""+aNumber);	  	    
-		  	        Multipart multipart = new MimeMultipart();	  	    
-		  	        multipart.addBodyPart(messageBodyPart);	            
-		  	        feedback.setContent(multipart);
-		  		    Transport.send(feedback);
-		     } 
-			 catch (MessagingException e)
-			 {
-		       		e.printStackTrace();
-		     }
-				
-			
 			System.out.println("Person name:::::"+p.name);
 			p.url = path;
-			p.verficationCode = ""+aNumber;
+			
 			p.update();
 	    }
 		else
 		{
 			 path = "none";
 	    	 Person p = Person.getPersonById(assistantId);
-	    	 try
-			 { 				
-			 			aNumber = (int)((Math.random() * 900000)+100000); 
-			 			System.out.println("Random Number:::::::"+aNumber);
-			  			Message feedback = new MimeMessage(session);
-			  			feedback.setFrom(new InternetAddress(username));
-			  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-			  			feedback.setSubject("MedicalDiary Verification Code");	  			
-			  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-			  	        messageBodyPart.setText(""+aNumber);	  	    
-			  	        Multipart multipart = new MimeMultipart();	  	    
-			  	        multipart.addBodyPart(messageBodyPart);	            
-			  	        feedback.setContent(multipart);
-			  		    Transport.send(feedback);
-			   } 
-			   catch (MessagingException e)
-			   {
-			       		e.printStackTrace();
-			   }
-			 p.verficationCode = ""+aNumber;	
 			 p.url = path;
 			 p.update();
 		}
-		return ok(Json.toJson(""+aNumber));
+		return ok(Json.toJson("Success"));
 	}
 	public static Result registerPatient() throws IOException {
 		System.out.println("called...............");
@@ -398,35 +338,60 @@ public class Application extends Controller {
 		registration.cloudLoginId = register.cloudLoginId;
 		registration.cloudLoginPassword = register.cloudLoginPassword;
 		registration.patient = patient.patientId;
-
+		registration.verficationCode = "000000";
+		registration.status = "Under Verification";
 		registration.save();
 
 		System.out.println("Return");
 		return ok(Json.toJson(registration.idPerson));
 	}
 	
-	public static Result registerProfilePicturePatient() throws IOException{
-		 int aNumber = 0; 
-		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
-		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
-		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
-		            "~", "*", "?", ":","\"","\\"," "});
-		 DynamicForm form = DynamicForm.form().bindFromRequest();
-		 final String username="kaustubh.kbh@gmail.com";
-	     final String password="krrish007";
-	     System.out.println("username="+username);
-	     System.out.println("Password="+password);
-	     Properties props = new Properties();
-	 	 props.put("mail.smtp.auth", "true");
-	 	 props.put("mail.smtp.starttls.enable", "true");
-	 	 props.put("mail.smtp.host", "smtp.gmail.com");
-	 	 props.put("mail.smtp.port", "587");
-	 	 Session session = Session.getInstance(props,
+	public static Result getVerificationCode()throws IOException 
+	{
+		int aNumber = 0; 
+		String email = URLDecoder.decode(request()
+				.getQueryString("email"), "UTF-8");
+		Properties props = new Properties();
+	 	props.put("mail.smtp.auth", "true");
+	 	props.put("mail.smtp.starttls.enable", "true");
+	 	props.put("mail.smtp.host", "smtp.gmail.com");
+	 	props.put("mail.smtp.port", "587");
+	 	final String username="kaustubh.kbh@gmail.com";
+	    final String password="krrish007";
+	 	Session session = Session.getInstance(props,
 	 	 		  new javax.mail.Authenticator() {
 	 	 			protected PasswordAuthentication getPasswordAuthentication() {
 	 	 				return new PasswordAuthentication(username, password);
 	 	 			}
 	 	  });
+		try
+		{
+			aNumber = (int)((Math.random() * 900000)+100000); 
+ 			System.out.println("Random Number:::::::"+aNumber);
+  			Message feedback = new MimeMessage(session);
+  			feedback.setFrom(new InternetAddress(username));
+  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(email));
+  			feedback.setSubject("MedicalDiary Verification Code");	  			
+  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
+  	        messageBodyPart.setText(""+aNumber);	  	    
+  	        Multipart multipart = new MimeMultipart();	  	    
+  	        multipart.addBodyPart(messageBodyPart);	            
+  	        feedback.setContent(multipart);
+  		    Transport.send(feedback);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ok(Json.toJson(""+aNumber));
+	}
+	public static Result registerProfilePicturePatient() throws IOException{
+		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		 DynamicForm form = DynamicForm.form().bindFromRequest();
+		
 		 
 		 String path = null;
 		 int patId = 0;
@@ -455,62 +420,26 @@ public class Application extends Controller {
 			  System.out.println("Path:::::::"+path);
 			  Person p = Person.getPersonById(patId);
 			  System.out.println("Person name:::::"+p.name);
-			  try
-			  { 				
-		 			aNumber = (int)((Math.random() * 900000)+100000); 
-		 			System.out.println("Random Number:::::::"+aNumber);
-		  			Message feedback = new MimeMessage(session);
-		  			feedback.setFrom(new InternetAddress(username));
-		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-		  			feedback.setSubject("MedicalDiary Verification Code");	  			
-		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-		  	        messageBodyPart.setText(""+aNumber);	  	    
-		  	        Multipart multipart = new MimeMultipart();	  	    
-		  	        multipart.addBodyPart(messageBodyPart);	            
-		  	        feedback.setContent(multipart);
-		  		    Transport.send(feedback);
-		        } 
-			    catch (MessagingException e)
-			    {
-		       			e.printStackTrace();
-		  		}
+			 
 				
 			 
 			  p.url = path;
-			  p.verficationCode = ""+aNumber;
+			 
 			  p.update();
 			 
 	     }
 	     else
 	     {	
 	    	  Person p = Person.getPersonById(patId);
-	    	  try
-			  {
-		 			aNumber = (int)((Math.random() * 900000)+100000); 
-		 			System.out.println("Random Number:::::::"+aNumber);
-		  			Message feedback = new MimeMessage(session);
-		  			feedback.setFrom(new InternetAddress(username));
-		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-		  			feedback.setSubject("MedicalDiary Verification Code");	  			
-		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-		  	        messageBodyPart.setText(""+aNumber);	  	    
-		  	        Multipart multipart = new MimeMultipart();	  	    
-		  	        multipart.addBodyPart(messageBodyPart);	            
-		  	        feedback.setContent(multipart);
-		  		    Transport.send(feedback);
-		        } 
-			    catch (MessagingException e)
-			    {
-		       			e.printStackTrace();
-		  		}
+	    	 
 		    	path = "none";
 		    	
-		    	p.verficationCode = ""+aNumber;
+		    	
 				p.url = path;
 				p.update();
 	     }
 		
-		return ok(Json.toJson(""+aNumber));
+		return ok(Json.toJson("Success"));
 	}
 
 	public static Result registerDoctor() throws IOException {
@@ -541,6 +470,8 @@ public class Application extends Controller {
 		registration.password = register.password;
 		registration.gender = register.gender;
 		registration.mobileNumber = register.mobileNumber;
+		registration.verficationCode = "000000";
+		registration.status = "Under Verification";
 
 		try {
 			registration.dateOfBirth = format.parse(register.dateOfBirth);
@@ -568,23 +499,8 @@ public class Application extends Controller {
 		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
 		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
 		            "~", "*", "?", ":","\"","\\"," "});
-		 int aNumber = 0;
 		 DynamicForm form = DynamicForm.form().bindFromRequest();
-		 final String username="kaustubh.kbh@gmail.com";
-	     final String password="krrish007";
-	     System.out.println("username="+username);
-	     System.out.println("Password="+password);
-	     Properties props = new Properties();
-	 	 props.put("mail.smtp.auth", "true");
-	 	 props.put("mail.smtp.starttls.enable", "true");
-	 	 props.put("mail.smtp.host", "smtp.gmail.com");
-	 	 props.put("mail.smtp.port", "587");
-	 	 Session session = Session.getInstance(props,
-	 	 		  new javax.mail.Authenticator() {
-	 	 			protected PasswordAuthentication getPasswordAuthentication() {
-	 	 				return new PasswordAuthentication(username, password);
-	 	 			}
-	 	  });
+		
 		 String path = null;
 		 int docId = 0;
 		 if(!form.get("doctorId").equalsIgnoreCase("null")){
@@ -605,25 +521,7 @@ public class Application extends Controller {
 			    	fileNameString = fileNameString.replace(""+s, "");
 			     }
 			  }
-			 try
-			  { 				
-		 			aNumber = (int)((Math.random() * 900000)+100000); 
-		 			System.out.println("Random Number:::::::"+aNumber);
-		  			Message feedback = new MimeMessage(session);
-		  			feedback.setFrom(new InternetAddress(username));
-		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-		  			feedback.setSubject("MedicalDiary Verification Code");	  			
-		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-		  	        messageBodyPart.setText(""+aNumber);	  	    
-		  	        Multipart multipart = new MimeMultipart();	  	    
-		  	        multipart.addBodyPart(messageBodyPart);	            
-		  	        feedback.setContent(multipart);
-		  		    Transport.send(feedback);
-		        } 
-			    catch (MessagingException e)
-			    {
-		       			e.printStackTrace();
-		  		}
+			 
 			  fileName = fileNameString;
 			  System.out.println("File name::::::"+fileName);
 			  File  newFile = new File(Play.application().configuration().getString("profile_pic_url_doctors")+ "//"+  fileName);
@@ -633,37 +531,19 @@ public class Application extends Controller {
 			  
 			  System.out.println("Person name:::::"+p.name);
 			  p.url = path;
-			  p.verficationCode = ""+aNumber;
+			 
 			  p.update();
 		   }
 		   else
 	       {	
 	    	  path = "none";
 	    	  Person p = Person.getPersonById(docId);
-	    	  try
-			  { 				
-		 			aNumber = (int)((Math.random() * 900000)+100000); 
-		 			System.out.println("Random Number:::::::"+aNumber);
-		  			Message feedback = new MimeMessage(session);
-		  			feedback.setFrom(new InternetAddress(username));
-		  			feedback.setRecipients(Message.RecipientType.TO,InternetAddress.parse(p.emailID));
-		  			feedback.setSubject("MedicalDiary Verification Code");	  			
-		  			BodyPart messageBodyPart = new MimeBodyPart();	  	       
-		  	        messageBodyPart.setText(""+aNumber);	  	    
-		  	        Multipart multipart = new MimeMultipart();	  	    
-		  	        multipart.addBodyPart(messageBodyPart);	            
-		  	        feedback.setContent(multipart);
-		  		    Transport.send(feedback);
-		        } 
-			    catch (MessagingException e)
-			    {
-		       			e.printStackTrace();
-		  		}
+	    	  
 			  p.url = path;
-			  p.verficationCode = ""+aNumber;
+			 
 			  p.update();
 	       }
-		   return ok(Json.toJson(""+aNumber));
+		   return ok(Json.toJson("Success"));
 	}
 	
 	public static Result login() throws IOException {
@@ -680,10 +560,12 @@ public class Application extends Controller {
 		
 		String email = null;
 		String type = null;
+		String status = null;
 		try {
 			Person user = Person.getUserByUserNameAndPassword(register.emailID,
 					register.password);
 			email = user.emailID;
+			status = user.status;
 			if(user.role == 1){
 				type = "Patient";
 			} else if(user.role == 2){
@@ -709,6 +591,7 @@ public class Application extends Controller {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("email", email);
 		map.put("type", type);
+		map.put("status",status);
 		return ok(Json.toJson(map));
 
 		/*
