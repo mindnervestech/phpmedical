@@ -488,12 +488,25 @@ public class Doctor extends Controller {
 	  				allTreatmentPlanVm.patientAppointmentTime = invoice.appointmentTime;
 	  			    TotalInvoice totalInvoice = TotalInvoice.grandTotalAndTotalDue(doctor_id, invoice.patientId, invoice.appointmentDate,invoice.appointmentTime);
 	  				//System.out.println("treatmentPlan.procedureId = "+treatmentPlan.procedureId);
-	  			    System.out.println("Grand Total::::::::"+totalInvoice);
-	  				allTreatmentPlanVm.grandTotal = totalInvoice.grandTotal;
-	  				allTreatmentPlanVm.totalDue = totalInvoice.totalDue;
-	  				allTreatmentPlanVm.discount = totalInvoice.discount;
-	  				allTreatmentPlanVm.tax = totalInvoice.taxValue;
-	  				allTreatmentPlanVm.advance = totalInvoice.advance;
+	  			    if(totalInvoice == null)
+	  			    {
+	  			    	System.out.println("Grand Total::::::::"+totalInvoice);
+		  				allTreatmentPlanVm.grandTotal = "0.0";
+		  				allTreatmentPlanVm.totalDue = "0.0";
+		  				allTreatmentPlanVm.discount = "0.0";
+		  				allTreatmentPlanVm.tax = "0.0";
+		  				allTreatmentPlanVm.advance = "0.0";
+	  			    }
+	  			    else
+	  			    {
+	  			    	System.out.println("Grand Total::::::::"+totalInvoice);
+		  				allTreatmentPlanVm.grandTotal = totalInvoice.grandTotal;
+		  				allTreatmentPlanVm.totalDue = totalInvoice.totalDue;
+		  				allTreatmentPlanVm.discount = totalInvoice.discount;
+		  				allTreatmentPlanVm.tax = totalInvoice.taxValue;
+		  				allTreatmentPlanVm.advance = totalInvoice.advance;
+	  			    }
+	  			   
 	  				List <AllProcedureVm>  doctorProcedures = new ArrayList<AllProcedureVm>();
 	  				AllProcedureVm allProcedureVm = new AllProcedureVm();
 				    allProcedureVm.procedureName = doctorProcedure.procedureName;
@@ -632,7 +645,12 @@ public class Doctor extends Controller {
 	  						allTemplateVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
 	  						
 	  						System.out.println("attributeList = "+attributeList.size());
-	  						
+	  						List<TemplateAttribute> attributes = TemplateAttribute.getAllAttributes(templateClass);
+	  						for(TemplateAttribute att : attributes)
+	  						{
+	  							System.out.println("Attribute name::::"+att.fieldName);
+	  							System.out.println("Attribute Cost::::"+att.fieldDefaultValue);
+	  						}
 	  						for(TemplateAttribute attribute : attributeList){
 	  							ShowFieldVm fieldVm = new ShowFieldVm();
 	  							fieldVm.fieldDefaultValue = attribute.fieldDefaultValue;
