@@ -11,6 +11,9 @@ public class AllTreatmentPlanVm {
 	public String patientAppointmentTime;
 	public String grandTotal;
 	public String totalDue;
+	public String discount;
+	public String tax;
+	public String advance;
 
 	public List<AllProcedureVm> procedure;
 	

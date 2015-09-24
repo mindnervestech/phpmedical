@@ -491,6 +491,9 @@ public class Doctor extends Controller {
 	  			    System.out.println("Grand Total::::::::"+totalInvoice);
 	  				allTreatmentPlanVm.grandTotal = totalInvoice.grandTotal;
 	  				allTreatmentPlanVm.totalDue = totalInvoice.totalDue;
+	  				allTreatmentPlanVm.discount = totalInvoice.discount;
+	  				allTreatmentPlanVm.tax = totalInvoice.taxValue;
+	  				allTreatmentPlanVm.advance = totalInvoice.advance;
 	  				List <AllProcedureVm>  doctorProcedures = new ArrayList<AllProcedureVm>();
 	  				AllProcedureVm allProcedureVm = new AllProcedureVm();
 				    allProcedureVm.procedureName = doctorProcedure.procedureName;
