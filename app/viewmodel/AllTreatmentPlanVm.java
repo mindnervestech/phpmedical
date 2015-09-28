@@ -14,7 +14,7 @@ public class AllTreatmentPlanVm {
 	public String discount;
 	public String tax;
 	public String advance;
-
+	public String total;
 	public List<AllProcedureVm> procedure;
 	
 }

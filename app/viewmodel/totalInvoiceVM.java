@@ -13,6 +13,7 @@ public class totalInvoiceVM {
 	public String percentageTax;
 	public String advance;
 	public String totalDue;
+	public String total;
 	public Integer shareWithPatient;
 	
     public String getDoctorId() {

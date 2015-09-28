@@ -27,6 +27,7 @@ import models.PatientRegister;
 import models.Person;
 import models.ReminderData;
 import models.ReminderTimeTable;
+import models.SummaryHistory;
 import models.Person.GenderType;
 
 import org.codehaus.jackson.JsonNode;
@@ -1040,6 +1041,14 @@ public class Patient extends Controller {
 			return message;
 		}
 
+	}
+	public static Result getAllHistoryPatient() throws IOException
+	{
+		System.out.println("called...............");
+		String appointmentDate = URLDecoder.decode(request().getQueryString("appointmentDate"),"UTF-8");
+		String appointmentTime = URLDecoder.decode(request().getQueryString("appointmentTime"),"UTF-8");
+		List <SummaryHistory> summaryList = SummaryHistory.getAllSummaryHistory(appointmentDate,appointmentTime);
+		return ok(Json.toJson(summaryList));
 	}
 
 }

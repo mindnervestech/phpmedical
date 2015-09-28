@@ -22,6 +22,7 @@ public class TotalInvoice extends Model {
 	public String grandTotal;
 	public String discount;
 	public String taxValue;
+	public String total;
 	public Integer getDoctorId() {
 		return doctorId;
 	}

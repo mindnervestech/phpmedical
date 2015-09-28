@@ -27,6 +27,9 @@ import org.hibernate.validator.constraints.URL;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import controllers.Patient.Error;
+import controllers.Patient.ErrorResponse;
+
 import models.Clinic;
 import models.DoctorClinicSchedule;
 import models.DoctorNotes;
@@ -36,6 +39,7 @@ import models.Invoices;
 import models.PatientClientBookAppointment;
 import models.PatientRegister;
 import models.Person;
+import models.SummaryHistory;
 import models.Person.GenderType;
 import models.ReminderData;
 import models.ReminderTimeTable;
@@ -65,11 +69,13 @@ import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
 import viewmodel.ModeVM;
 import viewmodel.PDAEditVm;
+import viewmodel.PatientClinicsAppointmentVM;
 import viewmodel.PersonVM;
 import viewmodel.ReminderVM;
 import viewmodel.ShiftAppointment;
 import viewmodel.ShiftDetails;
 import viewmodel.ShowFieldVm;
+import viewmodel.SummaryHistoryVM;
 import viewmodel.TimeTable;
 import viewmodel.TreatementFieldVm;
 import viewmodel.TreatmentPlanVm;
@@ -353,14 +359,17 @@ public class Doctor extends Controller {
 									shiftDetails.appointmentType = appointment.visitType;
 									shiftDetails.bookTime = appointment.bookTime;
 									shiftDetails.timeSlot = appointment.timeSlot;
+									shiftDetails.status = appointment.status;
 									//shiftDetailsList.add(shiftDetails);
+									 if(appointment.patientId != 0)
+									 {
+										 Person person = Person.getPatientsById(appointment.patientId);
+										 PersonVM personVM = new PersonVM();
+										 personVM.id = person.patient.toString();
+										 personVM.name = person.name;
 									
-									 Person person = Person.getPatientsById(appointment.patientId);
-									 PersonVM personVM = new PersonVM();
-									 personVM.id = person.patient.toString();
-									 personVM.name = person.name;
-									
-									 shiftDetails.patientInfo = personVM;
+										 shiftDetails.patientInfo = personVM;
+									 }
 									
 									 if(appointment.shift.equals("shift1")){
 										 clinicAppointment.shift1.add(shiftDetails);
@@ -377,6 +386,7 @@ public class Doctor extends Controller {
 								allClinicAppointment.clinicId = appointment.clinicId;
 								allClinicAppointment.doctorId = appointment.doctorId;
 								allClinicAppointment.patientId = appointment.patientId;
+								allClinicAppointment.status = appointment.status;
 								Clinic clinic = Clinic.findClinicById(appointment.clinicId);
 								
 								//allClinicAppointment.timeSlot = appointment.timeSlot;
@@ -496,6 +506,7 @@ public class Doctor extends Controller {
 		  				allTreatmentPlanVm.discount = "0.0";
 		  				allTreatmentPlanVm.tax = "0.0";
 		  				allTreatmentPlanVm.advance = "0.0";
+		  				allTreatmentPlanVm.total = "0.0";
 	  			    }
 	  			    else
 	  			    {
@@ -505,6 +516,7 @@ public class Doctor extends Controller {
 		  				allTreatmentPlanVm.discount = totalInvoice.discount;
 		  				allTreatmentPlanVm.tax = totalInvoice.taxValue;
 		  				allTreatmentPlanVm.advance = totalInvoice.advance;
+		  				allTreatmentPlanVm.total = totalInvoice.total;
 	  			    }
 	  			   
 	  				List <AllProcedureVm>  doctorProcedures = new ArrayList<AllProcedureVm>();
@@ -594,7 +606,7 @@ public class Doctor extends Controller {
 	  					allProcedureVm.category = doctorProcedureList.category;
 	  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
 	  					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
-
+	  						
 	  					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
 	  					
 	  					Boolean checkProcedure = false;
@@ -622,8 +634,6 @@ public class Doctor extends Controller {
 	  								fieldVm.fieldType = attribute.fieldType;
 	  								allTemplateVm.templates.add(fieldVm);
 	  							}
-	  							
-	  							//allTemplateVm.templates.add(e)
 	  							
 	  							procedureVm.allTemplate.add(allTemplateVm);
 	  							checkProcedure = true;
@@ -1734,7 +1744,7 @@ public static Result getAllDoctorPatientClinics() {
 			invoices.advance = totalInvoices.advance;
 			invoices.totalDue = totalInvoices.totalDue;
 			invoices.shareWithPatient = totalInvoices.shareWithPatient;
-
+			invoices.total = totalInvoices.total;
 			invoices.save();
 		}else{
 
@@ -1750,6 +1760,7 @@ public static Result getAllDoctorPatientClinics() {
 			invoices.advance = totalInvoices.advance;
 			invoices.totalDue = totalInvoices.totalDue;
 			invoices.shareWithPatient = totalInvoices.shareWithPatient;
+			invoices.total = totalInvoices.total;
 			invoices.update();
 		}
 		
@@ -2057,7 +2068,59 @@ public static Result getAllDoctorPatientClinics() {
 		
 		return ok(Json.toJson(speciality));
 	}
-	
+	public static Result getAllHistoryDoctor() throws IOException
+	{
+		System.out.println("called...............");
+		String appointmentDate = URLDecoder.decode(request().getQueryString("appointmentDate"),"UTF-8");
+		String appointmentTime = URLDecoder.decode(request().getQueryString("appointmentTime"),"UTF-8");
+		List <SummaryHistory> summaryList = SummaryHistory.getAllSummaryHistory(appointmentDate,appointmentTime);
+		return ok(Json.toJson(summaryList));
+	}
+	public static Result saveDoctorAppointmentDetails() throws IOException {
+
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+
+		PatientClinicsAppointmentVM bookAppointment = mapper.readValue(
+				json.traverse(), PatientClinicsAppointmentVM.class);
+
+		System.out.println("bookAppointment.patientId = "
+				+ bookAppointment.patientId);
+
+		Integer patient_id = Integer.parseInt(bookAppointment.patientId);
+
+		PatientClientBookAppointment appointment = PatientClientBookAppointment
+				.getClinicAppointment(bookAppointment.doctorId, patient_id,
+						bookAppointment.clinicId, bookAppointment.shift);
+
+		appointment.clinicId = bookAppointment.clinicId;
+		// appointment.patientId = bookAppointment.patientId;
+		appointment.patientId = patient_id;// Person.getPatientByMail(bookAppointment.patientId);
+		appointment.doctorId = bookAppointment.doctorId;
+		appointment.shift = bookAppointment.shift;
+		appointment.bookTime = bookAppointment.bookTime;
+		appointment.timeSlot = bookAppointment.timeSlot;
+		appointment.visitType = bookAppointment.visitType;
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			// System.out.println("Date  in java = "+format.parse(bookAppointment.appointmentDate));
+			appointment.appointmentDate = format
+					.parse(bookAppointment.appointmentDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// appointment.appointmentDate = bookAppointment.appointmentDate;
+		appointment.status = bookAppointment.status;
+		appointment.save();
+
+		return ok(Json.toJson(new ErrorResponse(Error.E304.getCode(),
+				Error.E304.getMessage())));
+
+	}
+
 	
 }
 	

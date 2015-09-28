@@ -7,7 +7,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 

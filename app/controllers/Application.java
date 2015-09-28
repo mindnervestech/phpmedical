@@ -44,6 +44,7 @@ import models.PatientClientBookAppointment;
 import models.PatientDependency;
 import models.PatientRegister;
 import models.Person;
+import models.SummaryHistory;
 import models.TemplateAttribute;
 import models.TemplateClass;
 import models.TemplateField;
@@ -54,8 +55,6 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
-
-
 import play.Play;
 import play.api.mvc.MultipartFormData;
 import play.data.DynamicForm;
@@ -77,6 +76,7 @@ import viewmodel.RegisterPatient;
 import viewmodel.RegisterVM;
 import viewmodel.ShowFieldVm;
 import viewmodel.ShowTemplatesVm;
+import viewmodel.SummaryHistoryVM;
 import viewmodel.TemplateVm;
 import viewmodel.totalInvoiceVM;
 import javax.activation.*;
@@ -1363,6 +1363,7 @@ public class Application extends Controller {
 
 		System.out.println("doctorClinicScheduleVM.schedules delete" + doctorClinicScheduleVM.schedules);
 		// int size = doctorClinicScheduleVM.schedules.size();
+		
 		if(doctorClinicScheduleVM.schedules != null){
 			System.out.println("doctorClinicScheduleVM.schedules delete" + doctorClinicScheduleVM.schedules);
 			for (int i = 0; i < doctorClinicScheduleVM.schedules.size(); i++) {
@@ -2080,6 +2081,7 @@ public class Application extends Controller {
 			DoctorRegister doctor = DoctorRegister.getDoctorById((Person.getDoctorByMail(decryptedValue)));
 			dels = Delegates.getAllByParentDoctor(doctor.doctorId);
 		} else {
+			
 			PatientRegister patient = PatientRegister.getPatientById((Person.getPatientByMail(decryptedValue)));
 			dels = Delegates.getAllByParentPatient(patient.patientId);
 		}
@@ -2432,6 +2434,44 @@ public class Application extends Controller {
 		Person person = Person.getPersonById(id);
 	    File file = new File(person.url);
 	    return ok(file);
+	}
+	
+	public static Result addSummaryHistory() throws IOException
+	{
+		System.out.println("called...............");
+		JsonNode json = request().body().asJson();
+		System.out.println("json" + json);
+		ObjectMapper mapper = new ObjectMapper();
+		SummaryHistoryVM summaryVM = mapper.readValue(json.traverse(),SummaryHistoryVM.class);
+		SummaryHistory summaryHistory = new SummaryHistory();
+		if(summaryVM.patientId != null)
+		{
+			summaryHistory.doctorId = null;
+			summaryHistory.patientId = summaryVM.patientId;
+			summaryHistory.symptoms = summaryVM.symptoms;
+			summaryHistory.diagonosis = summaryVM.diagonosis;
+			summaryHistory.medicalPrescribed = summaryVM.medicalPrescribed;
+			summaryHistory.testPrescribed = summaryVM.testPrescribed;
+			Date currentDate = new Date();
+			summaryHistory.curDate = currentDate.toString();
+			summaryHistory.appointmentDate = summaryVM.appointmentDate;
+			summaryHistory.appointmentTime = summaryVM.appointmentTime;
+		}
+		else
+		{
+			summaryHistory.patientId = null;
+			summaryHistory.doctorId = summaryVM.doctorId;
+			summaryHistory.symptoms = summaryVM.symptoms;
+			summaryHistory.diagonosis = summaryVM.diagonosis;
+			summaryHistory.medicalPrescribed = summaryVM.medicalPrescribed;
+			summaryHistory.testPrescribed = summaryVM.testPrescribed;
+			Date currentDate = new Date();
+			summaryHistory.curDate = currentDate.toString();
+			summaryHistory.appointmentDate = summaryVM.appointmentDate;
+			summaryHistory.appointmentTime = summaryVM.appointmentTime;
+		}
+		summaryHistory.save();
+		return ok(Json.toJson(summaryHistory));
 	}
 	
 

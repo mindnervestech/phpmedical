@@ -10,6 +10,7 @@ public class AllClinicAppointment {
 	public Integer patientId;
 	public Integer clinicId;
 	public String appointmentDate;
+	public String status;
 	//public String timeSlot;
 	
 	public List<ShiftAppointment> shift1 = new ArrayList<ShiftAppointment>();
