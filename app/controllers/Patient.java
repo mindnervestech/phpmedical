@@ -307,9 +307,21 @@ public class Patient extends Controller {
 		reminderData.setMedicinePrescribed(reminderVM.medicinePrescribed);
 		reminderData.setTestsPrescribed(reminderVM.testsPrescribed);
 		
-		
-
-/*		if (reminderVM.alarmReminderVMList != null) {
+		SummaryHistory summaryHistory = new SummaryHistory();
+		Person person = Person.getPersonByDoctorID(""+reminderVM.doctorId);
+		summaryHistory.doctorId = person.emailID;
+		summaryHistory.patientId = reminderVM.patientId;
+		summaryHistory.symptoms = reminderVM.symptoms;
+		summaryHistory.diagonosis = reminderVM.diagnosis;
+		summaryHistory.medicalPrescribed = reminderVM.medicinName;
+		summaryHistory.testPrescribed = reminderVM.testsPrescribed;
+		Date currentDate = new Date();
+		summaryHistory.curDate = currentDate.toString();
+		summaryHistory.appointmentDate = reminderVM.appointmentDate;
+		summaryHistory.appointmentTime = reminderVM.appointmentTime;
+		summaryHistory.type = reminderVM.ownerType;
+		summaryHistory.save();
+		/*		if (reminderVM.alarmReminderVMList != null) {
 			List<AlarmReminderVM> alarmReminderVMList = reminderVM.alarmReminderVMList;
 
 			for (AlarmReminderVM alarmReminderVM : alarmReminderVMList) {
@@ -391,7 +403,7 @@ public class Patient extends Controller {
 		{
 			reminderData.save();
 		}
-	}
+	  }
 		reminderData.save();
 		return ok(Json.toJson(reminderVM));
 	}
@@ -1042,13 +1054,6 @@ public class Patient extends Controller {
 		}
 
 	}
-	public static Result getAllHistoryPatient() throws IOException
-	{
-		System.out.println("called...............");
-		String appointmentDate = URLDecoder.decode(request().getQueryString("appointmentDate"),"UTF-8");
-		String appointmentTime = URLDecoder.decode(request().getQueryString("appointmentTime"),"UTF-8");
-		List <SummaryHistory> summaryList = SummaryHistory.getAllSummaryHistory(appointmentDate,appointmentTime);
-		return ok(Json.toJson(summaryList));
-	}
+	
 
 }

@@ -21,11 +21,12 @@ public class SummaryHistory extends Model {
 	public String curDate;
 	public String appointmentDate;
 	public String appointmentTime;
+    public String type;
 	
 	public static Finder<Integer,SummaryHistory> find = new Finder<>(Integer.class,SummaryHistory.class);
-	public static List<SummaryHistory> getAllSummaryHistory(String appointmentDate,String appointmentTime)
+	public static List<SummaryHistory> getAllSummaryHistory(String appointmentDate,String appointmentTime,String doctorId,String patientId)
 	{
-		return find.where().eq("appointmentDate", appointmentDate).eq("appointmentTime", appointmentTime).findList();
+		return find.where().eq("appointmentDate", appointmentDate).eq("appointmentTime", appointmentTime).eq("doctorId", doctorId).eq("patientId", patientId).findList();
 	}
 	
 

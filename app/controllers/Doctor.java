@@ -2068,14 +2068,6 @@ public static Result getAllDoctorPatientClinics() {
 		
 		return ok(Json.toJson(speciality));
 	}
-	public static Result getAllHistoryDoctor() throws IOException
-	{
-		System.out.println("called...............");
-		String appointmentDate = URLDecoder.decode(request().getQueryString("appointmentDate"),"UTF-8");
-		String appointmentTime = URLDecoder.decode(request().getQueryString("appointmentTime"),"UTF-8");
-		List <SummaryHistory> summaryList = SummaryHistory.getAllSummaryHistory(appointmentDate,appointmentTime);
-		return ok(Json.toJson(summaryList));
-	}
 	public static Result saveDoctorAppointmentDetails() throws IOException {
 
 		JsonNode json = request().body().asJson();

@@ -24,6 +24,7 @@ public class ReminderVM {
 	public String diagnosis;
 	public String medicinePrescribed;
 	public String testsPrescribed;
+	public String ownerType;
 	
 	public List<AlarmReminderVM> alarmReminderVMList;
 }
