@@ -316,7 +316,9 @@ public class Patient extends Controller {
 		summaryHistory.medicalPrescribed = reminderVM.medicinName;
 		summaryHistory.testPrescribed = reminderVM.testsPrescribed;
 		Date currentDate = new Date();
-		summaryHistory.curDate = currentDate.toString();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		summaryHistory.curDate = format.format(currentDate);
+		System.out.println("Date:::::::::"+summaryHistory.curDate);
 		summaryHistory.appointmentDate = reminderVM.appointmentDate;
 		summaryHistory.appointmentTime = reminderVM.appointmentTime;
 		summaryHistory.type = reminderVM.ownerType;

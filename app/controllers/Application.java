@@ -821,10 +821,13 @@ public class Application extends Controller {
 			String Nextdate = "";
 			String nextBookTime = "";
 			String nextShift = "";
+			String previousAppointment = "";
+			String previousDate = "";
 			Integer clinicId = null;
 			
 			//System.out.println("appointmentList = "+appointmentList.size());
-			if(appointmentList.size() > 0){
+			if(appointmentList.size() > 0)
+			{
 				
 				//Collections.sort(appointmentList, new CustomDateComparator());
 				Collections.sort(appointmentList, new Comparator<PatientClientBookAppointment>() {
@@ -874,10 +877,23 @@ public class Application extends Controller {
 				    	
 				    }
 				});
-				
+				int appointmentListSize = appointmentList.size();
+				System.out.println("AppointmentListsize= "+appointmentListSize);
 				for(int i = 0; i < appointmentList.size(); i++){
 					PatientClientBookAppointment appointment = appointmentList.get(i);
+					System.out.println("AppointmentListsize= "+(appointmentListSize == 2));
 					
+					for(int j=0;j < appointmentList.size();j++)
+					{
+						if(j == (appointmentListSize - 1))
+						{
+							System.out.println("Book Time::::::"+appointment.bookTime);
+							previousDate = formatter.format(appointment.appointmentDate);
+							previousAppointment = appointment.bookTime;
+							
+						
+						}
+					}
 					String[] timeValue;
 			    	Calendar calOne = Calendar.getInstance();
 			    	calOne.setTime(appointment.appointmentDate);
@@ -938,9 +954,10 @@ public class Application extends Controller {
 			}
 			
 			Person p = Person.getDoctorsById(doctor.doctorId);
-			patientDoctor.add(new PatientsDoctor(doctor.doctorId.toString(),
-					p.name, doctor.speciality, p.emailID, p.mobileNumber,
-					p.location, p.dateOfBirth.toString(), p.gender.toString(), 1, Nextdate,nextBookTime,nextShift,clinicId,lastVisted));
+			patientDoctor.add(new PatientsDoctor(doctor.doctorId.toString(),p.name,doctor.speciality,p.emailID,p.mobileNumber,
+					          p.location,p.dateOfBirth.toString(),p.gender.toString(),p.bloodGroup, lastVisted, 1,Nextdate,nextBookTime,
+					          nextShift,clinicId,lastVisted,previousAppointment,previousDate));
+			
 		}
 
 		List<BucketDoctors> bucketDoctors = BucketDoctors
