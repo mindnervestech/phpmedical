@@ -618,11 +618,20 @@ public class Patient extends Controller {
 			System.out.println("patientId = " + patientId);
 			System.out.println("appointmentDate = " + appointmentDate);
 			System.out.println("appointmentTime = " + appointmentTime);
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			Date date = dateFormat.parse(appointmentDate);
-			SimpleDateFormat monthFormat = new SimpleDateFormat("dd-MMM-yyyy");
-			System.out.println("new Date::::::"+monthFormat.format(date));
-			appointmentDate = monthFormat.format(date);
+			
+			try{
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date date = dateFormat.parse(appointmentDate);
+				SimpleDateFormat monthFormat = new SimpleDateFormat("dd-MMM-yyyy");
+				System.out.println("new Date::::::"+monthFormat.format(date));
+				appointmentDate = monthFormat.format(date);
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
+			
 		long doctor_id = Long.parseLong(decryptedValue);
 		// long patient_id = Long.parseLong(patientId);
 		Integer patient_id = Person.getPatientByMail(patientId);
