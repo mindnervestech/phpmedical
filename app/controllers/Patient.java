@@ -602,7 +602,7 @@ public class Patient extends Controller {
 		return ok(Json.toJson(clinicDoctorVM));
 	}
 
-	public static Result getPatientReminder() {
+	public static Result getPatientReminder() throws Exception {
 
 		String decryptedValue = null;
 		String patientId = null;
@@ -618,7 +618,11 @@ public class Patient extends Controller {
 			System.out.println("patientId = " + patientId);
 			System.out.println("appointmentDate = " + appointmentDate);
 			System.out.println("appointmentTime = " + appointmentTime);
-			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = dateFormat.parse(appointmentDate);
+			SimpleDateFormat monthFormat = new SimpleDateFormat("dd-MMM-yyyy");
+			System.out.println("new Date::::::"+monthFormat.format(date));
+			appointmentDate = monthFormat.format(date);
 		long doctor_id = Long.parseLong(decryptedValue);
 		// long patient_id = Long.parseLong(patientId);
 		Integer patient_id = Person.getPatientByMail(patientId);
@@ -626,6 +630,7 @@ public class Patient extends Controller {
 		System.out.println("patient_id = " + patient_id);
 		ReminderData reminderData = ReminderData.getAllReminderDataById(
 				doctor_id, patient_id, appointmentDate, appointmentTime);
+		System.out.println("Condition:::::::::::::::"+(reminderData == null));
 
 		if (reminderData == null) {
 			return ok(Json.toJson(new ReminderVM()));
