@@ -1062,6 +1062,7 @@ public class Application extends Controller {
 		clinics.email = clinic.email;
 		clinics.landLineNumber = clinic.landLineNumber;
 		clinics.mobileNumber = clinic.mobileNumber;
+		clinics.location = clinic.location;
 		clinics.speciality = clinic.speciality;
 		clinics.onlineAppointment = clinic.onlineAppointment;
 		clinics.update();
