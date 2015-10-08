@@ -436,7 +436,7 @@ public class Patient extends Controller {
 		String nextShift = "";
 		Integer clinicId = null;
 
-		// System.out.println("appointmentList = "+appointmentList.size());
+		System.out.println("appointmentList = "+appointmentList.size());
 		if (appointmentList.size() > 0) {
 
 			// Collections.sort(appointmentList, new CustomDateComparator());
@@ -493,10 +493,12 @@ public class Patient extends Controller {
 						}
 					});
 
-			for (int i = 0; i < appointmentList.size(); i++) {
+			
+			for (int i = 0; i < appointmentList.size(); i++) 
+			{
 				PatientClientBookAppointment appointment = appointmentList
 						.get(i);
-
+				
 				String[] timeValue;
 				Calendar calOne = Calendar.getInstance();
 				calOne.setTime(appointment.appointmentDate);
@@ -517,6 +519,7 @@ public class Patient extends Controller {
 				calOne.set(Calendar.AM_PM, 1);
 
 				Calendar calTwo = Calendar.getInstance();
+				System.out.println("Condition::::::"+(calOne.getTimeInMillis() < calTwo.getTimeInMillis()));
 
 				if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
 					Nextdate = "";
@@ -529,16 +532,17 @@ public class Patient extends Controller {
 					nextBookTime = appointment.bookTime;
 					nextShift = appointment.shift;
 					clinicId = appointment.clinicId;
+					System.out.println("App clinicId= "+appointment.clinicId);
 					break;
 				}
 
 			}
 
 		}
-
+		
 		List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
 		for (PatientClientBookAppointment appointment : appointmentList) {
-
+			
 			if (appointment.isVisited != null) {
 				if (appointment.isVisited == 1) {
 					visitedList.add(appointment);
@@ -573,8 +577,9 @@ public class Patient extends Controller {
 		 * public String bookDate; public String bookTime; public String shift;
 		 * public String lastVisited;
 		 */
-
+		
 		for (Clinic clinic : clinicList) {
+			int appointmentCount = 0;
 			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
 			doctorVM.idClinic = clinic.idClinic;
 			doctorVM.clinicName = clinic.clinicName;
@@ -584,16 +589,28 @@ public class Patient extends Controller {
 			doctorVM.location = clinic.location;
 			doctorVM.email = clinic.email;
 			doctorVM.doctorId = clinic.doctorId;
+			for(PatientClientBookAppointment appointment : appointmentList)
+			{
+				if(appointment.clinicId == Integer.valueOf(clinic.idClinic))
+				{
+					appointmentCount = appointmentCount + 1;
+				}
+			}
+			System.out.println("Appointment Count= "+appointmentCount);
+			doctorVM.totalAppointmentCount = ""+appointmentCount;
+
 
 			System.out.println("clinic.doctorId = " + clinic.doctorId);
 			System.out.println("clinicId = " + clinicId);
 
 			if (clinicId != null) {
 				if (clinicId.equals(Integer.valueOf(clinic.idClinic))) {
+					
 					doctorVM.bookDate = Nextdate;
 					doctorVM.bookTime = nextBookTime;
 					doctorVM.shift = nextShift;
 					doctorVM.lastVisited = lastVisted;
+					
 				}
 			}
 			clinicDoctorVM.add(doctorVM);
@@ -761,6 +778,7 @@ public class Patient extends Controller {
 
 		return ok(Json.toJson(clinicList));
 	}
+
 
 	public static Result getAllPatientAppointment() {
 
