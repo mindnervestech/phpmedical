@@ -589,6 +589,7 @@ public class Patient extends Controller {
 			doctorVM.location = clinic.location;
 			doctorVM.email = clinic.email;
 			doctorVM.doctorId = clinic.doctorId;
+			doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
 			for(PatientClientBookAppointment appointment : appointmentList)
 			{
 				if(appointment.clinicId == Integer.valueOf(clinic.idClinic))
