@@ -1049,6 +1049,84 @@ public class Patient extends Controller {
 		
 		return ok(Json.toJson("Success"));
 	}
+	
+	public static Result getPatientAppointment()throws IOException
+	{
+		String decryptedValue = null;
+		try{
+			decryptedValue = URLDecoder.decode(request().getQueryString("patientId"),"UTF-8");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		Person person =  Person.getPersonByMail(decryptedValue);
+		int patientId = person.idPerson;
+		List<PatientClientBookAppointment> appointmentList = PatientClientBookAppointment
+				                                            .getAllPatientAppointments(patientId);	
+		List<ClinicDoctorVM> clinicDoctorVM = new ArrayList<ClinicDoctorVM>();
+		List<Clinic> clinicList = Clinic.getAllClinic();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+		String Nextdate = "";
+		String nextBookTime = "";
+		int idClinic = 0;
+		for(PatientClientBookAppointment appoint : appointmentList){
+			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
+			idClinic = appoint.clinicId;
+			for(Clinic clinic : clinicList){
+				if(appoint.clinicId == clinic.idClinic){
+					doctorVM.idClinic = clinic.idClinic;
+					doctorVM.clinicName = clinic.clinicName;
+					doctorVM.landLineNumber = clinic.landLineNumber;
+					doctorVM.mobileNumber = clinic.mobileNumber;
+					doctorVM.address = clinic.address;
+					doctorVM.location = clinic.location;
+					doctorVM.email = clinic.email;
+					doctorVM.doctorId = clinic.doctorId;
+					doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
+					doctorVM.appointmentDate = ""+formatter.format(appoint.appointmentDate);
+					doctorVM.appointmentTime = appoint.bookTime;
+					doctorVM.appointmentType = appoint.visitType;
+					String[] timeValue;
+					Calendar calOne = Calendar.getInstance();
+					calOne.setTime(appoint.appointmentDate);
+					timeValue = appoint.bookTime.split(":");
+
+					int hour1 = Integer.parseInt(timeValue[0].trim());
+					int min1 = Integer.parseInt(timeValue[1].trim().split(
+								"[a-zA-Z ]+")[0]);
+					calOne.set(Calendar.HOUR, hour1);
+					calOne.set(Calendar.MINUTE, min1);
+
+					String strAM_PM = timeValue[1].replaceAll("[0-9]", "");
+					if (strAM_PM.equals("AM")) {
+						calOne.set(Calendar.AM_PM, 0);
+					} else {
+						calOne.set(Calendar.AM_PM, 1);
+					}
+					calOne.set(Calendar.AM_PM, 1);
+
+					Calendar calTwo = Calendar.getInstance();
+					System.out.println("Condition::::::"+(calOne.getTimeInMillis() < calTwo.getTimeInMillis()));
+
+					if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
+							Nextdate = "";
+						} else {
+							Nextdate = formatter.format(appoint.appointmentDate);
+							nextBookTime = appoint.bookTime;
+							doctorVM.bookDate = Nextdate;
+							doctorVM.bookTime = nextBookTime;
+							
+						}
+
+					}
+								
+			 }
+				
+			clinicDoctorVM.add(doctorVM);
+			
+		}
+		return ok(Json.toJson(clinicDoctorVM));
+	}
 
 	public static class ErrorResponse {
 		public String code;

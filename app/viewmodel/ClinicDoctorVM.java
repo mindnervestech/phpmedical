@@ -18,5 +18,8 @@ public class ClinicDoctorVM {
 	public ShiftDetails shift1; 
 	public ShiftDetails shift2; 
 	public ShiftDetails shift3; 
+	public String appointmentType;
+	public String appointmentDate;
+	public String appointmentTime;
 	
 }
