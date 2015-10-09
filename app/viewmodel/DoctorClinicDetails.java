@@ -12,6 +12,7 @@ public class DoctorClinicDetails {
 	public TimeTable slot1;
 	public TimeTable slot2;
 	public TimeTable slot3;
+	public String doctorEmail;
 	public String onlineAppointment;
 	
 	public DoctorClinicDetails(){}
