@@ -44,6 +44,7 @@ import viewmodel.HomeCountPatientVM;
 import viewmodel.PDAEditVm;
 import viewmodel.PatientAppointmentVM;
 import viewmodel.PatientClinicsAppointmentVM;
+import viewmodel.PatientsDoctor;
 import viewmodel.RegisterVM;
 import viewmodel.ReminderVM;
 import viewmodel.TimeTable;
@@ -973,6 +974,7 @@ public class Patient extends Controller {
 		int doctorsCount = 0;
 		int clinicCount = 0;
 		int appointmentCount = 0;
+		ArrayList<PatientsDoctor> patientDoctors = new ArrayList<PatientsDoctor>();
 		try 
 		{
 			decryptedValue = URLDecoder.decode(request().getQueryString("id"),"UTF-8");
@@ -1020,6 +1022,20 @@ public class Patient extends Controller {
 		appointmentVm.visitType = appointments.get(0).visitType;
 		appointmentVm.isVisited = appointments.get(0).isVisited;
 		vm.appointmentVm = appointmentVm;
+		for(DoctorRegister doctorRegister : doctors){
+			Person p = Person.getDoctorsById(doctorRegister.doctorId);
+			patientDoctors.add(new PatientsDoctor(doctorRegister.doctorId.toString(),p.name,doctorRegister.speciality,p.emailID,p.mobileNumber,
+			          p.location,p.dateOfBirth.toString(),p.gender.toString(),p.bloodGroup, null, 1,null,null,
+			          null,null,null,null,null));
+			
+		}
+		for(BucketDoctors bucketDoctor : bucketDoctors){
+			patientDoctors.add(new PatientsDoctor(
+					bucketDoctor.doctorId.toString(), bucketDoctor.name,
+					bucketDoctor.speciality, bucketDoctor.email, bucketDoctor.mobileNumber,
+					bucketDoctor.location, 2));
+		}
+		vm.doctors = patientDoctors;
 		return ok(Json.toJson(vm));
 	}
 	public static Result updatePatientProfile() throws IOException 

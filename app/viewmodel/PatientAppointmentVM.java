@@ -15,6 +15,5 @@ public class PatientAppointmentVM {
 	public String visitType;
 	public Integer isVisited;
 	
-	
 
 }
