@@ -1034,12 +1034,14 @@ public class Patient extends Controller {
 			patientDoctor.dateOfBirth = p.dateOfBirth.toString();
 			patientDoctor.gender = p.gender.toString();
 			patientDoctor.blood_group = p.bloodGroup;
-			patientDoctor.clinicId = appointments.get(0).clinicId;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-			patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
-			patientDoctor.bookTime = appointments.get(0).bookTime;
+			if(appointments.get(0).doctorId == p.doctor){
+				patientDoctor.clinicId = appointments.get(0).clinicId;
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+				patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
+				patientDoctor.shift = appointments.get(0).shift;
+				patientDoctor.bookTime = appointments.get(0).bookTime;
+			}
 			patientDoctor.type = 1;
-			patientDoctor.shift = appointments.get(0).shift;
 			patientDoctors.add(patientDoctor);
 			
 		}
@@ -1051,12 +1053,14 @@ public class Patient extends Controller {
 			patientDoctor.emailID = bucketDoctor.email;
 			patientDoctor.mobileNumber = bucketDoctor.mobileNumber;
 			patientDoctor.location = bucketDoctor.location;
-			patientDoctor.clinicId = appointments.get(0).clinicId;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-			patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
-			patientDoctor.bookTime = appointments.get(0).bookTime;
+			if(appointments.get(0).doctorId == bucketDoctor.doctorId){
+				patientDoctor.clinicId = appointments.get(0).clinicId;
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+				patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
+				patientDoctor.bookTime = appointments.get(0).bookTime;
+				patientDoctor.shift = appointments.get(0).shift;
+			}
 			patientDoctor.type = 2;
-			patientDoctor.shift = appointments.get(0).shift;
 			patientDoctors.add(patientDoctor);
 			
 		}
