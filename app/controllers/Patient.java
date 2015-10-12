@@ -1034,6 +1034,7 @@ public class Patient extends Controller {
 			patientDoctor.dateOfBirth = p.dateOfBirth.toString();
 			patientDoctor.gender = p.gender.toString();
 			patientDoctor.blood_group = p.bloodGroup;
+			System.out.println("Condition Register:::::"+(appointments.get(0).doctorId == p.doctor));
 			if(appointments.get(0).doctorId == p.doctor){
 				patientDoctor.clinicId = appointments.get(0).clinicId;
 				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
