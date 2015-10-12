@@ -110,4 +110,5 @@ public class PatientsDoctor {
 		this.previousAppointment = previousAppointment;
 		this.previousDate = previousDate;
 	}
+	
 }

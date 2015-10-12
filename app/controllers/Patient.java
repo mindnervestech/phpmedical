@@ -1024,16 +1024,41 @@ public class Patient extends Controller {
 		vm.appointmentVm = appointmentVm;
 		for(DoctorRegister doctorRegister : doctors){
 			Person p = Person.getDoctorsById(doctorRegister.doctorId);
-			patientDoctors.add(new PatientsDoctor(doctorRegister.doctorId.toString(),p.name,doctorRegister.speciality,p.emailID,p.mobileNumber,
-			          p.location,p.dateOfBirth.toString(),p.gender.toString(),p.bloodGroup, null, 1,null,null,
-			          null,null,null,null,null));
+			PatientsDoctor patientDoctor = new PatientsDoctor();
+			patientDoctor.doctorId = ""+doctorRegister.doctorId;
+			patientDoctor.name = p.name;
+			patientDoctor.speciality = doctorRegister.speciality;
+			patientDoctor.emailID = p.emailID;
+			patientDoctor.mobileNumber = p.mobileNumber;
+			patientDoctor.location = p.location;
+			patientDoctor.dateOfBirth = p.dateOfBirth.toString();
+			patientDoctor.gender = p.gender.toString();
+			patientDoctor.blood_group = p.bloodGroup;
+			patientDoctor.clinicId = appointments.get(0).clinicId;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
+			patientDoctor.bookTime = appointments.get(0).bookTime;
+			patientDoctor.type = 1;
+			patientDoctor.shift = appointments.get(0).shift;
+			patientDoctors.add(patientDoctor);
 			
 		}
 		for(BucketDoctors bucketDoctor : bucketDoctors){
-			patientDoctors.add(new PatientsDoctor(
-					bucketDoctor.doctorId.toString(), bucketDoctor.name,
-					bucketDoctor.speciality, bucketDoctor.email, bucketDoctor.mobileNumber,
-					bucketDoctor.location, 2));
+			PatientsDoctor patientDoctor = new PatientsDoctor();
+			patientDoctor.doctorId = ""+bucketDoctor.doctorId;
+			patientDoctor.name = bucketDoctor.name;
+			patientDoctor.speciality = bucketDoctor.speciality;
+			patientDoctor.emailID = bucketDoctor.email;
+			patientDoctor.mobileNumber = bucketDoctor.mobileNumber;
+			patientDoctor.location = bucketDoctor.location;
+			patientDoctor.clinicId = appointments.get(0).clinicId;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			patientDoctor.bookDate = formatter.format(appointments.get(0).appointmentDate);
+			patientDoctor.bookTime = appointments.get(0).bookTime;
+			patientDoctor.type = 2;
+			patientDoctor.shift = appointments.get(0).shift;
+			patientDoctors.add(patientDoctor);
+			
 		}
 		vm.doctors = patientDoctors;
 		return ok(Json.toJson(vm));
@@ -1089,7 +1114,8 @@ public class Patient extends Controller {
 			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
 			idClinic = appoint.clinicId;
 			for(Clinic clinic : clinicList){
-				if(appoint.clinicId == clinic.idClinic){
+				if(appoint.clinicId == clinic.idClinic)
+				{
 					doctorVM.idClinic = clinic.idClinic;
 					doctorVM.clinicName = clinic.clinicName;
 					doctorVM.landLineNumber = clinic.landLineNumber;
@@ -1131,7 +1157,6 @@ public class Patient extends Controller {
 							nextBookTime = appoint.bookTime;
 							doctorVM.bookDate = Nextdate;
 							doctorVM.bookTime = nextBookTime;
-							
 						}
 
 					}
