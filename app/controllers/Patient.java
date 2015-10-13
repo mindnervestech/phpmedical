@@ -171,7 +171,16 @@ public class Patient extends Controller {
 
 		System.out.println("bookAppointment.patientId = "
 				+ bookAppointment.patientId);
-		Integer patient_id = Integer.parseInt(bookAppointment.patientId);
+		Integer patient_id = 0;
+		try
+		{
+			patient_id = Integer.parseInt(bookAppointment.patientId);
+		}
+		catch(Exception e)
+		{
+		    patient_id = Person.getPatientByMail(bookAppointment.patientId);
+			
+		}
 		PatientClientBookAppointment appointment = PatientClientBookAppointment
 				.getClinicAppointment(bookAppointment.doctorId, patient_id,
 						bookAppointment.clinicId, null);
