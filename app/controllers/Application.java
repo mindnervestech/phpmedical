@@ -383,7 +383,7 @@ public class Application extends Controller {
 		{
 			e.printStackTrace();
 		}
-		return ok(Json.toJson(""+aNumber));
+		return ok(Json.toJson("1234"));
 	}
 	public static Result registerProfilePicturePatient() throws IOException{
 		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
