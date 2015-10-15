@@ -125,6 +125,8 @@ POST    /deletePatient							controllers.Patient.deletePatient()
 POST    /saveClinicAppointment                  controllers.Patient.saveClinicAppointment()
 GET     /homeCountPatient		                controllers.Patient.homeCountPatient()
 GET     /getPatientAppointment                  controllers.Patient.getPatientAppointment()
+POST    /saveFeedBackPatient                    controllers.Patient.saveFeedBackPatient()
+POST    /getFeedbackPatient                     controllers.Patient.getFeedbackPatient()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

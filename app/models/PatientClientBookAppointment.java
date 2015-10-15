@@ -26,6 +26,8 @@ public class PatientClientBookAppointment extends Model {
 	public String status;
 	public String visitType;
 	public Integer isVisited;
+	public String star;
+	public String reviews;
 	
 	public static Finder<Integer,PatientClientBookAppointment> find = new Finder<>(Integer.class,PatientClientBookAppointment.class);
 	
@@ -92,5 +94,7 @@ public class PatientClientBookAppointment extends Model {
 	{
 		return find.where().eq("doctorId", doctorId).eq("clinicId", clinicId).eq("shift", shift).findList();
 	}
+	
+	
 	
 }

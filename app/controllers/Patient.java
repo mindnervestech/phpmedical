@@ -40,6 +40,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import viewmodel.AlarmReminderVM;
 import viewmodel.ClinicDoctorVM;
 import viewmodel.DoctorClinicDetails;
+import viewmodel.FeedbackVM;
 import viewmodel.HomeCountPatientVM;
 import viewmodel.PDAEditVm;
 import viewmodel.PatientAppointmentVM;
@@ -1032,6 +1033,7 @@ public class Patient extends Controller {
 		appointmentVm.isVisited = appointments.get(0).isVisited;
 		vm.appointmentVm = appointmentVm;
 		for(DoctorRegister doctorRegister : doctors){
+			
 			Person p = Person.getDoctorsById(doctorRegister.doctorId);
 			PatientsDoctor patientDoctor = new PatientsDoctor();
 			patientDoctor.doctorId = ""+doctorRegister.doctorId;
@@ -1105,6 +1107,98 @@ public class Patient extends Controller {
 		return ok(Json.toJson("Success"));
 	}
 	
+	public static Result saveFeedBackPatient() throws IOException
+	{
+		String doctorString = "";
+		String patientString = "";
+		String clinicString = "";
+		String dateString = "";
+		String timeString = "";
+		Date appointmentDate = null;
+		PatientClientBookAppointment appointment = null;
+		ObjectMapper mapper = new ObjectMapper();
+		FeedbackVM vm = mapper.readValue(request().body().asJson(),FeedbackVM.class);
+		try{
+			doctorString = vm.doctorId;
+			patientString = vm.patientId; 
+			clinicString = vm.clinicId;
+			dateString = vm.appointmentDate; 
+			timeString = vm.appointmentTime; 
+			int patientId = Person.getPatientByMail(patientString);
+			int doctorId = Integer.parseInt(doctorString);
+			int clinicId = Integer.parseInt(clinicString);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM-dd");
+			appointmentDate = format.parse(dateString);
+			
+			List<PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getAllClinicAppointment(doctorId, clinicId);
+			System.out.println("Size = "+appointmentList.size());
+			for(PatientClientBookAppointment appoint : appointmentList){
+				int dateCompare = appoint.appointmentDate.compareTo(appointmentDate);
+				if((dateCompare == 1) && (appoint.bookTime.equals(timeString))){
+					System.out.println("Match Found");
+					appointment = appoint;
+					break;
+				}
+			}
+			System.out.println("Appointment Type= "+appointment.visitType);
+			if(vm.visited.equalsIgnoreCase("visited")){
+				appointment.star = vm.star;
+				appointment.isVisited = 1;
+				appointment.reviews = vm.reviews;
+			}else{
+				appointment.isVisited = null;
+				appointment.star = null;
+				appointment.reviews = null;
+			}
+			appointment.save();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return ok(Json.toJson(appointment));
+	}
+	
+	public static Result getFeedbackPatient() throws IOException{
+		String doctorString = "";
+		String patientString = "";
+		String clinicString = "";
+		String dateString = "";
+		String timeString = "";
+		Date appointmentDate = null;
+		PatientClientBookAppointment appointment = null;
+		ObjectMapper mapper = new ObjectMapper();
+		FeedbackVM vm = mapper.readValue(request().body().asJson(),FeedbackVM.class);
+		try{
+			doctorString = vm.doctorId;
+			patientString = vm.patientId; 
+			clinicString = vm.clinicId;
+			dateString = vm.appointmentDate; 
+			timeString = vm.appointmentTime; 
+			int patientId = Person.getPatientByMail(patientString);
+			int doctorId = Integer.parseInt(doctorString);
+			int clinicId = Integer.parseInt(clinicString);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM-dd");
+			appointmentDate = format.parse(dateString);
+			List<PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getAllClinicAppointment(doctorId, clinicId);
+			System.out.println("Size = "+appointmentList.size());
+			for(PatientClientBookAppointment appoint : appointmentList){
+				int dateCompare = appoint.appointmentDate.compareTo(appointmentDate);
+				if((dateCompare == 1) && (appoint.bookTime.equals(timeString))){
+					System.out.println("Match Found");
+					appointment = appoint;
+					vm.star = appoint.star;
+					vm.reviews = appoint.reviews;
+				    if(appoint.isVisited != null){
+				    	vm.visited = ""+appoint.isVisited;
+				    }
+					break;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return ok(Json.toJson(vm));
+	}
 	public static Result getPatientAppointment()throws IOException
 	{
 		String decryptedValue = null;
