@@ -21,5 +21,6 @@ public class ClinicDoctorVM {
 	public String appointmentType;
 	public String appointmentDate;
 	public String appointmentTime;
-	
+	public String star;
+	public String reviews;
 }

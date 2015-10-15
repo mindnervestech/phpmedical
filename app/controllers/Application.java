@@ -824,7 +824,8 @@ public class Application extends Controller {
 			String previousAppointment = "";
 			String previousDate = "";
 			Integer clinicId = null;
-			
+			String star = null;
+			String reviews = null;
 			//System.out.println("appointmentList = "+appointmentList.size());
 			if(appointmentList.size() > 0)
 			{
@@ -879,7 +880,8 @@ public class Application extends Controller {
 				});
 				int appointmentListSize = appointmentList.size();
 				System.out.println("AppointmentListsize= "+appointmentListSize);
-				for(int i = 0; i < appointmentList.size(); i++){
+				for(int i = 0; i < appointmentList.size(); i++)
+				{
 					PatientClientBookAppointment appointment = appointmentList.get(i);
 					System.out.println("AppointmentListsize= "+(appointmentListSize == 2));
 					
@@ -950,13 +952,35 @@ public class Application extends Controller {
 		    	Calendar calTwo = Calendar.getInstance();
 		    	if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
 		    		lastVisted = formatter.format(calOne.getTime());
+		    		star = appointment.star;
+		    		reviews = appointment.reviews;
 		    	}
 			}
 			
 			Person p = Person.getDoctorsById(doctor.doctorId);
-			patientDoctor.add(new PatientsDoctor(doctor.doctorId.toString(),p.name,doctor.speciality,p.emailID,p.mobileNumber,
-					          p.location,p.dateOfBirth.toString(),p.gender.toString(),p.bloodGroup, lastVisted, 1,Nextdate,nextBookTime,
-					          nextShift,clinicId,lastVisted,previousAppointment,previousDate));
+			PatientsDoctor doctorPatient = new PatientsDoctor();
+			doctorPatient.doctorId = doctor.doctorId.toString();
+			doctorPatient.name = p.name;
+		    doctorPatient.speciality = doctor.speciality;
+		    doctorPatient.emailID = p.emailID;
+		    doctorPatient.mobileNumber = p.mobileNumber;
+		    doctorPatient.location = p.location;
+		    doctorPatient.dateOfBirth = p.dateOfBirth.toString();
+		    doctorPatient.gender = p.gender.toString();
+		    doctorPatient.blood_group = p.bloodGroup;
+		    doctorPatient.allergic_to = p.allergicTo;
+		    doctorPatient.type = 1;
+		    doctorPatient.bookDate = Nextdate;
+		    doctorPatient.bookTime = nextBookTime;
+		    doctorPatient.shift = nextShift;
+		    doctorPatient.clinicId = clinicId;
+		    doctorPatient.lastVisited = lastVisted;
+		    doctorPatient.previousAppointment = previousAppointment;
+		    doctorPatient.previousDate = previousDate;
+		    doctorPatient.star = star;
+		    doctorPatient.reviews = reviews;
+		    patientDoctor.add(doctorPatient);
+			
 			
 		}
 

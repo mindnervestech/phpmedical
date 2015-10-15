@@ -20,6 +20,8 @@ public class PatientsDoctor {
 	public String lastVisited;
 	public String previousAppointment;
 	public String previousDate;
+	public String star;
+	public String reviews;
 	
 	public PatientsDoctor(){}
 	

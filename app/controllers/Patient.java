@@ -1268,6 +1268,13 @@ public class Patient extends Controller {
 						}
 
 					}
+				    if(appoint.isVisited != null){
+				    	if(appoint.isVisited == 1){
+				    		doctorVM.star = appoint.star;
+				    		doctorVM.reviews = appoint.reviews;
+				    		
+				    	}
+				    }
 								
 			 }
 				
