@@ -1623,10 +1623,14 @@ public class Doctor extends Controller {
 						}
 					}
 					
-				}
+				}		
+				DoctorClinicDetails doctorClinicDetails = new DoctorClinicDetails(decryptedValue, person.name, clinic.idClinic.toString(), clinic.clinicName, 
+						clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3,clinic.onlineAppointment);
+				doctorClinicDetails.clinicMobile = ""+clinic.mobileNumber;
+				doctorClinicDetails.clinicEmail = clinic.email;
+				doctorClinicDetails.clinicSpeciality = clinic.speciality;
 				
-				ClinicDetailsList.add(new DoctorClinicDetails(decryptedValue, person.name, clinic.idClinic.toString(), clinic.clinicName, 
-															clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3,clinic.onlineAppointment));
+				ClinicDetailsList.add(doctorClinicDetails);
 			}
 				
 		}else{

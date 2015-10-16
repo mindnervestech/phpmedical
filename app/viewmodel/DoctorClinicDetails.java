@@ -14,6 +14,9 @@ public class DoctorClinicDetails {
 	public TimeTable slot3;
 	public String doctorEmail;
 	public String onlineAppointment;
+	public String clinicMobile;
+	public String clinicEmail;
+	public String clinicSpeciality;
 	
 	public DoctorClinicDetails(){}
 	
