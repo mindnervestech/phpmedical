@@ -826,6 +826,7 @@ public class Application extends Controller {
 			Integer clinicId = null;
 			String star = null;
 			String reviews = null;
+			String lastVisitedTime = null;
 			//System.out.println("appointmentList = "+appointmentList.size());
 			if(appointmentList.size() > 0)
 			{
@@ -892,8 +893,7 @@ public class Application extends Controller {
 							System.out.println("Book Time::::::"+appointment.bookTime);
 							previousDate = formatter.format(appointment.appointmentDate);
 							previousAppointment = appointment.bookTime;
-							
-						
+													
 						}
 					}
 					String[] timeValue;
@@ -929,6 +929,7 @@ public class Application extends Controller {
 						clinicId = appointment.clinicId;
 						break;
 					}
+					
 				
 				}
 				
@@ -940,6 +941,7 @@ public class Application extends Controller {
 				if(appointment.isVisited != null){
 					if(appointment.isVisited == 1){
 						visitedList.add(appointment);
+						
 					}
 				}
 			}
@@ -952,6 +954,7 @@ public class Application extends Controller {
 		    	Calendar calTwo = Calendar.getInstance();
 		    	if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
 		    		lastVisted = formatter.format(calOne.getTime());
+		    		lastVisitedTime = appointment.bookTime;
 		    		star = appointment.star;
 		    		reviews = appointment.reviews;
 		    	}
@@ -979,6 +982,7 @@ public class Application extends Controller {
 		    doctorPatient.previousDate = previousDate;
 		    doctorPatient.star = star;
 		    doctorPatient.reviews = reviews;
+		    doctorPatient.lastVisitedTime = lastVisitedTime;
 		    patientDoctor.add(doctorPatient);
 			
 			

@@ -22,6 +22,7 @@ public class PatientsDoctor {
 	public String previousDate;
 	public String star;
 	public String reviews;
+	public String lastVisitedTime;
 	
 	public PatientsDoctor(){}
 	
