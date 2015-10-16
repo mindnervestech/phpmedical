@@ -1629,7 +1629,7 @@ public class Doctor extends Controller {
 				doctorClinicDetails.clinicMobile = ""+clinic.mobileNumber;
 				doctorClinicDetails.clinicEmail = clinic.email;
 				doctorClinicDetails.clinicSpeciality = clinic.speciality;
-				
+				doctorClinicDetails.doctorEmail = person.emailID;
 				ClinicDetailsList.add(doctorClinicDetails);
 			}
 				
