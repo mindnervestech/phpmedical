@@ -446,74 +446,42 @@ public class Patient extends Controller {
 		String nextBookTime = "";
 		String nextShift = "";
 		Integer clinicId = null;
+		System.out.println("Nextdate = " + Nextdate);
+		System.out.println("nextBookTime = " + nextBookTime);
+		System.out.println("nextShift = " + nextShift);
+		System.out.println("clinicId = " + clinicId);
+		
 
-		System.out.println("appointmentList = "+appointmentList.size());
-		if (appointmentList.size() > 0) {
+		List<ClinicDoctorVM> clinicDoctorVM = new ArrayList<ClinicDoctorVM>();
 
-			// Collections.sort(appointmentList, new CustomDateComparator());
-			Collections.sort(appointmentList,
-					new Comparator<PatientClientBookAppointment>() {
-						public int compare(PatientClientBookAppointment chair1,
-								PatientClientBookAppointment chair2) {
-
-							String[] timeValue;
-							Calendar calOne = Calendar.getInstance();
-							calOne.setTime(chair1.appointmentDate);
-							timeValue = chair1.bookTime.split(":");
-
-							int hour1 = Integer.parseInt(timeValue[0].trim());
-							int min1 = Integer.parseInt(timeValue[1].trim()
-									.split("[a-zA-Z ]+")[0]);
-							calOne.set(Calendar.HOUR, hour1);
-							calOne.set(Calendar.MINUTE, min1);
-
-							String strAM_PM = timeValue[1].replaceAll("[0-9]",
-									"");
-							if (strAM_PM.equals("AM")) {
-								calOne.set(Calendar.AM_PM, 0);
-							} else {
-								calOne.set(Calendar.AM_PM, 1);
-							}
-							Calendar calTwo = Calendar.getInstance();
-							calTwo.setTime(chair2.appointmentDate);
-							timeValue = chair2.bookTime.split(":");
-
-							int hour2 = Integer.parseInt(timeValue[0].trim());
-							int min2 = Integer.parseInt(timeValue[1].trim()
-									.split("[a-zA-Z ]+")[0]);
-							calTwo.set(Calendar.HOUR, hour2);
-							String strAM_PM2 = timeValue[1].replaceAll("[0-9]",
-									"");
-
-							if (strAM_PM2.equals("AM")) {
-								calTwo.set(Calendar.AM_PM, 0);
-							} else {
-								calTwo.set(Calendar.AM_PM, 1);
-							}
-							calOne.set(Calendar.AM_PM, 1);
-							calTwo.set(Calendar.MINUTE, min2);
-
-							if (calOne.compareTo(calTwo) == 1) {
-								return 1;
-							} else if (calOne.compareTo(calTwo) == -1) {
-								return -1;
-							} else {
-								return 0;
-							}
-
-						}
-					});
-
-			
-			for (int i = 0; i < appointmentList.size(); i++) 
-			{
-				PatientClientBookAppointment appointment = appointmentList
-						.get(i);
-				
-				String[] timeValue;
+		/*
+		 * public Integer idClinic; public String clinicName; public Long
+		 * landLineNumber; public Long mobileNumber; public String address;
+		 * public String location; public String email; public Integer doctorId;
+		 * public String bookDate; public String bookTime; public String shift;
+		 * public String lastVisited;
+		 */
+		
+		for (Clinic clinic : clinicList) {
+			int appointmentCount = 0;
+			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
+			doctorVM.idClinic = clinic.idClinic;
+			doctorVM.clinicName = clinic.clinicName;
+			doctorVM.landLineNumber = clinic.landLineNumber;
+			doctorVM.mobileNumber = clinic.mobileNumber;
+			doctorVM.address = clinic.address;
+			doctorVM.location = clinic.location;
+			doctorVM.email = clinic.email;
+			doctorVM.doctorId = clinic.doctorId;
+			doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
+			List<PatientClientBookAppointment> clinicAppointments = PatientClientBookAppointment
+					                                       .getAllPatientClinicAppointment(patient_id, clinic.idClinic);
+			System.out.println("clinicAppointments= "+clinicAppointments.size());
+			for(PatientClientBookAppointment clinicAppoint : clinicAppointments){
+		     	String[] timeValue;
 				Calendar calOne = Calendar.getInstance();
-				calOne.setTime(appointment.appointmentDate);
-				timeValue = appointment.bookTime.split(":");
+				calOne.setTime(clinicAppoint.appointmentDate);
+				timeValue = clinicAppoint.bookTime.split(":");
 
 				int hour1 = Integer.parseInt(timeValue[0].trim());
 				int min1 = Integer.parseInt(timeValue[1].trim().split(
@@ -539,68 +507,44 @@ public class Patient extends Controller {
 					clinicId = null;
 
 				} else {
-					Nextdate = formatter.format(appointment.appointmentDate);
-					nextBookTime = appointment.bookTime;
-					nextShift = appointment.shift;
-					clinicId = appointment.clinicId;
-					System.out.println("App clinicId= "+appointment.clinicId);
+					Nextdate = formatter.format(clinicAppoint.appointmentDate);
+					nextBookTime = clinicAppoint.bookTime;
+					nextShift = clinicAppoint.shift;
+					clinicId = clinicAppoint.clinicId;
+					System.out.println("App clinicId= "+clinicAppoint.clinicId);
+					System.out.println("NextBookTime= "+nextBookTime);
+					System.out.println("nextShift= "+nextShift);
+					System.out.println("clinicId= "+clinicId);
 					break;
 				}
 
-			}
-
-		}
-		
-		List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
-		for (PatientClientBookAppointment appointment : appointmentList) {
 			
-			if (appointment.isVisited != null) {
-				if (appointment.isVisited == 1) {
-					visitedList.add(appointment);
+			}
+			List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
+			for (PatientClientBookAppointment appointment : clinicAppointments) {
+				
+				if (appointment.isVisited != null) {
+					if (appointment.isVisited == 1) {
+						visitedList.add(appointment);
+					}
 				}
 			}
-		}
-
-		String lastVisted = null;
-
-		for (PatientClientBookAppointment appointment : visitedList) {
-			Calendar calOne = Calendar.getInstance();
-			calOne.setTime(appointment.appointmentDate);
-			Calendar calTwo = Calendar.getInstance();
-			if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
-				lastVisted = formatter.format(calOne.getTime());
-
+			String lastVisted = null;
+			String lastVisitedTime = null;
+			for (PatientClientBookAppointment appointment : visitedList) {
+				Calendar calOne = Calendar.getInstance();
+				calOne.setTime(appointment.appointmentDate);
+				Calendar calTwo = Calendar.getInstance();
+				if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
+					lastVisted = formatter.format(calOne.getTime());
+					lastVisitedTime = appointment.bookTime;
+				}
 			}
-		}
-
-		System.out.println("Nextdate = " + Nextdate);
-		System.out.println("nextBookTime = " + nextBookTime);
-		System.out.println("nextShift = " + nextShift);
-		System.out.println("clinicId = " + clinicId);
-		System.out.println("lastVisted = " + lastVisted);
-
-		List<ClinicDoctorVM> clinicDoctorVM = new ArrayList<ClinicDoctorVM>();
-
-		/*
-		 * public Integer idClinic; public String clinicName; public Long
-		 * landLineNumber; public Long mobileNumber; public String address;
-		 * public String location; public String email; public Integer doctorId;
-		 * public String bookDate; public String bookTime; public String shift;
-		 * public String lastVisited;
-		 */
-		
-		for (Clinic clinic : clinicList) {
-			int appointmentCount = 0;
-			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
-			doctorVM.idClinic = clinic.idClinic;
-			doctorVM.clinicName = clinic.clinicName;
-			doctorVM.landLineNumber = clinic.landLineNumber;
-			doctorVM.mobileNumber = clinic.mobileNumber;
-			doctorVM.address = clinic.address;
-			doctorVM.location = clinic.location;
-			doctorVM.email = clinic.email;
-			doctorVM.doctorId = clinic.doctorId;
-			doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
+			doctorVM.bookDate = Nextdate;
+			doctorVM.bookTime = nextBookTime;
+			doctorVM.shift = nextShift;
+			doctorVM.lastVisited = lastVisted;
+			doctorVM.lastVisitedTime = lastVisitedTime;
 			for(PatientClientBookAppointment appointment : appointmentList)
 			{
 				if(appointment.clinicId == Integer.valueOf(clinic.idClinic))
@@ -608,6 +552,7 @@ public class Patient extends Controller {
 					appointmentCount = appointmentCount + 1;
 				}
 			}
+			
 			System.out.println("Appointment Count= "+appointmentCount);
 			doctorVM.totalAppointmentCount = ""+appointmentCount;
 
@@ -615,16 +560,7 @@ public class Patient extends Controller {
 			System.out.println("clinic.doctorId = " + clinic.doctorId);
 			System.out.println("clinicId = " + clinicId);
 
-			if (clinicId != null) {
-				if (clinicId.equals(Integer.valueOf(clinic.idClinic))) {
-					
-					doctorVM.bookDate = Nextdate;
-					doctorVM.bookTime = nextBookTime;
-					doctorVM.shift = nextShift;
-					doctorVM.lastVisited = lastVisted;
-					
-				}
-			}
+			
 			clinicDoctorVM.add(doctorVM);
 		}
 

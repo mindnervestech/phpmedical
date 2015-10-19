@@ -14,6 +14,7 @@ public class ClinicDoctorVM {
 	public String shift;
 	public String doctorEmail;
 	public String lastVisited;
+	public String lastVisitedTime;
 	public String totalAppointmentCount;
 	public ShiftDetails shift1; 
 	public ShiftDetails shift2; 

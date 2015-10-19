@@ -95,6 +95,8 @@ public class PatientClientBookAppointment extends Model {
 		return find.where().eq("doctorId", doctorId).eq("clinicId", clinicId).eq("shift", shift).findList();
 	}
 	
-	
+	public static List<PatientClientBookAppointment> getAllPatientClinicAppointment(Integer patientId,Integer clinicId){
+		return find.where().eq("patientId", patientId).eq("clinicId", clinicId).findList();
+	}
 	
 }
