@@ -545,16 +545,10 @@ public class Patient extends Controller {
 			doctorVM.shift = nextShift;
 			doctorVM.lastVisited = lastVisted;
 			doctorVM.lastVisitedTime = lastVisitedTime;
-			for(PatientClientBookAppointment appointment : appointmentList)
-			{
-				if(appointment.clinicId == Integer.valueOf(clinic.idClinic))
-				{
-					appointmentCount = appointmentCount + 1;
-				}
-			}
 			
-			System.out.println("Appointment Count= "+appointmentCount);
-			doctorVM.totalAppointmentCount = ""+appointmentCount;
+			
+			System.out.println("Appointment Count= "+clinicAppointments.size());
+			doctorVM.totalAppointmentCount = ""+clinicAppointments.size();
 
 
 			System.out.println("clinic.doctorId = " + clinic.doctorId);
