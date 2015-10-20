@@ -1154,6 +1154,14 @@ public class Patient extends Controller {
 		}
 		return ok(Json.toJson(vm));
 	}
+	public static Result getAllClinicSpeciality()throws IOException{
+		Set<String> clinicSpeciality = new HashSet<String>();
+		List<Clinic> clinics = Clinic.getAllClinic();
+		for(Clinic clinic : clinics){
+			clinicSpeciality.add(clinic.speciality);
+		}
+		return ok(Json.toJson(clinicSpeciality));
+	}
 	public static Result getPatientAppointment()throws IOException
 	{
 		String decryptedValue = null;
