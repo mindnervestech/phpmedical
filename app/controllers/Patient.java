@@ -1187,6 +1187,7 @@ public class Patient extends Controller {
 					doctorVM.location = clinic.location;
 					doctorVM.email = clinic.email;
 					doctorVM.doctorId = clinic.doctorId;
+					doctorVM.shift = appoint.shift;
 					doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
 					doctorVM.appointmentDate = ""+formatter.format(appoint.appointmentDate);
 					doctorVM.appointmentTime = appoint.bookTime;
