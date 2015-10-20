@@ -1214,7 +1214,8 @@ public class Patient extends Controller {
 					System.out.println("Condition::::::"+(calOne.getTimeInMillis() < calTwo.getTimeInMillis()));
 
 					if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
-							Nextdate = "";
+							doctorVM.bookDate = Nextdate;
+							doctorVM.bookTime = nextBookTime;;
 						} else {
 							Nextdate = formatter.format(appoint.appointmentDate);
 							nextBookTime = appoint.bookTime;
