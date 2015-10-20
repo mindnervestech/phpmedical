@@ -445,6 +445,12 @@ public class Patient extends Controller {
 		String Nextdate = "";
 		String nextBookTime = "";
 		String nextShift = "";
+		String lastAppointmentDate = "";
+		String lastBookTime = "";
+		String lastShift = "";
+		String type = "";
+		String star = "";
+		String reviews = "";
 		Integer clinicId = null;
 		System.out.println("Nextdate = " + Nextdate);
 		System.out.println("nextBookTime = " + nextBookTime);
@@ -501,9 +507,12 @@ public class Patient extends Controller {
 				System.out.println("Condition::::::"+(calOne.getTimeInMillis() < calTwo.getTimeInMillis()));
 
 				if (calOne.getTimeInMillis() < calTwo.getTimeInMillis()) {
-					Nextdate = "";
-					nextBookTime = "";
-					nextShift = "";
+					lastAppointmentDate = formatter.format(clinicAppoint.appointmentDate);
+					lastBookTime = clinicAppoint.bookTime;
+					lastShift = clinicAppoint.shift;
+					type = clinicAppoint.visitType;
+					star = clinicAppoint.star;
+					reviews = clinicAppoint.reviews;
 					clinicId = null;
 
 				} else {
@@ -520,6 +529,15 @@ public class Patient extends Controller {
 
 			
 			}
+			if(clinicAppointments.size() == 1){
+				lastAppointmentDate = formatter.format(clinicAppointments.get(0).appointmentDate);
+				lastBookTime = clinicAppointments.get(0).bookTime;
+				lastShift = clinicAppointments.get(0).shift;
+				type = clinicAppointments.get(0).visitType;
+				star = clinicAppointments.get(0).star;
+				reviews = clinicAppointments.get(0).reviews;
+			}
+			
 			List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
 			for (PatientClientBookAppointment appointment : clinicAppointments) {
 				
@@ -545,12 +563,13 @@ public class Patient extends Controller {
 			doctorVM.shift = nextShift;
 			doctorVM.lastVisited = lastVisted;
 			doctorVM.lastVisitedTime = lastVisitedTime;
-			
-			
+			doctorVM.appointmentDate = lastAppointmentDate;
+			doctorVM.appointmentTime = lastBookTime;
+			doctorVM.appointmentType = type;
 			System.out.println("Appointment Count= "+clinicAppointments.size());
 			doctorVM.totalAppointmentCount = ""+clinicAppointments.size();
-
-
+			doctorVM.star = star;
+			doctorVM.reviews = reviews;
 			System.out.println("clinic.doctorId = " + clinic.doctorId);
 			System.out.println("clinicId = " + clinicId);
 
