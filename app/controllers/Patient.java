@@ -469,6 +469,12 @@ public class Patient extends Controller {
 		 */
 		
 		for (Clinic clinic : clinicList) {
+			lastAppointmentDate = "";
+			lastBookTime = "";
+			lastShift = "";
+			type = "";
+			star = "";
+			reviews = "";
 			int appointmentCount = 0;
 			ClinicDoctorVM doctorVM = new ClinicDoctorVM();
 			doctorVM.idClinic = clinic.idClinic;
