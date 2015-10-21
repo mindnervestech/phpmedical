@@ -1579,6 +1579,7 @@ public class Application extends Controller {
 			vm.doctorId = ""+clinic.doctorId;
 			Person person = Person.getDoctorsById(clinic.doctorId);
 			vm.doctorEmail = person.emailID;
+			vm.speciality = clinic.speciality;
 			clinicVms.add(vm);
 		}
 		
