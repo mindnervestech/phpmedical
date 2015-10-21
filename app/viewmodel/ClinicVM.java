@@ -8,6 +8,7 @@ public class ClinicVM {
 	public Long mobileNumber;
 	public String address;
 	public String location;
+	public String doctorEmail;
 	public String email;
 	public String doctorId;
 	public String parameter;

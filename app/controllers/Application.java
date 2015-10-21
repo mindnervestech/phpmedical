@@ -1565,9 +1565,24 @@ public class Application extends Controller {
 	}  
 	
 	public static Result getClinicDetails() {
-		List<Clinic> clinic = Clinic.getClinic(request().getQueryString(
+		List<Clinic> clinics = Clinic.getClinic(request().getQueryString(
 				"clinicName")); 
-		return ok(Json.toJson(clinic));
+		List<ClinicVM> clinicVms = new ArrayList<ClinicVM>();
+		for(Clinic clinic : clinics){
+			ClinicVM vm = new ClinicVM();
+			vm.idClinic = ""+clinic.idClinic;
+			vm.address = clinic.address;
+			vm.location = clinic.location;
+			vm.landLineNumber = clinic.landLineNumber;
+			vm.mobileNumber = clinic.mobileNumber;
+			vm.clinicName = clinic.clinicName;
+			vm.doctorId = ""+clinic.doctorId;
+			Person person = Person.getDoctorsById(clinic.doctorId);
+			vm.doctorEmail = person.emailID;
+			clinicVms.add(vm);
+		}
+		
+		return ok(Json.toJson(clinicVms));
 	}
 
 	public static class ErrorResponse {
