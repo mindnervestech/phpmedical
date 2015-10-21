@@ -1967,11 +1967,14 @@ public static Result getAllDoctorPatientClinics() {
 		DynamicForm form = DynamicForm.form().bindFromRequest();
 		FilePart picture = body.getFile("picture");
 		String email = form.get("email");
-		Person person = Person.getPersonByMail(email);
-		File file = new File(person.url);
-		Boolean result = file.delete();
-		if(result)
-		{
+		String value = "";
+		if(picture != null){
+			Person person = Person.getPersonByMail(email);
+			File file = new File(person.url);
+			Boolean result = file.delete();
+			
+			if(result)
+			{
 			 String fileName = picture.getFilename();
 			 String contentType = picture.getContentType(); 
 			 File fileSave = picture.getFile();
@@ -1996,9 +1999,15 @@ public static Result getAllDoctorPatientClinics() {
 			  System.out.println("file" + file.getAbsolutePath());
 			  person.url = path;
 			  person.update();
+			  value = "Success";
+			}else{
+				value = "Failure";
+			}
+		}else{
+			value = "Failure";
 		}
 		
-		return ok(Json.toJson("Success"));
+		return ok(Json.toJson(value));
     }
 	
 	public static Result updateDoctorProfile() throws IOException 
