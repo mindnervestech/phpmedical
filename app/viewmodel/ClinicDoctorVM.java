@@ -24,4 +24,5 @@ public class ClinicDoctorVM {
 	public String appointmentTime;
 	public String star;
 	public String reviews;
+	public String speciality;
 }

@@ -485,6 +485,7 @@ public class Patient extends Controller {
 			doctorVM.location = clinic.location;
 			doctorVM.email = clinic.email;
 			doctorVM.doctorId = clinic.doctorId;
+			doctorVM.speciality = clinic.speciality;
 			doctorVM.doctorEmail = Person.getDoctorsById(clinic.doctorId).emailID;
 			List<PatientClientBookAppointment> clinicAppointments = PatientClientBookAppointment
 					                                       .getAllPatientClinicAppointment(patient_id, clinic.idClinic);
