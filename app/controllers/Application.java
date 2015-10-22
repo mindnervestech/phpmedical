@@ -1240,13 +1240,98 @@ public class Application extends Controller {
 		List<PatientSearch> patientDoctor = new ArrayList<>();
 		List<Person> person = Person.getPatient(request()
 				.getQueryString("name"));
+		
 		for (Person patient : person) {
+			List<PatientClientBookAppointment> appointments = PatientClientBookAppointment
+					                                        .getAllPatientAppointments(patient.patient);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			String Nextdate = "";
+			String nextBookTime = "";
+			String nextShift = "";
+			Integer clinicId = null;
+			Integer doctorId = null;
+			String lastVisted = null;
+			String doctorEmail = "";
+			String appointmentDate = "";
+			String appointmentType = "";
+			String lastVisitedTime = "";
+			String appointmentTime = "";
+			ArrayList<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
+			for(PatientClientBookAppointment appointment : appointments){
+				appointmentDate = "";
+				appointmentType = "";
+				appointmentTime = "";
+				String[] timeValue;
+		    	Calendar calOne = Calendar.getInstance();
+		    	calOne.setTime(appointment.appointmentDate);
+		    	timeValue = appointment.bookTime.split(":");
+		    	
+		     	int hour1 = Integer.parseInt(timeValue[0].trim());
+		     	int min1 = Integer.parseInt(timeValue[1].trim().split("[a-zA-Z ]+")[0]);
+		     	calOne.set(Calendar.HOUR,hour1);
+		    	calOne.set(Calendar.MINUTE, min1);
+		    	
+		    	String strAM_PM = timeValue[1].replaceAll("[0-9]","");
+		    	if(strAM_PM.equals("AM")){
+		    		calOne.set(Calendar.AM_PM, 0);
+		    	}else{
+		    		calOne.set(Calendar.AM_PM, 1);
+		    	}
+		     	calOne.set(Calendar.AM_PM, 1);
+		     	
+		     	Calendar calTwo = Calendar.getInstance();
+				
+				if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
+					Nextdate = "";
+					nextBookTime = "";
+					nextShift = "";
+					appointmentDate = formatter.format(appointment.appointmentDate);
+					appointmentTime = appointment.bookTime;
+					appointmentType = appointment.visitType;
+					
+				}else{
+					Nextdate = formatter.format(appointment.appointmentDate);
+					nextBookTime = appointment.bookTime;
+					nextShift = appointment.shift;
+					clinicId = appointment.clinicId;
+					doctorId = appointment.doctorId;
+					break;
+				}
+				
+				if(appointment.isVisited != null){
+					if(appointment.isVisited == 1){
+						visitedList.add(appointment);
+					}
+				}
+			}
+			for(PatientClientBookAppointment visit : visitedList){
+				lastVisted = formatter.format(visit.appointmentDate);
+				lastVisitedTime = visit.bookTime;
+			}
+			PatientSearch patientElement = new PatientSearch();
+			patientElement.patientId = patient.patient.toString();
+			patientElement.name = patient.name;
+			patientElement.mobileNumber = patient.mobileNumber;
+			patientElement.location = patient.location;
+			patientElement.emailID = patient.emailID;
+			patientElement.bookDate = Nextdate;
+			patientElement.bookTime = nextBookTime;
+			patientElement.clinicId = clinicId;
+			patientElement.appointmentDate = appointmentDate;
+			patientElement.appointmentTime = appointmentTime;
+			patientElement.lastVisited = lastVisted;
+			patientElement.lastVisitedTime = lastVisitedTime;
+			patientElement.gender = patient.gender.toString();
+			patientElement.blood_group = patient.bloodGroup;
+			patientElement.allergic_to = patient.allergicTo;
+			patientElement.shift = nextShift;
+			patientElement.doctorId = ""+doctorId;
 			System.out.println(patient.name);
 			System.out.println(patient.emailID);
 			System.out.println(patient.mobileNumber);
 			System.out.println(patient.location);
-			patientDoctor.add(new PatientSearch(patient.patient.toString(),
-					patient.name, patient.mobileNumber, patient.location, patient.emailID));
+			patientDoctor.add(patientElement);
+			
 		}
 		return ok(Json.toJson(patientDoctor));
 	}
