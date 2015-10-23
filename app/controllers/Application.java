@@ -40,6 +40,7 @@ import models.DoctorClinicSchedule;
 import models.DoctorDependency;
 import models.DoctorProcedure;
 import models.DoctorRegister;
+import models.Notification;
 import models.PatientClientBookAppointment;
 import models.PatientDependency;
 import models.PatientRegister;
@@ -49,7 +50,6 @@ import models.TemplateAttribute;
 import models.TemplateClass;
 import models.TemplateField;
 import models.UploadFiles;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -67,6 +67,7 @@ import viewmodel.ChatVm;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
+import viewmodel.NotificationVM;
 import viewmodel.PDAEditVm;
 import viewmodel.PatientSearch;
 import viewmodel.PatientsDoctor;
@@ -74,6 +75,7 @@ import viewmodel.PersonVM;
 import viewmodel.RegisterDoctor;
 import viewmodel.RegisterPatient;
 import viewmodel.RegisterVM;
+import viewmodel.Reminder;
 import viewmodel.ShowFieldVm;
 import viewmodel.ShowTemplatesVm;
 import viewmodel.SummaryHistoryVM;
@@ -2582,7 +2584,57 @@ public class Application extends Controller {
 	    File file = new File(person.url);
 	    return ok(file);
 	}
-	
+	public static Result saveNotification() throws IOException
+	{
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		NotificationVM vm = mapper.readValue(request().body().asJson(),NotificationVM.class);
+		ArrayList<Reminder> reminders = vm.reminders;
+		System.out.println("Reminders= "+reminders.size());
+		for(Reminder rem : reminders){
+			Notification notification = new Notification();
+			notification.doctorId = rem.id;
+			notification.date = rem.date;
+			notification.time = rem.time;
+			notification.title = rem.title;
+			notification.save();
+		}
+		return ok(Json.toJson("Success"));
+	}
+	public static Result getNotification() throws IOException{
+		String doctorId = null;
+		doctorId = URLDecoder.decode(request().getQueryString("email"),"UTF-8");
+		List<Notification> notificationDoctor = Notification.getAllNotificationDoctor(doctorId);
+		System.out.println("NotificationDoctor= "+notificationDoctor.size());
+		ArrayList<Reminder> reminders = new ArrayList<Reminder>();
+		for(Notification doctor : notificationDoctor){
+			Reminder rem = new Reminder();
+			rem.id = doctor.doctorId;
+			rem.date = doctor.date;
+			rem.time = doctor.time;
+			rem.title = doctor.title;
+			reminders.add(rem);
+		}
+		NotificationVM vm = new NotificationVM();
+		vm.reminders = reminders;
+		return ok(Json.toJson(vm));
+	}
+	public static Result deleteNotification() throws IOException{
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		NotificationVM vm = mapper.readValue(request().body().asJson(),NotificationVM.class);
+		List<Notification> notifications = Notification.getAllNotificationDoctor(vm.reminders.get(0).id);
+		System.out.println("Notification List= "+notifications.size());
+		for(Reminder rem : vm.reminders){
+			for(Notification notif : notifications){
+				if((notif.date.equals(rem.date))&&(notif.time.equals(rem.time))){
+					notif.delete();
+					break;
+				}
+			}
+		}
+		return ok(Json.toJson("Success"));
+	}
 	
 	
 	public static Result getAllHistory() throws IOException

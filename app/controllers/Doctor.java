@@ -444,6 +444,7 @@ public class Doctor extends Controller {
 	  			// TODO Auto-generated catch block
 	  			e.printStackTrace();
 	  		}
+	  		System.out.println("doctorId= "+doctorId);
 	  		int doctor_id = Person.getDoctorByMail(doctorId);
 	  		List<Invoices> list = Invoices.getAllInvoicesByDoctorId(doctor_id);
 	  		List<AllTreatmentPlanVm> treatmentList  = new ArrayList<AllTreatmentPlanVm>();

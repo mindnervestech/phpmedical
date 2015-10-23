@@ -74,6 +74,9 @@ POST    /patientDoctorAdd                   controllers.Application.patientDocto
 POST    /editClinic						    controllers.Application.editClinic()
 POST    /deleteAssistant					controllers.Application.deleteAssistant()
 GET     /getAllHistory                      controllers.Application.getAllHistory()
+POST    /saveNotification                   controllers.Application.saveNotification()
+GET	    /getNotification                    controllers.Application.getNotification()
+POST	/deleteNotification                 controllers.Application.deleteNotification()
 
 #Doctors Urls
  
