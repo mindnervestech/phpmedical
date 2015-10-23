@@ -46,5 +46,8 @@ public class AllPatientsData {
 		this.clinicId = clinicId;
 		this.lastVisited = lastVisited;
 	}
+	public AllPatientsData(){
+		
+	}
 	
 }
