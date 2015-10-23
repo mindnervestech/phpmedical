@@ -1404,32 +1404,51 @@ public class Doctor extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		Integer doctor_id = Person.getDoctorByMail(doctorId);
-		
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-		String Nextdate = "";
+		String nextDate = "";
 		String nextBookTime = "";
 		String nextShift = "";
 		Integer clinicId = null;
 		Integer patient_id = null;
-		String lastVisted = null;
 		
+		
+		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
+				.getDoctorByMail(doctorId)));
 		List<AllPatientsData> patientDoctor = new ArrayList<AllPatientsData>();
-		
-		List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getAllPatientOfDoctor(doctor_id);
-		System.out.println("Size = "+appointmentList.size());
-		
-		if(appointmentList.size() > 0){
+		List<DoctorsPatient> doctorsPatient = new ArrayList<>();
+		System.out.println("doctors patient= "+doctor.patient.size());
+		for(PatientRegister patient : doctor.patient){
+			Person p = Person.getPatientsById(patient.patientId);
+
+			String bookTime = "";
+			String bookDate = "";
+			String lastVisited="";
+			String lastVisitedTime = "";
+			AllPatientsData patientData = new AllPatientsData();
+			patientData.patientId = ""+p.patient;
+			patientData.doctorId = ""+doctor_id;
+			patientData.name = p.name;
+			patientData.speciality = "";
+			patientData.emailID = p.emailID;
+			patientData.mobileNumber = p.mobileNumber;
+			patientData.location = p.location;
+			patientData.dateOfBirth = formatter.format(p.dateOfBirth);
+			patientData.gender = p.gender.toString();
+			patientData.blood_group = p.bloodGroup;
+			patientData.allergic_to = p.allergicTo;
+			patientData.type = 1;
 			
-			//Collections.sort(appointmentList, new CustomDateComparator());
-			Collections.sort(appointmentList, new Comparator<PatientClientBookAppointment>() {
-			    public int compare(PatientClientBookAppointment chair1, PatientClientBookAppointment chair2) {
-					
-			    	String[] timeValue;
+			List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.
+					                                              getAllAppointment(doctor_id, p.patient);
+			System.out.println("New Size = "+appointmentList.size());
+			List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
+			for(PatientClientBookAppointment appointment : appointmentList){
+				
+					String[] timeValue;
 			    	Calendar calOne = Calendar.getInstance();
-			    	calOne.setTime(chair1.appointmentDate);
-			    	timeValue = chair1.bookTime.split(":");
+			    	calOne.setTime(appointment.appointmentDate);
+			    	timeValue = appointment.bookTime.split(":");
 			    	
 			     	int hour1 = Integer.parseInt(timeValue[0].trim());
 			     	int min1 = Integer.parseInt(timeValue[1].trim().split("[a-zA-Z ]+")[0]);
@@ -1442,108 +1461,42 @@ public class Doctor extends Controller {
 			    	}else{
 			    		calOne.set(Calendar.AM_PM, 1);
 			    	}
-			    	Calendar calTwo = Calendar.getInstance();
-			    	calTwo.setTime(chair2.appointmentDate);
-			    	timeValue = chair2.bookTime.split(":");
-			    	
-			    	int hour2 = Integer.parseInt(timeValue[0].trim());
-			     	int min2 = Integer.parseInt(timeValue[1].trim().split("[a-zA-Z ]+")[0]);
-			     	calTwo.set(Calendar.HOUR,hour2);
-			     	String strAM_PM2 = timeValue[1].replaceAll("[0-9]","");
-			     	
-			     	if(strAM_PM2.equals("AM")){
-			     		calTwo.set(Calendar.AM_PM, 0);
-			    	}else{
-			    		calTwo.set(Calendar.AM_PM, 1);
-			    	}
 			     	calOne.set(Calendar.AM_PM, 1);
-			     	calTwo.set(Calendar.MINUTE, min2);
-			    	
-			    	
-			    	if(calOne.compareTo(calTwo) == 1){
-			    		return 1;
-			    	}else if(calOne.compareTo(calTwo) == -1){
-			    		return -1;
-			    	}else{
-			    		return 0;
-			    	}
-			    	
-			    }
-			});
-			
-			for(int i = 0; i < appointmentList.size(); i++){
-				PatientClientBookAppointment appointment = appointmentList.get(i);
-				
-				String[] timeValue;
-		    	Calendar calOne = Calendar.getInstance();
-		    	calOne.setTime(appointment.appointmentDate);
-		    	timeValue = appointment.bookTime.split(":");
-		    	
-		     	int hour1 = Integer.parseInt(timeValue[0].trim());
-		     	int min1 = Integer.parseInt(timeValue[1].trim().split("[a-zA-Z ]+")[0]);
-		     	calOne.set(Calendar.HOUR,hour1);
-		    	calOne.set(Calendar.MINUTE, min1);
-		    	
-		    	String strAM_PM = timeValue[1].replaceAll("[0-9]","");
-		    	if(strAM_PM.equals("AM")){
-		    		calOne.set(Calendar.AM_PM, 0);
-		    	}else{
-		    		calOne.set(Calendar.AM_PM, 1);
-		    	}
-		     	calOne.set(Calendar.AM_PM, 1);
-		     	
-		     	Calendar calTwo = Calendar.getInstance();
-				
-				if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
-					Nextdate = "";
-					nextBookTime = "";
-					nextShift = "";
-					clinicId = null;
+			     	
+			     	Calendar calTwo = Calendar.getInstance();
 					
-				}else{
-					Nextdate = formatter.format(appointment.appointmentDate);
-					nextBookTime = appointment.bookTime;
-					nextShift = appointment.shift;
-					clinicId = appointment.clinicId;
-					patient_id = appointment.patientId;
-					break;
-				}
-			}
-	   }
-		
-		//end Next appointmnet
-		
-		for(PatientClientBookAppointment appointment : appointmentList){
-			
-			Person p = Person.getAllPatientsById(appointment.patientId);
-			if(p != null){
-				boolean check = false;
-				for(AllPatientsData patients : patientDoctor){
-					if(patients.emailID.equals(p.emailID)){
-						check = true;
-					}
-				}
-				if(!check){
-					
-					if(patient_id != null && p.patient == patient_id){
-						Nextdate = formatter.format(appointment.appointmentDate);
+					if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
+						bookDate = formatter.format(appointment.appointmentDate);
+						bookTime = appointment.bookTime;
+						clinicId = null;
+						
+					}else{
+						nextDate = formatter.format(appointment.appointmentDate);
 						nextBookTime = appointment.bookTime;
 						nextShift = appointment.shift;
 						clinicId = appointment.clinicId;
-					}else{
-						Nextdate = null;
-						nextBookTime = null;
-						nextShift = null;
-						clinicId = null;
+						patient_id = appointment.patientId;
+						break;
 					}
-					
-					patientDoctor.add(new AllPatientsData(doctor_id.toString(),p.patient.toString(),
-							p.name, "", p.emailID, p.mobileNumber,
-							p.location, p.dateOfBirth.toString(), p.gender.toString(),p.bloodGroup,p.allergicTo, 1, Nextdate,nextBookTime,nextShift,clinicId,lastVisted));
+					if(appointment.isVisited != null){
+						visitedList.add(appointment);
+					}
 				}
+				
+				patientData.bookDate = nextDate;
+				patientData.bookTime = nextBookTime;
+				patientData.shift = nextShift;
+				patientData.clinicId = clinicId;
+				patientData.appointmentDate = bookDate;
+				patientData.appointmentTime = bookTime;
+				for(PatientClientBookAppointment visit : visitedList){
+					lastVisited = formatter.format(visit.appointmentDate);
+					lastVisitedTime = visit.bookTime;
+				}
+				patientData.appointmentDate = lastVisited;
+				patientData.appointmentTime = lastVisitedTime;
+				patientDoctor.add(patientData);
 			}
-		}
-		
 		return ok(Json.toJson(patientDoctor));
 	}
 	
