@@ -24,7 +24,7 @@ public class AllPatientsData {
 	public String lastVisitedTime;
 	public String star;
 	public String reviews;
-	
+	public String totalAppointment;
 	public AllPatientsData(String doctorId,String patientId, String name2, String speciality2,
 			String email2, Long mobileNumber2, String location2, String dateOfBirth, 
 			String gender, String blood_group, String allergic_to, Integer type, String bookDate, String bookTime, String shift, Integer clinicId, String lastVisited) {

@@ -1425,6 +1425,7 @@ public class Doctor extends Controller {
 			String bookDate = "";
 			String lastVisited="";
 			String lastVisitedTime = "";
+			int totalAppointment = 0;
 			AllPatientsData patientData = new AllPatientsData();
 			patientData.patientId = ""+p.patient;
 			patientData.doctorId = ""+doctor_id;
@@ -1443,6 +1444,7 @@ public class Doctor extends Controller {
 					                                              getAllAppointment(doctor_id, p.patient);
 			System.out.println("New Size = "+appointmentList.size());
 			List<PatientClientBookAppointment> visitedList = new ArrayList<PatientClientBookAppointment>();
+			totalAppointment = appointmentList.size();
 			for(PatientClientBookAppointment appointment : appointmentList){
 				
 					String[] timeValue;
@@ -1495,6 +1497,7 @@ public class Doctor extends Controller {
 				}
 				patientData.appointmentDate = lastVisited;
 				patientData.appointmentTime = lastVisitedTime;
+				patientData.totalAppointment = ""+totalAppointment;
 				patientDoctor.add(patientData);
 			}
 		return ok(Json.toJson(patientDoctor));
