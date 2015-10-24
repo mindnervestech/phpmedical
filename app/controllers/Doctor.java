@@ -1406,13 +1406,6 @@ public class Doctor extends Controller {
 		}
 		Integer doctor_id = Person.getDoctorByMail(doctorId);
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-		String nextDate = "";
-		String nextBookTime = "";
-		String nextShift = "";
-		Integer clinicId = null;
-		Integer patient_id = null;
-		
-		
 		DoctorRegister doctor = DoctorRegister.getDoctorById((Person
 				.getDoctorByMail(doctorId)));
 		List<AllPatientsData> patientDoctor = new ArrayList<AllPatientsData>();
@@ -1426,6 +1419,11 @@ public class Doctor extends Controller {
 			String lastVisited="";
 			String lastVisitedTime = "";
 			int totalAppointment = 0;
+			String nextDate = "";
+			String nextBookTime = "";
+			String nextShift = "";
+			Integer clinicId = null;
+			Integer patient_id = null;
 			AllPatientsData patientData = new AllPatientsData();
 			patientData.patientId = ""+p.patient;
 			patientData.doctorId = ""+doctor_id;
