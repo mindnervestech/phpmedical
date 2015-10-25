@@ -1919,62 +1919,7 @@ public static Result getAllDoctorPatientClinics() {
 		vm.setSpeciality(doctor.speciality);
 		return ok(Json.toJson(vm));
 	}
-	public static Result profilePictureUpdateBase64() throws IOException{
-		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
-	            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
-	            "~", "*", "?", ":","\"","\\"," "});
-		JsonNode json = request().body().asJson();
-		ObjectMapper mapper = new ObjectMapper();
-		UpdateVM vm = mapper.readValue(request().body().asJson(),UpdateVM.class);
-		String value = "";
-		if(vm != null){
-			if(vm.file != null){
-				String path = "";
-				BASE64Decoder decoder = new BASE64Decoder();
-				byte[] imageByte = decoder.decodeBuffer(vm.file);
-				Person person = Person.getPersonByMail(vm.email);
-				File file = new File(person.url);
-				System.out.println("url::::::"+person.url);
-				System.out.println("file Name= "+file.getName());
-				Boolean result = file.delete();
-				System.out.println("Result= "+result);
-				if(result){
-					 String fileName = vm.fileName;
-					 String fileNameString = fileName;
-					 for(String s : specialCharactersInSolr)
-					 {
-					     if(fileNameString.contains(s))
-					     {
-					    	fileNameString = fileNameString.replace(""+s, "");
-					     }
-					  }
-					  fileName = fileNameString;
-					  System.out.println("File Name= "+fileName);
-					  File fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_doctors")+"//"+fileName+vm.fileExtension);
-					  BufferedOutputStream bos = null;
-					  try{
-							  FileOutputStream fos = new FileOutputStream(fileBase64);
-						      bos = new BufferedOutputStream(fos); 
-						      bos.write(imageByte);
-						      path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName + vm.fileExtension;
-						      System.out.println("Url:::::::"+path);
-						      person.url = path;
-						      person.update();
-						      value = "Success";
-						      
-					   }catch(Exception e){
-							e.printStackTrace();
-						}
-						
-				}else{
-					value = "Failure";
-				}
-				
-			}
-		}
-		
-		return ok (Json.toJson(value));
-	}
+	
 	public static Result profilePictureUpdate() throws IOException
 	{
 		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
@@ -1982,6 +1927,7 @@ public static Result getAllDoctorPatientClinics() {
 		            "~", "*", "?", ":","\"","\\"," "});
 		String path = "";
 		play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+		
 		DynamicForm form = DynamicForm.form().bindFromRequest();
 		FilePart picture = body.getFile("picture");
 		String email = form.get("email");

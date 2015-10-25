@@ -2636,7 +2636,72 @@ public class Application extends Controller {
 		return ok(Json.toJson("Success"));
 	}
 	
-	
+	public static Result profilePictureUpdateBase64() throws IOException{
+		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+	            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+	            "~", "*", "?", ":","\"","\\"," "});
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		UpdateVM vm = mapper.readValue(request().body().asJson(),UpdateVM.class);
+		String value = "";
+		if(vm != null){
+			if(vm.file != null){
+				String path = "";
+				BASE64Decoder decoder = new BASE64Decoder();
+				byte[] imageByte = decoder.decodeBuffer(vm.file);
+				Person person = Person.getPersonByMail(vm.email);
+				File file = new File(person.url);
+				System.out.println("url::::::"+person.url);
+				System.out.println("file Name= "+file.getName());
+				Boolean result = file.delete();
+				System.out.println("Result= "+result);
+				if(result){
+					 String fileName = vm.fileName;
+					 String fileNameString = fileName;
+					 for(String s : specialCharactersInSolr)
+					 {
+					     if(fileNameString.contains(s))
+					     {
+					    	fileNameString = fileNameString.replace(""+s, "");
+					     }
+					  }
+					  fileName = fileNameString;
+					  System.out.println("File Name= "+fileName);
+					  File fileBase64;
+					  if(person.role == 1){
+						  fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+fileName+vm.fileExtension);
+					  }else if(person.role == 2){
+						  fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_doctors")+"//"+fileName+vm.fileExtension);
+					  }
+					  
+					  BufferedOutputStream bos = null;
+					  try{
+							  FileOutputStream fos = new FileOutputStream(fileBase64);
+						      bos = new BufferedOutputStream(fos); 
+						      bos.write(imageByte);
+						      if(person.role == 1){
+						    	  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName + vm.fileExtension;
+						      }else if(person.role == 2){
+						    	  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName + vm.fileExtension;
+						      }
+						      System.out.println("Url:::::::"+path);
+						      person.url = path;
+						      person.update();
+						      value = "Success";
+						      
+					   }catch(Exception e){
+							e.printStackTrace();
+						}
+						
+				}else{
+					value = "Failure";
+				}
+				
+			}
+		}
+		
+		return ok (Json.toJson(value));
+	}
 	public static Result getAllHistory() throws IOException
 	{
 		System.out.println("called...............");

@@ -77,6 +77,8 @@ GET     /getAllHistory                      controllers.Application.getAllHistor
 POST    /saveNotification                   controllers.Application.saveNotification()
 GET	    /getNotification                    controllers.Application.getNotification()
 POST	/deleteNotification                 controllers.Application.deleteNotification()
+POST    /profilePictureUpdateBase64         controllers.Application.profilePictureUpdateBase64()
+
 
 #Doctors Urls
  
@@ -109,7 +111,6 @@ POST    /deleteDoctor							controllers.Doctor.deleteDoctor()
 POST    /setStatusSlot							controllers.Doctor.setStatusSlot()
 GET     /getAllDoctorFinance                    controllers.Doctor.getAllDoctorFinance()
 POST    /saveDoctorAppointment                  controllers.Doctor.saveDoctorAppointmentDetails()
-POST    /profilePictureUpdateBase64             controllers.Doctor.profilePictureUpdateBase64()
 
 
 #patient Urls
