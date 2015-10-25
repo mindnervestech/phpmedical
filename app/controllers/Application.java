@@ -1,6 +1,8 @@
 package controllers;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -63,6 +65,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
+import sun.misc.BASE64Decoder;
 import viewmodel.ChatVm;
 import viewmodel.ClinicVM;
 import viewmodel.DoctorsPatient;
@@ -80,6 +83,7 @@ import viewmodel.ShowFieldVm;
 import viewmodel.ShowTemplatesVm;
 import viewmodel.SummaryHistoryVM;
 import viewmodel.TemplateVm;
+import viewmodel.UpdateVM;
 import viewmodel.totalInvoiceVM;
 import javax.activation.*;
 
