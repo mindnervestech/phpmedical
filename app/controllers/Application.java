@@ -2674,7 +2674,7 @@ public class Application extends Controller {
 					  File fileBase64;
 					  if(person.role == 1){
 						  fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+fileName+vm.fileExtension);
-					  }else if(person.role == 2){
+					  }else{
 						  fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_doctors")+"//"+fileName+vm.fileExtension);
 					  }
 					  
