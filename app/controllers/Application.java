@@ -2486,10 +2486,10 @@ public class Application extends Controller {
 				    File folder = new File(Play.application().configuration().getString("folder_create_url_doctor")+ "//" + doctorId);
 			    	System.out.println("Condition:::::::"+folder.exists());
 				   	if(folder.exists()){
-				   		fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
+				   		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_doctor")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
 				   	}else{
 			    		folder.mkdirs();
-			    		fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
+			    		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_doctor")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
 			    	}
 				    try{
 						  FileOutputStream fos = new FileOutputStream(fileBase64);
