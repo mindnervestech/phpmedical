@@ -1,6 +1,8 @@
 package controllers;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -53,6 +55,7 @@ import play.mvc.Result;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.data.DynamicForm;
 import play.libs.Json;
+import sun.misc.BASE64Decoder;
 import viewmodel.AlarmReminderVM;
 import viewmodel.AllClinicAppointment;
 import viewmodel.AllPatientsData;
@@ -79,6 +82,7 @@ import viewmodel.SummaryHistoryVM;
 import viewmodel.TimeTable;
 import viewmodel.TreatementFieldVm;
 import viewmodel.TreatmentPlanVm;
+import viewmodel.UpdateVM;
 import viewmodel.totalInvoiceVM;
 
 public class Doctor extends Controller {
@@ -95,7 +99,7 @@ public class Doctor extends Controller {
  *  Date today = new Date(110, 6, 24); // July 24th 
  *  int days = Days.daysBetween(new DateTime(past), new DateTime(today)).getDays(); // => 34		
 */		
-	     public static Result getAllClinicsWeekAppointment() {
+	     public static Result getAllClinicsWeekAppointment() throws ParseException {
 			
 			String doctorId = null;
 			String appointmentDate = null;
@@ -125,13 +129,14 @@ public class Doctor extends Controller {
 			
 			String dateStr = appointmentDate;
 			DateFormat formatter1 = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+			SimpleDateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd");
 			Date date = null;
 			try {
 				date = (Date)formatter1.parse(dateStr);
 				date = removeTime(date);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				date = (Date)standardFormat.parse(dateStr);
 			}
 			
 			for(PatientClientBookAppointment appointment : appointmentList){
@@ -285,7 +290,7 @@ public class Doctor extends Controller {
 	    
 	   
 	     
-	    public static Result getAllClinicsAppointment() {
+	    public static Result getAllClinicsAppointment() throws ParseException{
 				
 			String doctorId = null;
 			String appointmentDate = null;
@@ -315,13 +320,15 @@ public class Doctor extends Controller {
 			
 			String dateStr = appointmentDate;
 			DateFormat formatter1 = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+			SimpleDateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd");
+			
 			Date date = null;
 			try {
 				date = (Date)formatter1.parse(dateStr);
 				date = removeTime(date);
 			} catch (ParseException e) {
+				date = (Date)standardFormat.parse(dateStr);
 				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			/*List<DoctorClinicSchedule> doctorClinicSchedules = DoctorClinicSchedule.getDoctorClinicScheduleById(""+clinicId,doctorId);
 			System.out.println("Clinic Schedule size::::::::::::::"+doctorClinicSchedules.size());
@@ -1911,6 +1918,62 @@ public static Result getAllDoctorPatientClinics() {
 		DoctorRegister doctor = DoctorRegister.getDoctorById(person.doctor);
 		vm.setSpeciality(doctor.speciality);
 		return ok(Json.toJson(vm));
+	}
+	public static Result profilePictureUpdateBase64() throws IOException{
+		List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+	            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+	            "~", "*", "?", ":","\"","\\"," "});
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		UpdateVM vm = mapper.readValue(request().body().asJson(),UpdateVM.class);
+		String value = "";
+		if(vm != null){
+			if(vm.file != null){
+				String path = "";
+				BASE64Decoder decoder = new BASE64Decoder();
+				byte[] imageByte = decoder.decodeBuffer(vm.file);
+				Person person = Person.getPersonByMail(vm.email);
+				File file = new File(person.url);
+				System.out.println("url::::::"+person.url);
+				System.out.println("file Name= "+file.getName());
+				Boolean result = file.delete();
+				System.out.println("Result= "+result);
+				if(result){
+					 String fileName = vm.fileName;
+					 String fileNameString = fileName;
+					 for(String s : specialCharactersInSolr)
+					 {
+					     if(fileNameString.contains(s))
+					     {
+					    	fileNameString = fileNameString.replace(""+s, "");
+					     }
+					  }
+					  fileName = fileNameString;
+					  System.out.println("File Name= "+fileName);
+					  File fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_doctors")+"//"+fileName+vm.fileExtension);
+					  BufferedOutputStream bos = null;
+					  try{
+							  FileOutputStream fos = new FileOutputStream(fileBase64);
+						      bos = new BufferedOutputStream(fos); 
+						      bos.write(imageByte);
+						      path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName + vm.fileExtension;
+						      System.out.println("Url:::::::"+path);
+						      person.url = path;
+						      person.update();
+						      value = "Success";
+						      
+					   }catch(Exception e){
+							e.printStackTrace();
+						}
+						
+				}else{
+					value = "Failure";
+				}
+				
+			}
+		}
+		
+		return ok (Json.toJson(value));
 	}
 	public static Result profilePictureUpdate() throws IOException
 	{

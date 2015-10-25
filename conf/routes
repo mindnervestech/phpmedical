@@ -109,6 +109,8 @@ POST    /deleteDoctor							controllers.Doctor.deleteDoctor()
 POST    /setStatusSlot							controllers.Doctor.setStatusSlot()
 GET     /getAllDoctorFinance                    controllers.Doctor.getAllDoctorFinance()
 POST    /saveDoctorAppointment                  controllers.Doctor.saveDoctorAppointmentDetails()
+POST    /profilePictureUpdateBase64             controllers.Doctor.profilePictureUpdateBase64()
+
 
 #patient Urls
 
