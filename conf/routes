@@ -78,6 +78,8 @@ POST    /saveNotification                   controllers.Application.saveNotifica
 GET	    /getNotification                    controllers.Application.getNotification()
 POST	/deleteNotification                 controllers.Application.deleteNotification()
 POST    /profilePictureUpdateBase64         controllers.Application.profilePictureUpdateBase64()
+POST    /registerPicture                    controllers.Application.registerPicture()
+POST    /uploadFilesBase64                  controllers.Application.uploadFilesBase64()
 
 
 #Doctors Urls

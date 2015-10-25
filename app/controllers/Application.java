@@ -77,6 +77,7 @@ import viewmodel.PatientsDoctor;
 import viewmodel.PersonVM;
 import viewmodel.RegisterDoctor;
 import viewmodel.RegisterPatient;
+import viewmodel.RegisterPictureVM;
 import viewmodel.RegisterVM;
 import viewmodel.Reminder;
 import viewmodel.ShowFieldVm;
@@ -84,6 +85,7 @@ import viewmodel.ShowTemplatesVm;
 import viewmodel.SummaryHistoryVM;
 import viewmodel.TemplateVm;
 import viewmodel.UpdateVM;
+import viewmodel.UploadVM;
 import viewmodel.totalInvoiceVM;
 import javax.activation.*;
 
@@ -390,6 +392,73 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 		return ok(Json.toJson("1234"));
+	}
+	public static Result registerPicture() throws IOException{
+		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		 JsonNode json = request().body().asJson();
+		 ObjectMapper mapper = new ObjectMapper();
+		 String value = "";
+		 String fileName = "";
+		 String path = "";
+		 int patientId = 0;
+	     RegisterPictureVM register = mapper.readValue(json.traverse(),RegisterPictureVM.class);
+	     if(register != null){
+	    	 if(register.file != null)
+	    	 {
+	    		 patientId = Integer.parseInt(register.id);
+	    		 String fileNameString = register.fileName;
+	    		 for(String s : specialCharactersInSolr)
+				 {
+				     if(fileNameString.contains(s))
+				     {
+				    	fileNameString = fileNameString.replace(""+s, "");
+				     }
+				  }
+				  fileName = fileNameString;
+				  BASE64Decoder decoder = new BASE64Decoder();
+				  byte[] imageByte = decoder.decodeBuffer(register.file);
+				  Person p = Person.getPersonById(patientId);
+				  File  pictureFile;
+				  if(p.role == 1){
+					  pictureFile= new File(Play.application().configuration().getString("profile_pic_url_patients")+ "//"+  fileName+register.fileExtension);
+				  }else if(p.role == 2){
+					  pictureFile= new File(Play.application().configuration().getString("profile_pic_url_doctors")+ "//"+  fileName+register.fileExtension);
+				  }else{
+					  pictureFile= new File(Play.application().configuration().getString("profile_pic_url_assistant")+ "//"+  fileName+register.fileExtension);
+				  }
+				  
+				  
+				  BufferedOutputStream bos = null;
+				  try{
+						  FileOutputStream fos = new FileOutputStream(pictureFile);
+					      bos = new BufferedOutputStream(fos); 
+					      bos.write(imageByte);
+					      
+					      if(p.role == 1){
+					    	  path = Play.application().configuration().getString("profile_pic_url_patients")+"/" + fileName+register.fileExtension;
+					      }else if(p.role == 2){
+					    	  path = Play.application().configuration().getString("profile_pic_url_doctors")+"/" + fileName+register.fileExtension;
+					      }else{
+					    	  path = Play.application().configuration().getString("profile_pic_url_assistant")+"/" + fileName+register.fileExtension;
+					      }
+					      
+					      System.out.println("Path:::::::"+path);
+					      p.url = path;
+					      p.update();
+					      
+				   }catch(Exception e){
+						e.printStackTrace();
+					}
+				  
+	    		  value = "Success";
+	    	 }else{
+	    		 value = "Failure";
+	    	 }
+	     }
+		 
+		return ok(Json.toJson(value));
 	}
 	public static Result registerProfilePicturePatient() throws IOException{
 		 play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
@@ -2362,6 +2431,144 @@ public class Application extends Controller {
 			}
 		}
 		return ok();
+	}
+	public static Result uploadFilesBase64() throws IOException{
+		 List<String> specialCharactersInSolr = Arrays.asList(new String[]{
+		            "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^",
+		            "~", "*", "?", ":","\"","\\"," "});
+		 String doctorId = "";
+		 String patientId = "";
+		 String assistentId = "";
+		 String fileName = "";
+		 File fileBase64;
+		 BufferedOutputStream bos = null;
+		 String path = "";
+		 JsonNode json = request().body().asJson();
+		 System.out.println("json" + json);
+		 ObjectMapper mapper = new ObjectMapper();
+		 UploadVM uploadVm = mapper.readValue(json.traverse(),UploadVM.class);
+		 if(!uploadVm.doctorId.equalsIgnoreCase("null")){
+				doctorId = uploadVm.doctorId;	
+		 }
+		 if(!uploadVm.patientId.equalsIgnoreCase("null")){
+				 patientId = uploadVm.patientId;				
+		 }
+		 if(!uploadVm.assistentId.equalsIgnoreCase("null")){
+			    System.out.println("assistentId +++++++++++" + assistentId);
+				assistentId = uploadVm.assistentId;				
+		 }
+		 String appointmentDate = uploadVm.appointmentDate;
+		 String appointmentTime = uploadVm.appointmentTime;
+		 String category = uploadVm.category;
+		 String documentType = uploadVm.fileExtension;
+		 String name = uploadVm.name;
+		 String clinicName = uploadVm.clinicName;
+		 String clinicId = uploadVm.clinicId;
+		 System.out.println("doctorId" + doctorId);
+		 System.out.println("patientId" + patientId);
+		 System.out.println("assistentId" + assistentId);
+		 fileName = uploadVm.fileName;
+		 String fileNameString = fileName;
+		 for(String s : specialCharactersInSolr)
+		 {
+		    	if(fileNameString.contains(s))
+		    	{
+		    		fileNameString = fileNameString.replace(""+s, "");
+		    	}
+		 }
+		 fileName = fileNameString;
+		 System.out.println("File Name= "+fileName);
+		 UploadFiles uploadFile = new UploadFiles();
+		 if(uploadVm.file != null){
+			 BASE64Decoder decoder = new BASE64Decoder();
+			 byte[] imageByte = decoder.decodeBuffer(uploadVm.file);
+			 if(uploadVm.type.equals("Doctor")){
+				    File folder = new File(Play.application().configuration().getString("folder_create_url_doctor")+ "//" + doctorId);
+			    	System.out.println("Condition:::::::"+folder.exists());
+				   	if(folder.exists()){
+				   		fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
+				   	}else{
+			    		folder.mkdirs();
+			    		fileBase64 = new File(Play.application().configuration().getString("profile_pic_url_patients")+"//"+doctorId+"//"+fileName+uploadVm.fileExtension);
+			    	}
+				    try{
+						  FileOutputStream fos = new FileOutputStream(fileBase64);
+					      bos = new BufferedOutputStream(fos); 
+					      bos.write(imageByte);
+			    	      path = Play.application().configuration().getString("folder_create_url_doctor")+"/" + doctorId + "/"+  fileName + uploadVm.fileExtension;
+				    }catch(Exception e){
+				    	e.printStackTrace();
+				    }
+			  }else if(uploadVm.type.equals("Patient")){
+				    File folder = new File(Play.application().configuration().getString("folder_create_url_patient")+ "//" + patientId);
+			    	System.out.println("Condition:::::::"+folder.exists());
+				   	if(folder.exists()){
+				   		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_patient")+"//"+patientId+"//"+fileName+uploadVm.fileExtension);
+				   	}else{
+			    		folder.mkdirs();
+			    		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_patient")+"//"+patientId+"//"+fileName+uploadVm.fileExtension);
+			    	}
+				    try{
+						  FileOutputStream fos = new FileOutputStream(fileBase64);
+					      bos = new BufferedOutputStream(fos); 
+					      bos.write(imageByte);
+			    	      path = Play.application().configuration().getString("folder_create_url_patient")+"/" + patientId + "/"+  fileName + uploadVm.fileExtension;
+				    }catch(Exception e){
+				    	e.printStackTrace();
+				    }
+				 
+			  }else if(uploadVm.equals("assistent")){
+				  File folder = new File(Play.application().configuration().getString("folder_create_url_assistant")+ "//" + assistentId);
+			    	System.out.println("Condition:::::::"+folder.exists());
+				   	if(folder.exists()){
+				   		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_assistant")+"//"+assistentId+"//"+fileName+uploadVm.fileExtension);
+				   	}else{
+			    		folder.mkdirs();
+			    		fileBase64 = new File(Play.application().configuration().getString("folder_create_url_assistant")+"//"+assistentId+"//"+fileName+uploadVm.fileExtension);
+			    	}
+				    try{
+						  FileOutputStream fos = new FileOutputStream(fileBase64);
+					      bos = new BufferedOutputStream(fos); 
+					      bos.write(imageByte);
+			    	      path = Play.application().configuration().getString("folder_create_url_assistant")+"/" + assistentId + "/"+  fileName + uploadVm.fileExtension;
+				    }catch(Exception e){
+				    	e.printStackTrace();
+				    }
+			  }
+			  
+			  if(!doctorId.equalsIgnoreCase("0")) {
+		    		uploadFile.doctorId = Person.getDoctorByMail(doctorId); 
+		       }else{
+		    		uploadFile.doctorId = 0;
+		       }
+		       if(!patientId.equalsIgnoreCase("0")){
+				    System.out.println("patientId" + patientId);
+		    		uploadFile.patientId = Person.getPatientByMail(patientId); 
+		        }else{
+		    		uploadFile.patientId = 0;
+		    	}
+		    	if(!assistentId.equalsIgnoreCase("0")){
+				    System.out.println("assistentId" + assistentId);
+		    		uploadFile.assistentId = Person.getAssistentByMail(assistentId); 
+		    	}else{
+		    		uploadFile.assistentId = 0;
+		    	}
+		    	uploadFile.appointmentDate = appointmentDate;
+		    	uploadFile.appointmentTime = appointmentTime;
+		    	uploadFile.category = category;
+		    	uploadFile.name = name;
+		    	uploadFile.fileName = fileName;
+		    	uploadFile.documentType = documentType;
+		    	uploadFile.type = uploadVm.type;
+		    	uploadFile.Url = path;
+		    	uploadFile.clinicId = clinicId;
+		    	uploadFile.clinicName = clinicName;
+		    	uploadFile.save();
+			  
+		 }
+		 
+		 return ok(Json.toJson(uploadFile));
+
 	}
 	public static Result uploadFiles() 
 	{
