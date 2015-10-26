@@ -13,6 +13,7 @@ public class PDAEditVm {
 	 private String url;
 	 private String speciality;
 	 private String allegricTo;
+	 private String patientId;
 	public String getName() {
 		return name;
 	}

@@ -840,6 +840,7 @@ public class Patient extends Controller {
 		vm.setUrl(person.url);
 		vm.setId(person.idPerson);
 		vm.setAllegricTo(person.allergicTo);
+		vm.setPatientId(""+person.patient);
 		return ok(Json.toJson(vm));
 	}
 	

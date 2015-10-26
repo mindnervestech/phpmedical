@@ -996,10 +996,8 @@ public class Application extends Controller {
 						nextBookTime = appointment.bookTime;
 						nextShift = appointment.shift;
 						clinicId = appointment.clinicId;
-						break;
 					}
-					
-				
+								
 				}
 				
 		   }
