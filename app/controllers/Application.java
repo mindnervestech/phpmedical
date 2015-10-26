@@ -992,10 +992,12 @@ public class Application extends Controller {
 			     	Calendar calTwo = Calendar.getInstance();
 					
 					if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
-						Nextdate = "";
-						nextBookTime = "";
-						nextShift = "";
-						clinicId = null;
+						if(appointment.star ==null){
+							Nextdate = "";
+							nextBookTime = "";
+							nextShift = "";
+							clinicId = null;
+					 }
 						
 					}else{
 						Nextdate = formatter.format(appointment.appointmentDate);
