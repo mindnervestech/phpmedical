@@ -23,6 +23,9 @@ public class PatientsDoctor {
 	public String star;
 	public String reviews;
 	public String lastVisitedTime;
+	public String previousClinicId;
+	public String lastVisitedClinicId;
+	public String lastVisitedShift;
 	
 	public PatientsDoctor(){}
 	

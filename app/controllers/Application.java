@@ -902,6 +902,9 @@ public class Application extends Controller {
 			String star = null;
 			String reviews = null;
 			String lastVisitedTime = null;
+			String lastVisitedShift = null;
+			String lastVisitedClinicId = null;
+			String previousClinicId = null;
 			//System.out.println("appointmentList = "+appointmentList.size());
 			if(appointmentList.size() > 0)
 			{
@@ -961,16 +964,6 @@ public class Application extends Controller {
 					PatientClientBookAppointment appointment = appointmentList.get(i);
 					System.out.println("AppointmentListsize= "+(appointmentListSize == 2));
 					
-					for(int j=0;j < appointmentList.size();j++)
-					{
-						if(j == (appointmentListSize - 1))
-						{
-							System.out.println("Book Time::::::"+appointment.bookTime);
-							previousDate = formatter.format(appointment.appointmentDate);
-							previousAppointment = appointment.bookTime;
-													
-						}
-					}
 					String[] timeValue;
 			    	Calendar calOne = Calendar.getInstance();
 			    	calOne.setTime(appointment.appointmentDate);
@@ -993,10 +986,9 @@ public class Application extends Controller {
 					
 					if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
 						if(appointment.star ==null){
-							Nextdate = "";
-							nextBookTime = "";
-							nextShift = "";
-							clinicId = null;
+							previousDate = formatter.format(appointment.appointmentDate);
+							previousAppointment = appointment.bookTime;
+							previousClinicId = ""+appointment.clinicId;
 					 }
 						
 					}else{
@@ -1034,6 +1026,8 @@ public class Application extends Controller {
 		    		lastVisitedTime = appointment.bookTime;
 		    		star = appointment.star;
 		    		reviews = appointment.reviews;
+		    		lastVisitedClinicId = ""+appointment.clinicId;
+		    		lastVisitedShift = appointment.shift;
 		    	}
 			}
 			
@@ -1059,10 +1053,11 @@ public class Application extends Controller {
 		    doctorPatient.previousDate = previousDate;
 		    doctorPatient.star = star;
 		    doctorPatient.reviews = reviews;
+		    doctorPatient.previousClinicId = previousClinicId;
+		    doctorPatient.lastVisitedShift = lastVisitedShift;
+		    doctorPatient.lastVisitedClinicId = lastVisitedClinicId;
 		    doctorPatient.lastVisitedTime = lastVisitedTime;
 		    patientDoctor.add(doctorPatient);
-			
-			
 		}
 
 		List<BucketDoctors> bucketDoctors = BucketDoctors
