@@ -86,6 +86,12 @@ public class PDAEditVm {
 	public void setAllegricTo(String allegricTo) {
 		this.allegricTo = allegricTo;
 	}
+	public String getPatientId() {
+		return patientId;
+	}
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
 	
 	
 }
