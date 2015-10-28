@@ -19,9 +19,11 @@ public class AllPatientsData {
 	public String shift;
 	public Integer clinicId;
 	public String lastVisited;
+	public String appointmentClinicId;
 	public String appointmentDate;
 	public String appointmentTime;
 	public String lastVisitedTime;
+	public String lastVisitedClinicId;
 	public String star;
 	public String reviews;
 	public String totalAppointment;

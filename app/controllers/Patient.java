@@ -879,6 +879,7 @@ public class Patient extends Controller {
 
 		return ok(Json.toJson(status));
 	}
+	
 	public static Result profilePictureUpdatePatient() throws IOException
 	{
 		List<String> specialCharactersInSolr = Arrays.asList(new String[]{

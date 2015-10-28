@@ -328,6 +328,7 @@ public class Doctor extends Controller {
 				date = removeTime(date);
 			} catch (ParseException e) {
 				date = (Date)standardFormat.parse(dateStr);
+				date = removeTime(date);
 				// TODO Auto-generated catch block
 			}
 			/*List<DoctorClinicSchedule> doctorClinicSchedules = DoctorClinicSchedule.getDoctorClinicScheduleById(""+clinicId,doctorId);
@@ -349,14 +350,15 @@ public class Doctor extends Controller {
 				
 				
 			}*/
+			System.out.println("Appointmnet List= "+appointmentList.size());
 			for(PatientClientBookAppointment appointment : appointmentList){
 				
 					try {
 				 		Date dbDate = formatter1.parse(appointment.appointmentDate.toString());
-						
-						if(date.compareTo(dbDate) == 0)
-						{
-							
+				 		System.out.println("database date= "+dbDate.getTime());
+				 		System.out.println("User date= "+date.getTime());
+				 	    if(date.getTime() == dbDate.getTime())
+				 	    {
 							if(ClinicList.size() != 0){
 								
 								for(AllClinicAppointment clinicAppointment : ClinicList){
@@ -731,7 +733,7 @@ public class Doctor extends Controller {
 		}
 	
 	
-		public static Result getAllDoctorClinics() {
+		public static Result getAllDoctorClinics() throws Exception{
 			
 		       String doctorId = null;
 		       String currentDate = null;
@@ -747,12 +749,14 @@ public class Doctor extends Controller {
 				
 				String dateStr = currentDate;
 				DateFormat formatter1 = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+				DateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd");
 				Date date = null;
 				try {
 					date = (Date)formatter1.parse(dateStr);
 					date = removeTime(date);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
+					date = (Date)standardFormat.parse(dateStr);
 					e.printStackTrace();
 				}
 				
@@ -784,7 +788,8 @@ public class Doctor extends Controller {
 								ShiftDetails shift1Details = new ShiftDetails();
 								shift1Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
 								shift1Details = getDays(schedulesShift1, shift1Details);
-								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift1");
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment
+										.getAllClinicAppointment(doctor_Id, c.idClinic, "Shift1", date);
 								shift1Details.appointmentCount = appointments.size();
 								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
 								{
@@ -802,7 +807,8 @@ public class Doctor extends Controller {
 								ShiftDetails shift2Details = new ShiftDetails();
 								shift2Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
 								shift2Details = getDays(schedulesShift2, shift2Details);
-								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift2");
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment
+										.getAllClinicAppointment(doctor_Id, c.idClinic, "Shift2", date);
 								shift2Details.appointmentCount = appointments.size();
 								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
 								{
@@ -820,7 +826,8 @@ public class Doctor extends Controller {
 								ShiftDetails shift3Details = new ShiftDetails();
 								shift3Details.shiftTime = clinicSchedule.form+" to "+clinicSchedule.totime;
 								shift3Details = getDays(schedulesShift3, shift3Details);
-								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment.getAllClinicAppointment(doctor_Id, c.idClinic, "shift3");
+								List<PatientClientBookAppointment> appointments = PatientClientBookAppointment
+										.getAllClinicAppointment(doctor_Id, c.idClinic, "Shift3", date);
 								shift3Details.appointmentCount = appointments.size();
 								if((clinicSchedule.availability == null) || (clinicSchedule.availability.equalsIgnoreCase("Available")))
 								{
@@ -1431,6 +1438,8 @@ public class Doctor extends Controller {
 			String nextShift = "";
 			Integer clinicId = null;
 			Integer patient_id = null;
+			Integer lastVisitedClinicId = 0;
+			Integer appointmentClinicId= 0;
 			AllPatientsData patientData = new AllPatientsData();
 			patientData.patientId = ""+p.patient;
 			patientData.doctorId = ""+doctor_id;
@@ -1473,9 +1482,11 @@ public class Doctor extends Controller {
 			     	Calendar calTwo = Calendar.getInstance();
 					
 					if(calOne.getTimeInMillis() < calTwo.getTimeInMillis()){
-						bookDate = formatter.format(appointment.appointmentDate);
-						bookTime = appointment.bookTime;
-						clinicId = null;
+						if(appointment.star == null){
+							bookDate = formatter.format(appointment.appointmentDate);
+							bookTime = appointment.bookTime;
+							appointmentClinicId = appointment.clinicId;
+						}
 						
 					}else{
 						nextDate = formatter.format(appointment.appointmentDate);
@@ -1499,10 +1510,13 @@ public class Doctor extends Controller {
 				for(PatientClientBookAppointment visit : visitedList){
 					lastVisited = formatter.format(visit.appointmentDate);
 					lastVisitedTime = visit.bookTime;
+					lastVisitedClinicId = visit.clinicId;
 				}
-				patientData.appointmentDate = lastVisited;
-				patientData.appointmentTime = lastVisitedTime;
+				patientData.lastVisited = lastVisited;
+				patientData.lastVisitedTime = lastVisitedTime;
 				patientData.totalAppointment = ""+totalAppointment;
+				patientData.lastVisitedClinicId = ""+lastVisitedClinicId;
+				patientData.appointmentClinicId = ""+appointmentClinicId;
 				patientDoctor.add(patientData);
 			}
 		return ok(Json.toJson(patientDoctor));
