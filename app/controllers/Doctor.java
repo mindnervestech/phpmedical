@@ -1690,9 +1690,21 @@ public static Result getAllDoctorPatientClinics() {
 					}
 					
 				}
+				DoctorClinicDetails clinicDetail = new DoctorClinicDetails();
+				clinicDetail.doctorId = person.doctor.toString();
+				clinicDetail.doctorName = person.name;
+				clinicDetail.clinicId = clinic.idClinic.toString();
+				clinicDetail.clinicName = clinic.clinicName;
+				clinicDetail.clinicLocation = clinic.location;
+				clinicDetail.clinicMobile = clinic.mobileNumber.toString();
+				clinicDetail.contactNumber = clinic.landLineNumber.toString();
+				clinicDetail.slot1 = timeTable1;
+				clinicDetail.slot2 = timeTable2;
+				clinicDetail.slot3 = timeTable3;
+				clinicDetail.clinicEmail = clinic.email;
+				clinicDetail.clinicSpeciality = clinic.speciality;
+				ClinicDetailsList.add(clinicDetail);
 				
-				ClinicDetailsList.add(new DoctorClinicDetails(person.doctor.toString(), person.name, clinic.idClinic.toString(), clinic.clinicName, 
-										clinic.location, clinic.landLineNumber.toString(),timeTable1,timeTable2,timeTable3,clinic.onlineAppointment));
 			}
 		
 		return ok(Json.toJson(ClinicDetailsList));
