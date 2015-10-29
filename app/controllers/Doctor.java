@@ -2071,6 +2071,15 @@ public static Result getAllDoctorPatientClinics() {
 		
 		return ok(Json.toJson(speciality));
 	}
+	public static Result getClinicsSpecialities(){
+		Set<String> speciality = new HashSet<String>();
+		List<Clinic> clinics = Clinic.getAllClinic();
+		for(Clinic c : clinics){
+			speciality.add(c.speciality);
+		}
+		
+		return ok(Json.toJson(speciality));
+	}
 	public static Result saveDoctorAppointmentDetails() throws IOException {
 
 		JsonNode json = request().body().asJson();
