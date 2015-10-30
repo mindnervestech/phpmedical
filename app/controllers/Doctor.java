@@ -1711,6 +1711,7 @@ public static Result getAllDoctorPatientClinics() {
 				clinicDetail.slot3 = timeTable3;
 				clinicDetail.clinicEmail = clinic.email;
 				clinicDetail.clinicSpeciality = clinic.speciality;
+				clinicDetail.onlineAppointment = clinic.onlineAppointment;
 				ClinicDetailsList.add(clinicDetail);
 				
 			}
