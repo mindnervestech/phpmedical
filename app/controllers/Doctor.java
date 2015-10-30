@@ -765,7 +765,15 @@ public class Doctor extends Controller {
 				List <PatientClientBookAppointment> appointmentList = PatientClientBookAppointment.getNextDoctorClinicAppointment(doctor_Id,"Occupied");
 				System.out.println("appointmentList = "+appointmentList.size());
 				List<Clinic> clinics = Clinic.findAllByDoctorId(doctor_Id);
-				for(Clinic c: clinics)
+				DoctorRegister doctor = DoctorRegister.getDoctorById(doctor_Id);
+				List<Clinic> clinicList = doctor.clinic;
+				for(Clinic cl : clinics){
+					if(cl.doctorId == doctor.doctorId){
+						clinicList.add(cl);
+					}
+				}
+				System.out.println("Clinic List = "+clinicList.size());
+				for(Clinic c: clinicList)
 				{
 					System.out.println("Clinic Name:::::"+c.clinicName);
 					ClinicDoctorVM vm = new ClinicDoctorVM();
@@ -2067,15 +2075,6 @@ public static Result getAllDoctorPatientClinics() {
 		{
 			speciality.add(doc.speciality);
 			System.out.println("Speciality:::::"+doc.speciality);
-		}
-		
-		return ok(Json.toJson(speciality));
-	}
-	public static Result getClinicsSpecialities(){
-		Set<String> speciality = new HashSet<String>();
-		List<Clinic> clinics = Clinic.getAllClinic();
-		for(Clinic c : clinics){
-			speciality.add(c.speciality);
 		}
 		
 		return ok(Json.toJson(speciality));
