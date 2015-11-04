@@ -43,6 +43,7 @@ public class DoctorRegister extends Model {
 		return find.findList();
 	}
 	
+
 	
 	
 }

@@ -44,6 +44,15 @@ public class PatientClientBookAppointment extends Model {
 			return appointment;
 		}
 	}
+	public static PatientClientBookAppointment getSaveAppointmentDetails(Integer doctorId, Integer patient_id, Integer clinicId, String shift,Date appointmentDate) {
+		PatientClientBookAppointment appointment = find.where().eq("doctorId", doctorId).eq("patientId", patient_id).eq("clinicId", clinicId).eq("shift", shift).eq("appointmentDate",appointmentDate).findUnique();
+		
+		if(appointment == null){
+			return new PatientClientBookAppointment();
+		}else{
+			return appointment;
+		}
+	}
 	
 	public static PatientClientBookAppointment saveVisitedClinicAppointment(Integer doctorId, Integer patient_id, Integer clinicId, String shift) {
 		

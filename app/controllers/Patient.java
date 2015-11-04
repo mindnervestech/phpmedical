@@ -214,7 +214,7 @@ public class Patient extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println("json" + json);
 		ObjectMapper mapper = new ObjectMapper();
-
+		Date date = null;
 		PatientClinicsAppointmentVM bookAppointment = mapper.readValue(
 				json.traverse(), PatientClinicsAppointmentVM.class);
 
@@ -222,10 +222,19 @@ public class Patient extends Controller {
 				+ bookAppointment.patientId);
 
 		Integer patient_id = Person.getPatientByMail(bookAppointment.patientId);
-
-		PatientClientBookAppointment appointment = PatientClientBookAppointment
+		SimpleDateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try{
+			date = (Date)standardFormat.parse(bookAppointment.appointmentDate);
+			date = removeTime(date);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		/*PatientClientBookAppointment appointment = PatientClientBookAppointment
 				.getClinicAppointment(bookAppointment.doctorId, patient_id,
-						bookAppointment.clinicId, bookAppointment.shift);
+						bookAppointment.clinicId, bookAppointment.shift);*/
+		PatientClientBookAppointment appointment = PatientClientBookAppointment
+				.getSaveAppointmentDetails(bookAppointment.doctorId, patient_id, bookAppointment.clinicId, bookAppointment.shift,date);
 
 		appointment.clinicId = bookAppointment.clinicId;
 		// appointment.patientId = bookAppointment.patientId;
@@ -253,7 +262,16 @@ public class Patient extends Controller {
 				Error.E304.getMessage())));
 
 	}
-
+	public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+	
 	public static Result savePatientReminder() throws IOException {
 
 		JsonNode json = request().body().asJson();
@@ -276,26 +294,7 @@ public class Patient extends Controller {
 			reminderData = new ReminderData();
 		}
 
-/*		Integer patient_id = Person.getPatientByMail(reminderVM.patientId);
-		reminderData.doctorId = reminderVM.doctorId;
-		reminderData.appointmentDate = reminderVM.appointmentDate;
-		reminderData.appointmentTime = reminderVM.appointmentTime;
-		reminderData.doctorId = reminderVM.doctorId;
-		reminderData.patientId = patient_id;
-		reminderData.medicinName = reminderVM.medicinName;
-		reminderData.startDate = reminderVM.startDate;
-		reminderData.endDate = reminderVM.endDate;
-		reminderData.duration = reminderVM.duration;
-		reminderData.numberOfDoses = reminderVM.numberOfDoses;
-		reminderData.schedule = reminderVM.schedule;
-		reminderData.doctorInstruction = reminderVM.doctorInstruction;
-		reminderData.visitDate = reminderVM.visitDate;
-		reminderData.visitType = reminderVM.visitType;
-		reminderData.referredBy = reminderVM.referredBy;
-		reminderData.symptoms = reminderVM.symptoms;
-		reminderData.diagnosis = reminderVM.diagnosis;
-		reminderData.medicinePrescribed = reminderVM.medicinePrescribed;
-		reminderData.testsPrescribed = reminderVM.testsPrescribed;*/
+
 		
 		Integer patient_id = Person.getPatientByMail(reminderVM.patientId);
 		System.out.println("patientId::::::"+patient_id);
@@ -334,60 +333,31 @@ public class Patient extends Controller {
 		summaryHistory.appointmentTime = reminderVM.appointmentTime;
 		summaryHistory.type = reminderVM.ownerType;
 		summaryHistory.save();
-		/*		if (reminderVM.alarmReminderVMList != null) {
-			List<AlarmReminderVM> alarmReminderVMList = reminderVM.alarmReminderVMList;
-
-			for (AlarmReminderVM alarmReminderVM : alarmReminderVMList) {
-				System.out.println("alarmReminderVM.id =  "
-						+ alarmReminderVM.id);
-				if (alarmReminderVM.id != null) {
-					ReminderTimeTable reminderTimeTables = ReminderTimeTable
-							.getreminderTimeTableById(alarmReminderVM.id);
-					reminderTimeTables.alarmDate = alarmReminderVM.alarmDate;
-					reminderTimeTables.time1 = alarmReminderVM.time1;
-					reminderTimeTables.time2 = alarmReminderVM.time2;
-					reminderTimeTables.time3 = alarmReminderVM.time3;
-					reminderTimeTables.time4 = alarmReminderVM.time4;
-					reminderTimeTables.time5 = alarmReminderVM.time5;
-					reminderTimeTables.time6 = alarmReminderVM.time6;
-					reminderTimeTables.update();
-				} else {
-					ReminderTimeTable reminderTimeTables = new ReminderTimeTable();
-					reminderTimeTables.alarmDate = alarmReminderVM.alarmDate;
-					reminderTimeTables.time1 = alarmReminderVM.time1;
-					reminderTimeTables.time2 = alarmReminderVM.time2;
-					reminderTimeTables.time3 = alarmReminderVM.time3;
-					reminderTimeTables.time4 = alarmReminderVM.time4;
-					reminderTimeTables.time5 = alarmReminderVM.time5;
-					reminderTimeTables.time6 = alarmReminderVM.time6;
-					reminderData.reminderTimeTables.add(reminderTimeTables);
-				}
-			}
-		}*/
 		
 		if (reminderVM.alarmReminderVMList != null)
 		{
 			if (reminderVM.id != null) 
-			{
-				List<ReminderTimeTable> listTime = ReminderTimeTable.getAllReminderTimeTableById(reminderVM.id);
-//				System.out.println("listTime " + listTime);
-				for (ReminderTimeTable alarmReminder : listTime) 
-				{
-					alarmReminder.delete();
-				}
-
+			{			
 				List<AlarmReminderVM> alarmReminderVMList = reminderVM.alarmReminderVMList;
 				for (AlarmReminderVM alarmReminderVM : alarmReminderVMList) 
 				{
-					ReminderTimeTable reminderTimeTables = new ReminderTimeTable();
-					reminderTimeTables.alarmDate = alarmReminderVM.alarmDate;
-					reminderTimeTables.time1 = alarmReminderVM.time1;
-					reminderTimeTables.time2 = alarmReminderVM.time2;
-					reminderTimeTables.time3 = alarmReminderVM.time3;
-					reminderTimeTables.time4 = alarmReminderVM.time4;
-					reminderTimeTables.time5 = alarmReminderVM.time5;
-					reminderTimeTables.time6 = alarmReminderVM.time6;
-					reminderData.reminderTimeTables.add(reminderTimeTables);
+					if(alarmReminderVM.id == null){
+						ReminderTimeTable reminderTimeTables = new ReminderTimeTable();
+						reminderTimeTables.alarmDate = alarmReminderVM.alarmDate;
+						reminderTimeTables.time1 = alarmReminderVM.time1;
+						reminderTimeTables.time2 = alarmReminderVM.time2;
+						reminderTimeTables.time3 = alarmReminderVM.time3;
+						reminderTimeTables.time4 = alarmReminderVM.time4;
+						reminderTimeTables.time5 = alarmReminderVM.time5;
+						reminderTimeTables.time6 = alarmReminderVM.time6;
+						reminderTimeTables.medicineName = alarmReminderVM.medicineName;
+						reminderTimeTables.doses = alarmReminderVM.doses;
+						reminderTimeTables.duration = alarmReminderVM.duration;
+						reminderTimeTables.startDate = alarmReminderVM.startDate;
+						reminderTimeTables.endDate = alarmReminderVM.endDate;
+						reminderTimeTables.doctorInstruction = alarmReminderVM.doctorInstruction;
+						reminderData.reminderTimeTables.add(reminderTimeTables);
+					}
 				}
 			}
 		    else
@@ -403,6 +373,12 @@ public class Patient extends Controller {
 					reminderTimeTables.time4 = alarmReminderVM.time4;
 					reminderTimeTables.time5 = alarmReminderVM.time5;
 					reminderTimeTables.time6 = alarmReminderVM.time6;
+					reminderTimeTables.medicineName = alarmReminderVM.medicineName;
+					reminderTimeTables.doses = alarmReminderVM.doses;
+					reminderTimeTables.duration = alarmReminderVM.duration;
+					reminderTimeTables.startDate = alarmReminderVM.startDate;
+					reminderTimeTables.endDate = alarmReminderVM.endDate;
+					reminderTimeTables.doctorInstruction = alarmReminderVM.doctorInstruction;
 					reminderData.reminderTimeTables.add(reminderTimeTables);
 				}
 		}
@@ -420,7 +396,65 @@ public class Patient extends Controller {
 		reminderData.save();
 		return ok(Json.toJson(reminderVM));
 	}
-
+	public static Result updatePatientReminder() throws IOException{
+		JsonNode json = request().body().asJson();
+		System.out.println("json " + json);
+		ObjectMapper mapper = new ObjectMapper();
+		ReminderVM reminderVM = mapper.readValue(json.traverse(),
+				ReminderVM.class);
+		ReminderData reminderData = null;
+		reminderData = ReminderData.getReminderDataById(reminderVM.id);
+		List<AlarmReminderVM> alarmList = reminderVM.alarmReminderVMList;
+		String medicineName = alarmList.get(0).medicineName;
+		List<ReminderTimeTable> reminderTimeTablesList = ReminderTimeTable
+				.getAllReminderTimeTableByMedicine(reminderVM.id, medicineName);
+		System.out.println("Update List size= "+reminderTimeTablesList.size());
+		for(ReminderTimeTable timeTable : reminderTimeTablesList){
+			timeTable.delete();
+		}
+		for (AlarmReminderVM alarmReminderVM : alarmList) 
+		{
+			if(alarmReminderVM.id == null){
+				ReminderTimeTable reminderTimeTables = new ReminderTimeTable();
+				reminderTimeTables.alarmDate = alarmReminderVM.alarmDate;
+				reminderTimeTables.time1 = alarmReminderVM.time1;
+				reminderTimeTables.time2 = alarmReminderVM.time2;
+				reminderTimeTables.time3 = alarmReminderVM.time3;
+				reminderTimeTables.time4 = alarmReminderVM.time4;
+				reminderTimeTables.time5 = alarmReminderVM.time5;
+				reminderTimeTables.time6 = alarmReminderVM.time6;
+				reminderTimeTables.medicineName = alarmReminderVM.medicineName;
+				reminderTimeTables.doses = alarmReminderVM.doses;
+				reminderTimeTables.duration = alarmReminderVM.duration;
+				reminderTimeTables.startDate = alarmReminderVM.startDate;
+				reminderTimeTables.endDate = alarmReminderVM.endDate;
+				reminderTimeTables.doctorInstruction = alarmReminderVM.doctorInstruction;
+				reminderData.reminderTimeTables.add(reminderTimeTables);
+			}
+		}
+		reminderData.update();
+		
+		return ok(Json.toJson(reminderVM));
+	}
+	
+	public static Result deletePatientReminder() throws IOException{
+		JsonNode json = request().body().asJson();
+		System.out.println("json " + json);
+		ObjectMapper mapper = new ObjectMapper();
+		ReminderVM reminderVM = mapper.readValue(json.traverse(),
+				ReminderVM.class);
+		ReminderData reminderData = null;
+		reminderData = ReminderData.getReminderDataById(reminderVM.id);
+		List<AlarmReminderVM> alarmList = reminderVM.alarmReminderVMList;
+		String medicineName = alarmList.get(0).medicineName;
+		List<ReminderTimeTable> reminderTimeTablesList = ReminderTimeTable
+				.getAllReminderTimeTableByMedicine(reminderVM.id, medicineName);
+		System.out.println("Update List size= "+reminderTimeTablesList.size());
+		for(ReminderTimeTable timeTable : reminderTimeTablesList){
+			timeTable.delete();
+		}
+		return ok(Json.toJson("Success"));
+	}
 	public static Result getAllPatientClinics() {
 
 		String patientId = null;
@@ -656,11 +690,22 @@ public class Patient extends Controller {
 		List<AlarmReminderVM> alarmReminderVMs = new ArrayList<AlarmReminderVM>();
 
 		for (ReminderTimeTable reminderTimeTable : reminderTimeTablesList) {
-			alarmReminderVMs.add(new AlarmReminderVM(reminderTimeTable.id,
-					reminderTimeTable.alarmDate, reminderTimeTable.time1,
-					reminderTimeTable.time2, reminderTimeTable.time3,
-					reminderTimeTable.time4, reminderTimeTable.time5,
-					reminderTimeTable.time6));
+			AlarmReminderVM vm = new AlarmReminderVM();
+			vm.id = reminderTimeTable.id;
+			vm.alarmDate = reminderTimeTable.alarmDate;
+			vm.time1 = reminderTimeTable.time1;
+			vm.time2 = reminderTimeTable.time2;
+			vm.time3 = reminderTimeTable.time3;
+			vm.time4 = reminderTimeTable.time4;
+			vm.time5 = reminderTimeTable.time5;
+			vm.time6 = reminderTimeTable.time6;
+			vm.medicineName = reminderTimeTable.medicineName;
+			vm.doses = reminderTimeTable.doses;
+			vm.duration = reminderTimeTable.duration;
+			vm.startDate = reminderTimeTable.startDate;
+			vm.endDate = reminderTimeTable.endDate;
+			vm.doctorInstruction = reminderTimeTable.doctorInstruction;
+			alarmReminderVMs.add(vm);
 		}
 
 		reminderVM.alarmReminderVMList = alarmReminderVMs;

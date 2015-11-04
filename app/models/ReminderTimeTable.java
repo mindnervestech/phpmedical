@@ -25,6 +25,12 @@ public class ReminderTimeTable extends Model {
 	public String time4;
 	public String time5;
 	public String time6;
+	public String medicineName;
+    public int doses;
+    public int duration;
+    public String startDate;
+    public String endDate;
+    public String doctorInstruction;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	public ReminderData reminderData;

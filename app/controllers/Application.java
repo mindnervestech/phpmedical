@@ -2457,7 +2457,7 @@ public class Application extends Controller {
 		 String category = uploadVm.category;
 		 String documentType = uploadVm.fileExtension;
 		 String name = uploadVm.name;
-		 String clinicName = uploadVm.clinicName;
+		 String clinicName = null;
 		 String clinicId = uploadVm.clinicId;
 		 System.out.println("doctorId" + doctorId);
 		 System.out.println("patientId" + patientId);
@@ -2557,6 +2557,13 @@ public class Application extends Controller {
 		    	uploadFile.type = uploadVm.type;
 		    	uploadFile.Url = path;
 		    	uploadFile.clinicId = clinicId;
+		    	List<Clinic> clinics = Clinic.getAllClinic();
+		    	for(Clinic c : clinics){
+		    		if(c.idClinic.equals(clinicId)){
+		    			clinicName = c.clinicName;
+		    			break;
+		    		}
+		    	}
 		    	uploadFile.clinicName = clinicName;
 		    	uploadFile.save();
 			  
