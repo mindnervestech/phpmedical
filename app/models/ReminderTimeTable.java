@@ -45,5 +45,10 @@ public class ReminderTimeTable extends Model {
 		return find.where().eq("reminder_data_id", id).findList();
 	}
 	
+	public static List<ReminderTimeTable> getAllReminderTimeTableByMedicine(long id,String medicineName)
+	{
+		return find.where().eq("reminder_data_id", id).eq("medicineName", medicineName).findList();
+	}
+	
 		
 }
