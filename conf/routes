@@ -80,6 +80,7 @@ POST	/deleteNotification                 controllers.Application.deleteNotificat
 POST    /profilePictureUpdateBase64         controllers.Application.profilePictureUpdateBase64()
 POST    /registerPicture                    controllers.Application.registerPicture()
 POST    /uploadFilesBase64                  controllers.Application.uploadFilesBase64()
+POST    /deleteFile                         controllers.Application.deleteFile()
 
 
 #Doctors Urls

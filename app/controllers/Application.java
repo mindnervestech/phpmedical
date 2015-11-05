@@ -2926,6 +2926,17 @@ public class Application extends Controller {
 		return ok(Json.toJson(summaryList));
 	}
 	
+	public static Result deleteFile() throws IOException
+	{
+		String idFile = null;
+		idFile = URLDecoder.decode(request().getQueryString("id"),"UTF-8");
+		Long id = Long.parseLong(idFile);
+		UploadFiles uploadFile = UploadFiles.getUploadFile(id);
+		File file = new File(uploadFile.Url);
+		file.delete();
+		uploadFile.delete();
+		return ok(Json.toJson("Success"));
+	}
 
 }
 	

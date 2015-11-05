@@ -56,4 +56,7 @@ public class UploadFiles extends Model {
 		return find.where().eq("id", id).findUnique();
 	}
 	
+	
+	
+	
 }
