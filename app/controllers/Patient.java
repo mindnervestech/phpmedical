@@ -392,7 +392,18 @@ public class Patient extends Controller {
 		{
 			reminderData.save();
 		}
+		
+	  }else{
+		  if (reminderVM.id != null) 
+			{
+				System.out.println("Update" + reminderVM.id);
+				reminderData.update();
+			} else 
+			{
+				reminderData.save();
+			}
 	  }
+		
 		return ok(Json.toJson(reminderVM));
 	}
 	public static Result updatePatientReminder() throws IOException{
