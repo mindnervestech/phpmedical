@@ -393,7 +393,6 @@ public class Patient extends Controller {
 			reminderData.save();
 		}
 	  }
-		reminderData.save();
 		return ok(Json.toJson(reminderVM));
 	}
 	public static Result updatePatientReminder() throws IOException{
