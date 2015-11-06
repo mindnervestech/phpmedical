@@ -70,6 +70,7 @@ import viewmodel.DoctorProcedureVm;
 import viewmodel.DoctorReportVm;
 import viewmodel.DoctorsPatient;
 import viewmodel.FieldVm;
+import viewmodel.HomeCountDoctorVM;
 import viewmodel.ModeVM;
 import viewmodel.PDAEditVm;
 import viewmodel.PatientClinicsAppointmentVM;
@@ -430,8 +431,8 @@ public class Doctor extends Controller {
 							
 								ClinicList.add(allClinicAppointment);
 							}
-							
-						}
+				 	    }	
+						
 					}catch (ParseException e) {
 						e.printStackTrace();
 					}
@@ -732,7 +733,30 @@ public class Doctor extends Controller {
 			return ok(Json.toJson(invoices));
 		}
 	
-	
+		public static Result homeCountDoctor() throws Exception{
+			
+			int patientCount = 0;
+			int financeCount = 0;
+			int appointmentCount = 0;
+			
+			String emailId = URLDecoder.decode(request().getQueryString("doctorId"),"UTF-8");
+			Person person = Person.getDoctorIdByEmail(emailId);
+			int doctorId = person.doctor;
+			DoctorRegister doctorRegister = DoctorRegister.getDoctorById(doctorId);
+			List<PatientRegister> patients = doctorRegister.patient;
+			patientCount = patients.size();
+			List<PatientClientBookAppointment> appointments = PatientClientBookAppointment
+					                                          .getAllPatientOfDoctor(doctorId);
+			appointmentCount = appointments.size();
+			List<Invoices> invoices = Invoices.getAllInvoicesByDoctorId(doctorId);
+			financeCount = invoices.size();
+			HomeCountDoctorVM vm = new HomeCountDoctorVM();
+			vm.patientCount = patientCount;
+			vm.appointments = appointmentCount;
+			vm.financeCount = financeCount;
+			return ok(Json.toJson(vm));
+			
+		}
 		public static Result getAllDoctorClinics() throws Exception{
 			
 		       String doctorId = null;
@@ -857,100 +881,7 @@ public class Doctor extends Controller {
 					clinicDoctorVM.add(vm);
 					
 				}
-				/*if(appointmentList.size() > 0)
-				{
-					
-					for(PatientClientBookAppointment appointment : appointmentList){
-						
-						try {
-					 		Date dbDate = formatter1.parse(appointment.appointmentDate.toString());
-							System.out.println("Condition::::::"+(date.compareTo(dbDate) == 0));
-							if(date.compareTo(dbDate) == 0){
-				        		System.out.println("Date1 is equal to Date2");
-				        		if(clinicDoctorVM.size() != 0)
-				        		{
-				        			boolean checkAdd = false;
-				        			for(int i = 0; i<clinicDoctorVM.size(); i++){
-				        			    ClinicDoctorVM doctorVM = clinicDoctorVM.get(i);
-				        				if(doctorVM.idClinic.equals(appointment.clinicId)){
-				        					//System.out.println("In if !!!"+appointment.bookTime);
-				        					checkAdd = true;
-				        					
-				        					ShiftDetails shiftValue = new ShiftDetails();
-				        					if(appointment.shift != null)
-				        					{
-					        					if(appointment.shift.equals("shift1")){
-					        						ShiftDetails shiftValue1 = 	doctorVM.shift1;
-					        						
-					        						if(shiftValue1 == null){
-					        							shiftValue1 = new ShiftDetails();
-					        							shiftValue1.appointmentCount = 1;
-					        							shiftValue1.shiftTime = appointment.timeSlot;
-					        							shiftValue1.shiftTime = appointment.timeSlot;
-					        							List<DoctorClinicSchedule> doctorClinicScheduleList = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, appointment.clinicId.toString(),"shift1");
-					        							doctorVM.shift1 = getDays(doctorClinicScheduleList,shiftValue1);
-					        						}else {
-					        							shiftValue1.shiftTime = appointment.timeSlot;
-					        							shiftValue1.appointmentCount = shiftValue1.appointmentCount + 1;
-					        						}
-					        						
-					        					}else if(appointment.shift.equals("shift2")){
-					        						
-					        						ShiftDetails shiftValue2 = 	doctorVM.shift2;
-					        						System.out.println("Condition2"+(shiftValue2 == null));
-					        						if(shiftValue2 == null){
-					        							shiftValue2 = new ShiftDetails();
-					        							shiftValue2.appointmentCount = 1;
-					        							shiftValue2.shiftTime = appointment.timeSlot;
-					        							List<DoctorClinicSchedule> doctorClinicScheduleList = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, appointment.clinicId.toString(),"shift2");
-					        							doctorVM.shift2 = getDays(doctorClinicScheduleList,shiftValue2);
-					        							
-					        						}else {
-					        							shiftValue2.shiftTime = appointment.timeSlot;
-					        							shiftValue2.appointmentCount = shiftValue2.appointmentCount + 1;
-					        							doctorVM.shift2 = shiftValue2;
-					        						}
-					        						
-					        					}else if(appointment.shift.equals("shift3"))
-					        					{
-					        						
-					        						ShiftDetails shiftValue3 = doctorVM.shift3;
-					        						if(shiftValue3 == null)
-					        						{
-					        							shiftValue3 = new ShiftDetails();
-					        							shiftValue3.appointmentCount = 1;
-					        							shiftValue3.shiftTime = appointment.timeSlot;
-					        							List<DoctorClinicSchedule> doctorClinicScheduleList = DoctorClinicSchedule.findAllClinicScheduleByShift(doctorId, appointment.clinicId.toString(),"shift3");
-					        							doctorVM.shift3 = getDays(doctorClinicScheduleList,shiftValue3);
-					        						}else {
-					        							shiftValue3.shiftTime = appointment.timeSlot;
-					        							shiftValue3.appointmentCount = shiftValue3.appointmentCount + 1;
-					        							doctorVM.shift3 = shiftValue3;
-					        						}
-					        						
-					        					}
-				        					}
-				        				}
-				        			}
-				        			if(!checkAdd){
-				        				clinicDoctorVM.add(getClinicDetails(appointment));
-				        			}
-				        			
-				        		}else{
-				        			
-				        			clinicDoctorVM.add(getClinicDetails(appointment));
-				        		}
-				        		
-				        	}
-							
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
-					}
-			    }*/
-				
-				
-				return ok(Json.toJson(clinicDoctorVM));
+			  return ok(Json.toJson(clinicDoctorVM));
 			}
 		
 		

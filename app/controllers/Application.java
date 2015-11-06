@@ -2559,8 +2559,11 @@ public class Application extends Controller {
 		    	uploadFile.clinicId = clinicId;
 		    	List<Clinic> clinics = Clinic.getAllClinic();
 		    	for(Clinic c : clinics){
-		    		if(c.idClinic.equals(clinicId)){
+		    		System.out.println("Clinic Condition= "+c.idClinic.equals(clinicId));
+		    		if(clinicId.equals(""+c.idClinic)){
 		    			clinicName = c.clinicName;
+		    			System.out.println("Condition true");
+		    			System.out.println("Clinic name= "+c.clinicName);
 		    			break;
 		    		}
 		    	}
