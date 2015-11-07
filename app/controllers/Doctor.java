@@ -808,6 +808,7 @@ public class Doctor extends Controller {
 					vm.address = c.address;
 					vm.location = c.location;
 					vm.email = c.email;
+					vm.speciality = c.speciality;
 					vm.doctorId = doctor_Id;
 					
 					
