@@ -2490,6 +2490,8 @@ public class Application extends Controller {
 						  FileOutputStream fos = new FileOutputStream(fileBase64);
 					      bos = new BufferedOutputStream(fos); 
 					      bos.write(imageByte);
+					      bos.flush();
+					      bos.close();
 			    	      path = Play.application().configuration().getString("folder_create_url_doctor")+"/" + doctorId + "/"+  fileName + uploadVm.fileExtension;
 				    }catch(Exception e){
 				    	e.printStackTrace();
@@ -2507,6 +2509,8 @@ public class Application extends Controller {
 						  FileOutputStream fos = new FileOutputStream(fileBase64);
 					      bos = new BufferedOutputStream(fos); 
 					      bos.write(imageByte);
+					      bos.flush();
+					      bos.close();
 			    	      path = Play.application().configuration().getString("folder_create_url_patient")+"/" + patientId + "/"+  fileName + uploadVm.fileExtension;
 				    }catch(Exception e){
 				    	e.printStackTrace();
@@ -2525,6 +2529,8 @@ public class Application extends Controller {
 						  FileOutputStream fos = new FileOutputStream(fileBase64);
 					      bos = new BufferedOutputStream(fos); 
 					      bos.write(imageByte);
+					      bos.flush();
+					      bos.close();
 			    	      path = Play.application().configuration().getString("folder_create_url_assistant")+"/" + assistentId + "/"+  fileName + uploadVm.fileExtension;
 				    }catch(Exception e){
 				    	e.printStackTrace();
