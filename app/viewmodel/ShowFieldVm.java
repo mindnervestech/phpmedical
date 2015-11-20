@@ -8,5 +8,5 @@ public class ShowFieldVm {
 	public Integer templateId;
 	public String fieldDisplayName;
 	public String fieldDefaultValue;
-
+	public Boolean selected = false;
 }

@@ -11,7 +11,6 @@ public class TreatmentPlanVm {
 	public String templateId;
 	public String patientAppointmentDate;
 	public String patientAppointmentTime;
-	
 	public ArrayList<TreatementFieldVm> fieldArrayList;
 	
 }

@@ -615,7 +615,7 @@ public class Doctor extends Controller {
 	  					AllProcedureVm allProcedureVm = new AllProcedureVm();
 	  					allProcedureVm.procedureName = doctorProcedureList.procedureName;
 	  					allProcedureVm.category = doctorProcedureList.category;
-	  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
+	  					allProcedureVm.id = String.valueOf(invoices.id);
 	  					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
 	  						
 	  					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
@@ -991,7 +991,7 @@ public class Doctor extends Controller {
   					AllProcedureVm allProcedureVm = new AllProcedureVm();
   					allProcedureVm.procedureName = doctorProcedureList.procedureName;
   					allProcedureVm.category = doctorProcedureList.category;
-  					allProcedureVm.id = String.valueOf(doctorProcedureList.id);
+  					allProcedureVm.id = String.valueOf(treatmentPlan.id);
   					allProcedureVm.doctorId = String.valueOf(doctorProcedureList.doctorId);
 
   					List<ShowFieldVm> fieldVms = new ArrayList<ShowFieldVm>();
@@ -1721,7 +1721,48 @@ public static Result getAllDoctorPatientClinics() {
 		}
 	}
 	
-	
+	public static Result deleteTreatmentTemplate() throws IOException{
+		System.out.println("Delete Treatment Template");
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		String message = "";
+		AllProcedureVm procedure = mapper.readValue(request().body().asJson(),AllProcedureVm.class);
+		if(procedure != null){
+			if(procedure.id != null){
+				Long id = Long.parseLong(procedure.id);
+				TreatmentPlan treatment = TreatmentPlan.getTreatmentPlanById(id);
+				treatment.delete();
+				message = "Success";
+			}else{
+				message = "Failure";
+			}
+		}else{
+			message = "Failure";
+		}
+		return ok(Json.toJson(message));
+		
+	}
+	public static Result deleteInvoiceTemplate() throws IOException{
+		System.out.println("Delete Treatment Template");
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		String message = "";
+		AllProcedureVm procedure = mapper.readValue(request().body().asJson(),AllProcedureVm.class);
+		if(procedure != null){
+			if(procedure.id != null){
+				Long id = Long.parseLong(procedure.id);
+				Invoices treatment = Invoices.getTreatmentPlanById(id);
+				treatment.delete();
+				message = "Success";
+			}else{
+				message = "Failure";
+			}
+		}else{
+			message = "Failure";
+		}
+		return ok(Json.toJson(message));
+		
+	}
 	public static Result saveTreatementTemplate() throws IOException{
 		System.out.println("saveTreatementTemplate ");
 		JsonNode json = request().body().asJson();
