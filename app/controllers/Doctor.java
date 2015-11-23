@@ -2126,6 +2126,8 @@ public static Result getAllDoctorPatientClinics() {
 					patient.lastVisited = ""+appointment.isVisited;
 					patient.reviews = appointment.reviews;
 					patient.star = appointment.star;
+					Person patientBasicData = Person.getPatientsById(appointment.patientId);
+					patient.patientName = patientBasicData.name;
 					doctorPatients.add(patient);
 				}
 			}
