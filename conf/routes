@@ -117,7 +117,7 @@ POST    /saveDoctorAppointment                  controllers.Doctor.saveDoctorApp
 GET     /homeCountDoctor                        controllers.Doctor.homeCountDoctor()
 POST    /deleteTreatmentTemplate                controllers.Doctor.deleteTreatmentTemplate()
 POST    /deleteInvoiceTemplate                  controllers.Doctor.deleteInvoiceTemplate()
-
+GET     /doctorPatientsFeedback                 controllers.Doctor.doctorPatientsFeedback()
 
 #patient Urls
 

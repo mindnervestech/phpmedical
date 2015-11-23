@@ -2097,6 +2097,41 @@ public static Result getAllDoctorPatientClinics() {
 				Error.E304.getMessage())));
 
 	}
+	
+	public static Result doctorPatientsFeedback() throws IOException{
+		
+		String email = request().getQueryString("email");
+		Person person = Person.getPersonByMail(email);
+		int doctorId = person.doctor;
+		List<PatientClientBookAppointment> patientList = PatientClientBookAppointment
+				                                         .getAllPatientOfDoctor(doctorId);
+		List<AllPatientsData> doctorPatients = new ArrayList<AllPatientsData>();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+		for(PatientClientBookAppointment appointment : patientList){
+			if(appointment.isVisited != null){
+				if(appointment.isVisited == 1){
+					AllPatientsData patient = new AllPatientsData();
+					patient.allergic_to = null;
+					patient.appointmentClinicId = null;
+					patient.appointmentDate = formatter.format(appointment.appointmentDate);
+					patient.appointmentTime = appointment.bookTime;
+					patient.blood_group = null;
+					patient.bookDate = null;
+					patient.bookTime = null;
+					patient.clinicId = appointment.clinicId;
+					patient.dateOfBirth = null;
+					patient.doctorId = ""+appointment.doctorId;
+					patient.emailID = null;
+					patient.gender = null;
+					patient.lastVisited = ""+appointment.isVisited;
+					patient.reviews = appointment.reviews;
+					patient.star = appointment.star;
+					doctorPatients.add(patient);
+				}
+			}
+		}
+		return ok(Json.toJson(doctorPatients));
+	}
 
 	
 }
