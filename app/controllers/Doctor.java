@@ -1828,8 +1828,24 @@ public static Result getAllDoctorPatientClinics() {
 					//System.out.println("update !!!!");
 				}
 			}
-	
-		return ok(Json.toJson(planVm));
+			Invoices invoices = Invoices.checkInvoicesById(doctor_id,patient_id,Integer.parseInt(planVm.procedureId),
+					Integer.parseInt(planVm.templateId),planVm.patientAppointmentDate,planVm.patientAppointmentTime);
+			if(invoices == null)
+			{
+				
+				invoices = new Invoices();
+				invoices.doctorId = doctor_id;//Person.getDoctorByMail(planVm.doctorId);
+				invoices.patientId =  patient_id;//Person.getPatientByMail(planVm.patientId);
+				invoices.procedureId = Integer.parseInt(planVm.procedureId);
+				invoices.templateId = Integer.parseInt(planVm.templateId);
+				invoices.appointmentDate = planVm.patientAppointmentDate;
+				invoices.appointmentTime = planVm.patientAppointmentTime;
+				invoices.save();
+				
+			}else{
+				invoices = new Invoices();
+			}
+		   return ok(Json.toJson(planVm));
 		
 	}
 	
