@@ -3036,5 +3036,9 @@ public class Application extends Controller {
 	     return (deg * Math.PI / 180.0);
 	}
 
+	private static double rad2deg(double rad) {
+	     return (rad * 180.0 / Math.PI);
+	}
+
 }
 	
