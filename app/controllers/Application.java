@@ -4,7 +4,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +61,10 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
+import org.jboss.netty.handler.codec.http.multipart.FileUpload;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import play.Play;
 import play.api.mvc.MultipartFormData;
 import play.data.DynamicForm;
@@ -2945,6 +2953,87 @@ public class Application extends Controller {
 		file.delete();
 		uploadFile.delete();
 		return ok(Json.toJson("Success"));
+	}
+	
+	public static Result doctorList() throws IOException{
+		String userLat,userLong,userDistance;
+		userLat = URLDecoder.decode(request().getQueryString("user_lat"),"UTF-8");
+		userLong = URLDecoder.decode(request().getQueryString("user_long"),"UTF-8");
+		userDistance = URLDecoder.decode(request().getQueryString("user_distance"),"UTF-8");
+		System.out.println("User Lat= "+userLat);
+		System.out.println("User Long= "+userLong);
+		Double usrLat = Double.parseDouble(userLat);
+        Double usrLong = Double.parseDouble(userLong);
+        Double usrDistance = Double.parseDouble(userDistance);
+        List<Person> personList = Person.getDoctor("");
+        List<PatientsDoctor> patientDoctor = new ArrayList<>();
+		for(Person person : personList){
+			String api = "http://maps.googleapis.com/maps/api/geocode/json?address=" +person.location + "&sensor=false";
+			URL url = new URL(api);
+			StringBuilder jsonResults = new StringBuilder();
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.connect();
+			int responseCode = httpConnection.getResponseCode();
+			try{
+				if(responseCode == 200){
+					System.out.println("I am here");
+					 InputStreamReader in = new InputStreamReader(
+							 httpConnection.getInputStream());
+		                int read;
+		                char[] buff = new char[1024];
+		                while ((read = in.read(buff)) != -1) {
+		                    jsonResults.append(buff, 0, read);
+		                }
+		                JSONObject jsonObj = new JSONObject(jsonResults.toString());
+		                System.out.println("json object= "+jsonObj.toString());
+		                JSONArray resultJsonArray = jsonObj.getJSONArray("results");
+		                System.out.println("Size= "+resultJsonArray.length());
+		                JSONObject before_geometry_jsonObj = resultJsonArray
+		                        .getJSONObject(0);
+		                String addressString = before_geometry_jsonObj.getString("formatted_address");
+		                JSONObject geometry_jsonObj = before_geometry_jsonObj
+		                        .getJSONObject("geometry");
+		                JSONObject location_jsonObj = geometry_jsonObj
+		                        .getJSONObject("location");
+		                double lat = location_jsonObj.getDouble("lat");
+		                System.out.println("Lat= "+lat);
+		                double lng = location_jsonObj.getDouble("lng");
+		                System.out.println("Long= "+lng);
+		                Double calculateDistance = distance(usrLat,usrLong,lat,lng);
+		                System.out.println("Distance= "+calculateDistance);
+		                if(calculateDistance <= usrDistance){
+		                	PatientsDoctor doctor = new PatientsDoctor();
+		                	doctor.doctorId = person.doctor.toString();
+		                	doctor.name = person.name;
+		                	DoctorRegister d = DoctorRegister.getDoctorById(person.doctor);
+		                	doctor.speciality = d.speciality;
+		                	doctor.emailID = person.emailID;
+		                	doctor.mobileNumber = person.mobileNumber;
+		                	doctor.location = person.location;
+		                	doctor.type = 1;
+		                	doctor.gender = ""+person.gender;
+		                	patientDoctor.add(doctor);
+		                }
+		               
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return ok(Json.toJson(patientDoctor));
+	}
+	
+	private static double distance(double lat1, double lon1, double lat2, double lon2) {
+	        double theta = lon1 - lon2;
+	        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+	        dist = Math.acos(dist);
+	        dist = rad2deg(dist);
+	        dist = dist * 60 * 1.1515;
+	        return (dist);
+	}
+	
+    private static double deg2rad(double deg) {
+	     return (deg * Math.PI / 180.0);
 	}
 
 }

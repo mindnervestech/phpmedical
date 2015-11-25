@@ -81,6 +81,7 @@ POST    /profilePictureUpdateBase64         controllers.Application.profilePictu
 POST    /registerPicture                    controllers.Application.registerPicture()
 POST    /uploadFilesBase64                  controllers.Application.uploadFilesBase64()
 POST    /deleteFile                         controllers.Application.deleteFile()
+GET     /doctorList							controllers.Application.doctorList()
 
 
 #Doctors Urls

@@ -13,7 +13,8 @@ object ApplicationBuild extends Build {
     javaJdbc,
     javaEbean,
     "mysql" % "mysql-connector-java" % "5.1.18",
-    "com.feth" %% "play-easymail" % "0.3-SNAPSHOT"
+    "com.feth" %% "play-easymail" % "0.3-SNAPSHOT",
+    "org.json"%"org.json"%"chargebee-1.0"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
