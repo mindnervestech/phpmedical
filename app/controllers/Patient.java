@@ -892,7 +892,7 @@ public class Patient extends Controller {
 			clinic.isVisited = appointment.isVisited;
 			clinic.star = appointment.star;
 			clinic.reviews = appointment.reviews;
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 			clinic.appointmentDateIos = formatter.format(appointment.appointmentDate.getTime());
 			clinics.add(clinic);
 		}
@@ -909,7 +909,7 @@ public class Patient extends Controller {
 		vm.setPassword(person.password);
 		vm.setMobileNumber(""+person.mobileNumber);
 		vm.setGender(""+person.gender);
-		DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		vm.setDateOfBirth(""+df.format(person.dateOfBirth));
 		vm.setLocation(person.location);
 		vm.setBloodGroup(person.bloodGroup);
