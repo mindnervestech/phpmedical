@@ -39,6 +39,7 @@ import play.mvc.Result;
 import play.mvc.Http.MultipartFormData.FilePart;
 import viewmodel.AlarmReminderVM;
 import viewmodel.ClinicDoctorVM;
+import viewmodel.ClinicListVm;
 import viewmodel.DoctorClinicDetails;
 import viewmodel.FeedbackVM;
 import viewmodel.HomeCountPatientVM;
@@ -875,7 +876,27 @@ public class Patient extends Controller {
 					}
 				});
 
-		return ok(Json.toJson(clinicList));
+		List<ClinicListVm> clinics = new ArrayList<ClinicListVm>();
+		for(PatientClientBookAppointment appointment : clinicList){
+			ClinicListVm clinic = new ClinicListVm();
+			clinic.id = appointment.id;
+			clinic.doctorId = appointment.doctorId;
+			clinic.patientId = appointment.patientId;
+			clinic.clinicId = appointment.clinicId;
+			clinic.shift = appointment.shift;
+			clinic.bookTime = appointment.bookTime;
+			clinic.timeSlot = appointment.timeSlot;
+			clinic.appointmentDate = appointment.appointmentDate;
+			clinic.status = appointment.status;
+			clinic.visitType = appointment.visitType;
+			clinic.isVisited = appointment.isVisited;
+			clinic.star = appointment.star;
+			clinic.reviews = appointment.reviews;
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			clinic.appointmentDateIos = formatter.format(appointment.appointmentDate.getTime());
+			clinics.add(clinic);
+		}
+		return ok(Json.toJson(clinics));
 	}
 
 	public static Result getProfilePatient() throws IOException
