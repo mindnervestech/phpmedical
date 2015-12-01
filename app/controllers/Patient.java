@@ -909,7 +909,7 @@ public class Patient extends Controller {
 		vm.setPassword(person.password);
 		vm.setMobileNumber(""+person.mobileNumber);
 		vm.setGender(""+person.gender);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 		vm.setDateOfBirth(""+df.format(person.dateOfBirth));
 		vm.setLocation(person.location);
 		vm.setBloodGroup(person.bloodGroup);
