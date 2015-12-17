@@ -678,7 +678,7 @@ public class Patient extends Controller {
 		ReminderVM reminderVM = new ReminderVM();
 		reminderVM.id = reminderData.id;
 		reminderVM.doctorId = reminderData.doctorId;
-		reminderVM.patientId = Person.getPersonById(reminderData.patientId).emailID;
+		reminderVM.patientId = Person.getPatientsById(reminderData.patientId).emailID;
 		reminderVM.appointmentDate = reminderData.appointmentDate;
 		reminderVM.appointmentTime = reminderData.appointmentTime;
 		reminderVM.medicinName = reminderData.medicinName;
